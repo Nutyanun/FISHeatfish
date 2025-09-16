@@ -1,0 +1,83 @@
+[gd_scene load_steps=4 format=3 uid="uid://bcjj2ssuhcf86"]
+
+[ext_resource type="Texture2D" uid="uid://epmtjth3sj8c" path="res://scene/pixel_art_large.png" id="1_5uyae"]
+[ext_resource type="Texture2D" uid="uid://d1l1kk8c17fhp" path="res://scene/pearl.webp" id="2_ls46f"]
+[ext_resource type="Script" uid="uid://bfhnem5ly6srj" path="res://scene/Mook1.cs" id="3_htymy"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="bg" type="Sprite2D" parent="."]
+position = Vector2(577.87, 325.4)
+scale = Vector2(1.15826, 1.15461)
+texture = ExtResource("1_5uyae")
+
+[node name="mook2" type="Sprite2D" parent="bg"]
+position = Vector2(-167.38, 82.7985)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook3" type="Sprite2D" parent="bg"]
+position = Vector2(-233.859, 41.226)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook4" type="Sprite2D" parent="bg"]
+position = Vector2(-296.885, 88.8612)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook5" type="Sprite2D" parent="bg"]
+position = Vector2(-364.227, 47.2887)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook6" type="Sprite2D" parent="bg"]
+position = Vector2(120.12, 142.559)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook7" type="Sprite2D" parent="bg"]
+position = Vector2(32.9201, 139.961)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook8" type="Sprite2D" parent="bg"]
+position = Vector2(-43.056, 167.676)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook9" type="Sprite2D" parent="bg"]
+position = Vector2(-116.442, 133.898)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook10" type="Sprite2D" parent="bg"]
+position = Vector2(139.977, 55.9496)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook11" type="Sprite2D" parent="bg"]
+position = Vector2(79.5417, 6.58231)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook12" type="Sprite2D" parent="bg"]
+position = Vector2(3.5657, -27.1953)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook13" type="Sprite2D" parent="bg"]
+position = Vector2(-5.06793, -105.144)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook14" type="Sprite2D" parent="bg"]
+position = Vector2(66.5912, -157.11)
+scale = Vector2(0.117586, 0.128034)
+texture = ExtResource("2_ls46f")
+
+[node name="mook1" type="Sprite2D" parent="."]
+position = Vector2(156, 380)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("3_htymy")
