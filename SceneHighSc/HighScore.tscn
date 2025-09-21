@@ -1,0 +1,92 @@
+[gd_scene load_steps=10 format=3 uid="uid://c26e32jg8pegl"]
+
+[ext_resource type="Script" uid="uid://bknxiwb0wa4qh" path="res://SceneHighSc/HighScore.cs" id="1_dw5gy"]
+[ext_resource type="Texture2D" uid="uid://ejee8464wa76" path="res://SceneHighSc/เนเธ•เนเธ—เธฐเน€เธฅv2.png" id="2_oeidb"]
+[ext_resource type="Texture2D" uid="uid://dbudhnst5eses" path="res://SceneHighSc/return-Photoroom.png" id="3_mom7u"]
+[ext_resource type="Texture2D" uid="uid://bhn1yeorkgdyo" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Paper UI Pack/Plain/3 Item Holder/1.png" id="4_i45cl"]
+[ext_resource type="FontFile" uid="uid://nbiyo6o7uewn" path="res://SceneHighSc/Pixeboy.ttf" id="5_0t5tn"]
+[ext_resource type="Texture2D" uid="uid://bb0emn2jnuymn" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Paper UI Pack/Folding & Cutout/1 Paper/1.png" id="6_lvifv"]
+[ext_resource type="Texture2D" uid="uid://clokyn6o48a0y" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Content/6 Highlighter/1.png" id="7_i268c"]
+[ext_resource type="Texture2D" uid="uid://y72lb30yex54" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Content/6 Highlighter/2.png" id="8_5q86q"]
+[ext_resource type="Texture2D" uid="uid://dfq3xjf2dmsr1" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Content/6 Highlighter/3.png" id="9_8ud3t"]
+
+[node name="Highscore" type="Node2D"]
+script = ExtResource("1_dw5gy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(578, 328)
+scale = Vector2(1.60446, 1.60396)
+texture = ExtResource("2_oeidb")
+
+[node name="TextureButton" type="TextureButton" parent="Sprite2D"]
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -358.377
+offset_top = -97.8827
+offset_right = -977.377
+offset_bottom = 0.117279
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("3_mom7u")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="TextureRect" type="TextureRect" parent="Sprite2D"]
+offset_left = -206.0
+offset_top = -208.0
+offset_right = 234.0
+offset_bottom = -70.0
+texture = ExtResource("4_i45cl")
+expand_mode = 5
+flip_h = true
+flip_v = true
+
+[node name="Label" type="Label" parent="."]
+offset_left = 382.0
+offset_top = 81.0
+offset_right = 803.0
+offset_bottom = 139.0
+theme_override_colors/font_color = Color(0.101961, 0.137255, 0.494118, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.993203, 0.982674, 0.997393, 1)
+theme_override_fonts/font = ExtResource("5_0t5tn")
+theme_override_font_sizes/font_size = 100
+text = "HIGHSCORE"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+text_overrun_behavior = 4
+uppercase = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_left = 194.0
+offset_top = 217.0
+offset_right = 1000.0
+offset_bottom = 596.0
+texture = ExtResource("6_lvifv")
+flip_v = true
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+offset_left = 173.0
+offset_top = 205.0
+offset_right = 293.0
+offset_bottom = 304.0
+texture = ExtResource("7_i268c")
+
+[node name="TextureRect3" type="TextureRect" parent="."]
+offset_left = 894.0
+offset_top = 197.0
+offset_right = 1013.0
+offset_bottom = 314.0
+texture = ExtResource("8_5q86q")
+
+[node name="TextureRect4" type="TextureRect" parent="."]
+offset_left = 905.0
+offset_top = 504.0
+offset_right = 1021.0
+offset_bottom = 623.0
+texture = ExtResource("9_8ud3t")
+
+[connection signal="pressed" from="Sprite2D/TextureButton" to="." method="_on_texture_button_pressed"]

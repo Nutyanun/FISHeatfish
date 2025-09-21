@@ -1,0 +1,39 @@
+[gd_scene load_steps=4 format=3 uid="uid://bu0oyi3tyr6hy"]
+
+[ext_resource type="Script" uid="uid://ctj64ddfk5bb2" path="res://SceneStartandHigh/StartGame.cs" id="1_vrmn8"]
+[ext_resource type="FontFile" uid="uid://d01rcsesfvm8g" path="res://SceneStartandHigh/Pixeboy.ttf" id="2_vrmn8"]
+[ext_resource type="Texture2D" uid="uid://bkihpikbx4ay4" path="res://SceneStartandHigh/sea3.png" id="2_xaedw"]
+
+[node name="StartGame" type="Node2D"]
+script = ExtResource("1_vrmn8")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(575, 325.811)
+scale = Vector2(0.750577, 0.637088)
+texture = ExtResource("2_xaedw")
+
+[node name="StartButton" type="Button" parent="Sprite2D"]
+offset_left = -161.951
+offset_top = 172.68
+offset_right = 149.049
+offset_bottom = 238.68
+theme_override_colors/font_color = Color(0.941847, 0.796214, 0, 1)
+theme_override_fonts/font = ExtResource("2_vrmn8")
+theme_override_font_sizes/font_size = 100
+text = "START"
+flat = true
+text_overrun_behavior = 4
+autowrap_mode = 3
+
+[node name="HighscButton" type="Button" parent="Sprite2D"]
+offset_left = -247.219
+offset_top = 237.006
+offset_right = 222.781
+offset_bottom = 328.006
+theme_override_colors/font_color = Color(0.101961, 0.137255, 0.494118, 1)
+theme_override_fonts/font = ExtResource("2_vrmn8")
+theme_override_font_sizes/font_size = 95
+text = "HIGHSCORE"
+flat = true
+text_overrun_behavior = 4
+autowrap_mode = 3

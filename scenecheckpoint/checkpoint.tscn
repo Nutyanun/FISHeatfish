@@ -1,0 +1,134 @@
+[gd_scene load_steps=10 format=3 uid="uid://bcjj2ssuhcf86"]
+
+[ext_resource type="Texture2D" uid="uid://epmtjth3sj8c" path="res://scenecheckpoint/pixel_art_large.png" id="1_5uyae"]
+[ext_resource type="Script" uid="uid://m4grem1elxpu" path="res://scriptlink/CheckpointManager.cs" id="1_sk1eg"]
+[ext_resource type="Texture2D" uid="uid://d1l1kk8c17fhp" path="res://scenecheckpoint/pearl.webp" id="2_ls46f"]
+[ext_resource type="Script" uid="uid://gx0wa5vqq3tx" path="res://scriptlink/Level.cs" id="4_sk1eg"]
+[ext_resource type="Script" uid="uid://yjoibvi3vn5g" path="res://scenecheckpoint/Resetcheckpoint.cs" id="5_230tk"]
+[ext_resource type="FontFile" uid="uid://bqb3tid7kns2e" path="res://Font/Silkscreen/slkscrb.ttf" id="5_pxyni"]
+[ext_resource type="Texture2D" uid="uid://d3ypvwjgv2law" path="res://scenecheckpoint/gobackbutton.png" id="7_oisqg"]
+[ext_resource type="Script" uid="uid://gcp7aypxx1w5" path="res://scenecheckpoint/Gobackstartgame.cs" id="8_ddha4"]
+
+[sub_resource type="Theme" id="Theme_oisqg"]
+default_font = ExtResource("5_pxyni")
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_sk1eg")
+
+[node name="bg" type="Sprite2D" parent="."]
+position = Vector2(577.87, 325.4)
+scale = Vector2(1.15826, 1.15461)
+texture = ExtResource("1_5uyae")
+
+[node name="level1" type="Sprite2D" parent="."]
+position = Vector2(156, 380)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+
+[node name="level2" type="Sprite2D" parent="."]
+position = Vector2(234, 428)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 2
+
+[node name="level3" type="Sprite2D" parent="."]
+position = Vector2(307, 373)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 3
+
+[node name="level4" type="Sprite2D" parent="."]
+position = Vector2(384, 421)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 4
+
+[node name="level5" type="Sprite2D" parent="."]
+position = Vector2(443, 480)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 5
+
+[node name="level6" type="Sprite2D" parent="."]
+position = Vector2(528, 519)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 6
+
+[node name="level7" type="Sprite2D" parent="."]
+position = Vector2(616, 487)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 7
+
+[node name="level8" type="Sprite2D" parent="."]
+position = Vector2(717, 490)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 8
+
+[node name="level9" type="Sprite2D" parent="."]
+position = Vector2(740, 390)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 9
+
+[node name="level10" type="Sprite2D" parent="."]
+position = Vector2(670, 333)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+LevelNumber = 10
+
+[node name="level11" type="Sprite2D" parent="."]
+position = Vector2(582, 294)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+
+[node name="level12" type="Sprite2D" parent="."]
+position = Vector2(572, 204)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+
+[node name="level13" type="Sprite2D" parent="."]
+position = Vector2(655, 143.999)
+scale = Vector2(0.136195, 0.147829)
+texture = ExtResource("2_ls46f")
+script = ExtResource("4_sk1eg")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="resetcheckpoint" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 588.0
+offset_right = 233.0
+offset_bottom = 619.0
+theme = SubResource("Theme_oisqg")
+text = "Reset checkpoint"
+script = ExtResource("5_230tk")
+
+[node name="gobackstartgame" type="TextureButton" parent="Control"]
+layout_mode = 0
+offset_left = 1038.0
+offset_top = 544.0
+offset_right = 1678.0
+offset_bottom = 1184.0
+scale = Vector2(0.175287, 0.178128)
+texture_normal = ExtResource("7_oisqg")
+script = ExtResource("8_ddha4")
