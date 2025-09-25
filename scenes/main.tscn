@@ -1,0 +1,208 @@
+[gd_scene load_steps=23 format=3 uid="uid://fw7v7jnwb250"]
+
+[ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
+[ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish1.tscn" id="2_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://65d7a5r4eqfe" path="res://scenes/fish2.tscn" id="3_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="4_tefeu"]
+[ext_resource type="PackedScene" uid="uid://cckise0dr8nnj" path="res://scenes/shark.tscn" id="5_o6xl0"]
+[ext_resource type="PackedScene" uid="uid://cjlwti2qyeaf6" path="res://scenes/Player.tscn" id="5_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://c7u54uhfrpmcj" path="res://scenes/bg.tscn" id="8_tipki"]
+[ext_resource type="FontFile" uid="uid://bc6cd5qpcylc6" path="res://BoldPixels/BoldPixels.otf" id="10_choun"]
+[ext_resource type="Script" uid="uid://c82ve4r8igw6p" path="res://scripts/Hud.cs" id="10_eb6dy"]
+[ext_resource type="Script" uid="uid://dst8ehoc1274i" path="res://scripts/ScoreManager.cs" id="10_ya4ey"]
+[ext_resource type="Script" uid="uid://clrin8jr56gc8" path="res://scripts/PauseUi.cs" id="12_eb6dy"]
+[ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
+[ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
+[ext_resource type="Texture2D" uid="uid://k71pn3nnxtf7" path="res://Buttons/f/freeversion (1).png" id="15_muem4"]
+[ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ya4ey"]
+font = ExtResource("10_choun")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_eb6dy"]
+font = ExtResource("10_choun")
+font_size = 40
+
+[sub_resource type="LabelSettings" id="LabelSettings_trceg"]
+font = ExtResource("10_choun")
+font_size = 40
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a8y0u"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_jkv2x"]
+font = ExtResource("10_choun")
+font_size = 75
+
+[sub_resource type="LabelSettings" id="LabelSettings_jbj1t"]
+font = ExtResource("10_choun")
+font_size = 45
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_choun")
+
+[node name="FishSpawner" type="Node2D" parent="."]
+position = Vector2(-1, 0)
+script = ExtResource("1_o5qli")
+FishScenes = Array[PackedScene]([ExtResource("2_jyhfs"), ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_o6xl0")])
+Weights = PackedFloat32Array(1, 4, 2, 0.5)
+
+[node name="Player" parent="." instance=ExtResource("5_tbgi4")]
+
+[node name="BG" parent="." instance=ExtResource("8_tipki")]
+
+[node name="ScoreManager" type="Node2D" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+position = Vector2(-1, 0)
+script = ExtResource("10_ya4ey")
+
+[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel")]
+unique_name_in_owner = true
+process_mode = 3
+script = ExtResource("10_eb6dy")
+ScoreLabel = NodePath("ScoreLabel")
+LivesLabel = NodePath("LivesLabel")
+LevelLabel = NodePath("LevelLabel")
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+offset_left = 73.0
+offset_top = 17.0
+offset_right = 340.0
+offset_bottom = 57.0
+text = "Score : 0 / 50"
+label_settings = SubResource("LabelSettings_ya4ey")
+
+[node name="LevelLabel" type="Label" parent="HUD"]
+offset_left = 815.0
+offset_top = 20.0
+offset_right = 979.0
+offset_bottom = 60.0
+text = "Level : 1"
+label_settings = SubResource("LabelSettings_eb6dy")
+
+[node name="LivesLabel" type="Label" parent="HUD"]
+offset_left = 513.0
+offset_top = 23.0
+offset_right = 677.0
+offset_bottom = 63.0
+text = "Lives : 3"
+label_settings = SubResource("LabelSettings_trceg")
+
+[node name="GameOverLabel" type="Panel" parent="HUD"]
+unique_name_in_owner = true
+process_mode = 3
+visible = false
+z_index = 1000
+offset_left = 351.0
+offset_top = 274.0
+offset_right = 816.0
+offset_bottom = 394.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_a8y0u")
+
+[node name="Center" type="CenterContainer" parent="HUD/GameOverLabel"]
+process_mode = 3
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="rood" type="VBoxContainer" parent="HUD/GameOverLabel/Center"]
+process_mode = 3
+z_index = 1000
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/GameOverLabel/Center/rood"]
+layout_mode = 2
+text = "GAME OVER"
+label_settings = SubResource("LabelSettings_jkv2x")
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="HUD/GameOverLabel/Center/rood"]
+layout_mode = 2
+text = "Press Enter to retry"
+label_settings = SubResource("LabelSettings_jbj1t")
+
+[node name="Buttons" type="HBoxContainer" parent="HUD/GameOverLabel/Center/rood"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Retry" type="Button" parent="HUD/GameOverLabel/Center/rood/Buttons"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Retry"
+
+[node name="Quit" type="Button" parent="HUD/GameOverLabel/Center/rood/Buttons"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Quit"
+icon_alignment = 1
+
+[node name="PauseUI" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 100
+script = ExtResource("12_eb6dy")
+
+[node name="Panel" type="Control" parent="PauseUI"]
+process_mode = 3
+z_index = 100
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+grow_horizontal = 0
+
+[node name="MenuButton" type="Button" parent="PauseUI/Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -1.833
+anchor_right = -1.833
+offset_left = -134.0
+offset_top = 12.0
+offset_right = -63.0
+offset_bottom = 83.0
+action_mode = 0
+icon = ExtResource("13_trceg")
+flat = true
+icon_alignment = 1
+
+[node name="SubMenu" type="VBoxContainer" parent="PauseUI/Panel"]
+process_mode = 3
+visible = false
+z_index = 110
+layout_mode = 1
+anchors_preset = -1
+offset_left = -134.68
+offset_top = 12.0
+offset_right = -13.68
+offset_bottom = 233.0
+
+[node name="ResumeButton" type="Button" parent="PauseUI/Panel/SubMenu"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+text = "Resume"
+icon = ExtResource("14_jbj1t")
+flat = true
+
+[node name="QuitToMenuButton" type="Button" parent="PauseUI/Panel/SubMenu"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+text = "Menu"
+icon = ExtResource("15_muem4")
+flat = true
+
+[node name="QuitGameButton" type="Button" parent="PauseUI/Panel/SubMenu"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+text = "Quit"
+icon = ExtResource("16_dp3eg")
+flat = true
+
+[connection signal="GameOver" from="ScoreManager" to="HUD" method="ShowGameOver"]
+[connection signal="LevelChanged" from="ScoreManager" to="HUD" method="UpdateLevel"]
+[connection signal="LivesChanged" from="ScoreManager" to="HUD" method="UpdateLives"]
+[connection signal="ScoreChanged" from="ScoreManager" to="HUD" method="UpdateScore"]

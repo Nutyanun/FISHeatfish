@@ -1,0 +1,62 @@
+[gd_scene load_steps=9 format=3 uid="uid://c6scf1upnwqly"]
+
+[ext_resource type="Script" uid="uid://dk50rkr56pbfv" path="res://scripts/Fish.cs" id="1_ngq1a"]
+[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://SpearFishing Assets Pack/Sprites/JellyFish - 32x16/JellyFish.png" id="3_ngq1a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w4qb2"]
+atlas = ExtResource("3_ngq1a")
+region = Rect2(0, 0, 32, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bhfbd"]
+atlas = ExtResource("3_ngq1a")
+region = Rect2(32, 0, 32, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mkrf7"]
+atlas = ExtResource("3_ngq1a")
+region = Rect2(64, 0, 32, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i1kv6"]
+atlas = ExtResource("3_ngq1a")
+region = Rect2(96, 0, 32, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2rvw7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w4qb2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bhfbd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mkrf7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i1kv6")
+}],
+"loop": true,
+"name": &"pink",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8srm5"]
+size = Vector2(109.625, 75.25)
+
+[node name="Fish1" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1_ngq1a")
+Speed = 100.0
+Points = 10
+RequiredScore = 20
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(142, 121)
+scale = Vector2(4.5, 4.5)
+sprite_frames = SubResource("SpriteFrames_2rvw7")
+animation = &"pink"
+autoplay = "pink"
+frame_progress = 0.452758
+
+[node name="CollisionShape2D_pink" type="CollisionShape2D" parent="."]
+position = Vector2(146.188, 123.375)
+shape = SubResource("RectangleShape2D_8srm5")
