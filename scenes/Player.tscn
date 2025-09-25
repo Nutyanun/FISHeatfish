@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dt7277imqp2bs" path="res://SpearFishing Assets Pack/Sprites/Fish1 - 16x16/Orange.png" id="2_yluv2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yluv2"]
-radius = 7.28011
+radius = 25.318
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jgys2"]
 size = Vector2(46, 52)
@@ -251,7 +251,7 @@ collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MouthArea"]
-position = Vector2(-376, -48)
+position = Vector2(-399, -54)
 shape = SubResource("CircleShape2D_yluv2")
 
 [node name="HurtArea" type="Area2D" parent="."]
@@ -265,7 +265,7 @@ position = Vector2(-399, -55)
 shape = SubResource("RectangleShape2D_jgys2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(-401, -56)
+position = Vector2(-400, -56)
 scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_jy2vl")
 autoplay = "default"

@@ -12,10 +12,9 @@ public partial class Player : CharacterBody2D
 	[Export] public string SwimAnimation = "swim";
 	[Export] public string BiteAnimation = "bite";
 
-	// ตั้งชื่อโหนดให้ตรงกับที่อยู่ใน Player.tscn
 	[Export] public NodePath AnimatedSpritePath { get; set; } = "AnimatedSprite2D";
-	[Export] public NodePath MouthAreaPath     { get; set; } = "MouthArea"; // พื้นที่ "งับ"
-	[Export] public NodePath HurtAreaPath      { get; set; } = "HurtArea";  // พื้นที่ "โดนตัว"
+	[Export] public NodePath MouthAreaPath     { get; set; } = "MouthArea";
+	[Export] public NodePath HurtAreaPath      { get; set; } = "HurtArea";
 
 	[Export] public bool  ClampToViewport = false;
 	[Export] public float ClampMargin     = 8f;
@@ -25,10 +24,8 @@ public partial class Player : CharacterBody2D
 	private Area2D _hurtArea;
 	private float _biteTimer;
 
-	// เก็บ Fish ที่อยู่ในปาก
 	private readonly HashSet<Fish> _targetsInMouth = new();
 
-	// ===== helper หา ScoreManager แบบกันพลาด =====
 	private ScoreManager GetSM()
 	{
 		return
@@ -37,7 +34,6 @@ public partial class Player : CharacterBody2D
 			GetNodeOrNull<ScoreManager>("/root/ScoreManager");
 	}
 
-	// ===== helper แปลง Node/Area2D -> Fish =====
 	private Fish ResolveFish(Node n)
 	{
 		if (n is Fish f) return f;
@@ -60,7 +56,6 @@ public partial class Player : CharacterBody2D
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(SwimAnimation) == true)
 			_anim.Play(SwimAnimation);
 
-		// พื้นที่ "งับ"
 		if (_mouthArea != null)
 		{
 			_mouthArea.Monitoring  = true;
@@ -73,7 +68,6 @@ public partial class Player : CharacterBody2D
 			_mouthArea.AreaExited  += area => { if (TryGetFish(area, out var fish)) _targetsInMouth.Remove(fish); };
 		}
 
-		// พื้นที่ "โดนตัว"
 		if (_hurtArea != null)
 		{
 			_hurtArea.Monitoring  = true;
@@ -87,7 +81,7 @@ public partial class Player : CharacterBody2D
 	public override void _PhysicsProcess(double delta)
 	{
 		var sm = GetSM();
-		if (sm != null && sm.IsGameOver) return;
+		if (sm != null && (sm.IsLevelCleared || sm.IsGameOver)) return;
 
 		Vector2 input = GetMoveInput();
 		Vector2 targetVel = input * MaxSpeed;
@@ -116,11 +110,10 @@ public partial class Player : CharacterBody2D
 		return v == Vector2.Zero ? v : v.Normalized();
 	}
 
-	// ===== งับเพื่อกิน (ต้องกดปุ่ม) =====
 	private void TryBite()
 	{
 		var sm = GetSM();
-		if (sm != null && sm.IsGameOver) return;
+		if (sm != null && (sm.IsLevelCleared || sm.IsGameOver)) return;
 
 		if (_biteTimer > 0f) return;
 		_biteTimer = BiteCooldown;
@@ -133,37 +126,35 @@ public partial class Player : CharacterBody2D
 		{
 			if (!IsInstanceValid(fish)) { _targetsInMouth.Remove(fish); continue; }
 
-			// คะแนนไม่ถึงปลาตัวนี้ → ตาย
 			if (sm != null && sm.Score < fish.RequiredScore)
 			{
 				GD.Print($"[Player] Too small to bite {fish.Name}: need {fish.RequiredScore}, have {sm.Score} → DIE");
-				sm.PlayerDied();
+				sm.LoseLife(1);
 				return;
 			}
 
-			// กินได้ → บวกคะแนน
-			sm?.Add(fish.Points);
+			sm?.AddScore(fish.Points);
 			GD.Print($"[Player] Eat {fish.Name}, +{fish.Points}");
 
 			fish.QueueFree();
 			_targetsInMouth.Remove(fish);
-			break; // งับครั้งเดียวกิน 1 ตัว
+			break;
 		}
 
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(SwimAnimation) == true)
 			_anim.Play(SwimAnimation);
 	}
 
-	// ===== โดนตัวปลาใหญ่เมื่อไหร่ ตายทันที (ไม่ต้องกด) =====
 	private void CheckDeathOnTouch(Fish fish)
 	{
 		var sm = GetSM();
-		if (sm == null || sm.IsGameOver) return;
+		if (sm == null || sm.IsLevelCleared || sm.IsGameOver) return;
+		if (!IsInstanceValid(fish)) return;
 
 		if (sm.Score < fish.RequiredScore)
 		{
 			GD.Print($"[Player] Touch big {fish.Name}: need {fish.RequiredScore}, have {sm.Score} → DIE");
-			sm.PlayerDied();
+			sm.LoseLife(1);
 		}
 	}
 
