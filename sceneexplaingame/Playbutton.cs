@@ -14,6 +14,6 @@ public partial class Playbutton : TextureButton
 	private void OnExitButtonPressed()
 	{
 		GD.Print("exit button pressed!");
-		GetTree().ChangeSceneToFile($"res://sceneplaying/playing{LevelNumber}.tscn");
+		GetTree().ChangeSceneToFile("res://scenes/main.tscn");
 	}
 }

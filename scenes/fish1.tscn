@@ -47,7 +47,7 @@ collision_layer = 2
 script = ExtResource("1_ngq1a")
 Speed = 100.0
 Points = 10
-RequiredScore = 20
+RequiredScore = 15
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(142, 121)

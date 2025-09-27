@@ -9,5 +9,5 @@
 [node name="FishSpawner" type="Node2D"]
 script = ExtResource("1_isa6r")
 FishScenes = Array[PackedScene]([ExtResource("2_vblnl"), ExtResource("3_br7ep"), ExtResource("4_ox20s"), ExtResource("5_br7ep")])
-Weights = PackedFloat32Array(1, 3, 1.5, 0.5)
-MaxFish = 30
+Weights = PackedFloat32Array(4, 10, 4.5, 3)
+MaxFish = 55
