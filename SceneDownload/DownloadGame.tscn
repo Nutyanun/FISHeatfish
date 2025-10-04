@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://bnsre4dxex3i3"]
 
-[ext_resource type="Script" uid="uid://byjmcd7j63hv7" path="res://SceneDownload/DownloadGame.cs" id="1_53fhd"]
+[ext_resource type="Script" uid="uid://byjmcd7j63hv7" path="res://Script/DownloadGame.cs" id="1_53fhd"]
 [ext_resource type="Texture2D" uid="uid://dt0o3prhbe1wy" path="res://SceneDownload/sea1.png" id="2_g0nyw"]
 [ext_resource type="FontFile" uid="uid://doguki6q6pi6q" path="res://SceneDownload/Pixeboy.ttf" id="3_dnjup"]
 [ext_resource type="Texture2D" uid="uid://b8cgtjinilmom" path="res://SceneDownload/mermaid.png" id="3_g0nyw"]
@@ -77,12 +77,12 @@ scale = Vector2(0.186523, 0.152344)
 texture = ExtResource("9_bbht7")
 
 [node name="H" type="Sprite2D" parent="TextureRect"]
-position = Vector2(417, 657)
-scale = Vector2(0.219971, 0.140869)
+position = Vector2(426, 698)
+scale = Vector2(0.21679688, 0.18164064)
 texture = ExtResource("10_0qqys")
 
 [node name="U2" type="Sprite2D" parent="TextureRect"]
-position = Vector2(568, 664)
+position = Vector2(568, 680.00006)
 scale = Vector2(0.181641, 0.149414)
 texture = ExtResource("3_ne7mo")
 
