@@ -91,34 +91,38 @@ public partial class ScoreManager : Node2D
 			DoGameOver();
 	}
 
-	// เรียกเมื่อกินปลา 1 ตัว
 	public void AddScore(int basePoints)
 	{
-		if (IsGameOver || IsLevelCleared) return;
+	if (IsGameOver || IsLevelCleared) return;
 
-		_fishInWindow++;
-		int gained = basePoints * Mult;
+	_fishInWindow++;
+	int gained = basePoints * Mult;
 
-		LevelScore += gained;
-		TotalScore += gained;
+	LevelScore += gained;
+	TotalScore += gained;
 
-		if (TotalScore > HighScore)
-		{
-			HighScore = TotalScore;
-			SaveHighScore();
-		}
-
-		EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
-		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
-		EmitSignal(SignalName.MultiplierChanged, Mult, _fishInWindow, FishPerStep, _windowLeft);
-
-		if (LevelScore >= TargetScore && !IsLevelCleared)
-		{
-			IsLevelCleared = true;
-			EmitSignal(SignalName.LevelCleared, LevelScore, Level);
-			GetTree().Paused = true;
-		}
+	if (TotalScore > HighScore)
+	{
+		HighScore = TotalScore;
+		SaveHighScore();
 	}
+
+	EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
+	EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
+	EmitSignal(SignalName.MultiplierChanged, Mult, _fishInWindow, FishPerStep, _windowLeft);
+
+	// ✅ เปลี่ยนส่วนนี้
+	if (LevelScore >= TargetScore)
+	{
+		// แค่แจ้งว่าแต้มถึงเป้า แต่ยังไม่จบ
+		GD.Print($"[ScoreManager] Target reached ({LevelScore}/{TargetScore}) — continue until time runs out!");
+		// สามารถใส่เอฟเฟกต์หรือเสียงเฉลิมฉลองได้ เช่น:
+		// GetNode<AudioStreamPlayer>("SfxTarget").Play();
+	}
+
+	// ❌ ไม่ emit LevelCleared และไม่ pause เกมที่นี่
+	}
+
 
 	public void LoseLife(int amount = 1)
 	{
@@ -134,12 +138,21 @@ public partial class ScoreManager : Node2D
 
 	private void DoGameOver()
 	{
-		if (IsGameOver) return;
-		IsGameOver = true;
-		SaveHighScore();
-		EmitSignal(SignalName.GameOver, LevelScore, Level);
-		GetTree().Paused = true;
+	if (IsGameOver) return;
+	IsGameOver = true;
+	SaveHighScore();
+
+	// ถ้าผู้เล่นได้แต้มถึงเป้า → ถือว่าผ่านด่าน
+	if (LevelScore >= TargetScore)
+	{
+		GameProgress.Advance();   // ปลดล็อกด่านต่อไป
+		GD.Print("[ScoreManager] Level complete! Unlocked next checkpoint.");
 	}
+
+	EmitSignal(SignalName.GameOver, LevelScore, Level);
+	GetTree().Paused = true;
+	}
+
 
 	public void ResetForNewLevel(int newLevel, int newTarget, int lives)
 	{

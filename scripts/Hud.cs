@@ -2,6 +2,7 @@ using Godot;
 
 public partial class Hud : CanvasLayer
 {
+	[Export] public int LevelNumber = 1;
 	[Export] public Label ScoreLabel { get; set; }
 	[Export] public Label LivesLabel { get; set; }
 	[Export] public Label LevelLabel { get; set; }
@@ -183,7 +184,7 @@ public partial class Hud : CanvasLayer
 		GetTree().Paused = false;
 		HideOverlay();
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-		GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
+		GetTree().ChangeSceneToFile($"res://scenescore/score{LevelNumber}.tscn");
 	}
 
 	public override void _UnhandledInput(InputEvent e)
