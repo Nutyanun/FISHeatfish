@@ -49,4 +49,11 @@ public partial class CheckpointManager : Node2D
 		string digits = new string(name.Where(char.IsDigit).ToArray());
 		return string.IsNullOrEmpty(digits) ? 0 : int.Parse(digits);
 	}
+	
+	public void Refresh()
+	{
+	GameProgress.Load();
+	UpdateLevelVisual();
+	}
+
 }

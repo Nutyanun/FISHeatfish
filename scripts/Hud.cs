@@ -12,6 +12,7 @@ public partial class Hud : CanvasLayer
 	[Export] public Label MultiplierLabel { get; set; }
 	[Export] public Label TimerLabel { get; set; }
 
+
 	// Overlay ใช้ทั้ง Level Clear และ Game Over
 	private Control _overlay;
 	private Label _title;
@@ -180,11 +181,38 @@ public partial class Hud : CanvasLayer
 
 	private async void OnQuitPressed()
 	{
-		GD.Print("[HUD] Quit pressed");
-		GetTree().Paused = false;
-		HideOverlay();
-		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-		GetTree().ChangeSceneToFile($"res://scenescore/score{LevelNumber}.tscn");
+	GD.Print("[HUD] Quit pressed");
+	GetTree().Paused = false;
+	HideOverlay();
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+	// หา ScoreManager มาเช็กสถานะเกม
+	var sm = GetNodeOrNull<ScoreManager>("%ScoreManager") 
+			 ?? GetNodeOrNull<ScoreManager>("ScoreManager");
+
+	if (sm != null)
+	{
+		if (sm.IsLevelCleared)
+		{
+			// ชนะ → ไปหน้า score
+			GetTree().ChangeSceneToFile($"res://scenescore/score{LevelNumber}.tscn");
+		}
+		else if (sm.IsGameOver)
+		{
+			// แพ้ → ไปหน้า checkpoint
+			GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
+		}
+		else
+		{
+			// เผื่อกรณีอื่น ๆ (เช่น pause ระหว่างเล่น)
+			GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
+		}
+	}
+	else
+	{
+		// ถ้าหา ScoreManager ไม่เจอ ก็กลับ checkpoint ไปก่อนเลย
+		GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
+	}
 	}
 
 	public override void _UnhandledInput(InputEvent e)

@@ -111,7 +111,7 @@ public partial class ScoreManager : Node2D
 	EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
 	EmitSignal(SignalName.MultiplierChanged, Mult, _fishInWindow, FishPerStep, _windowLeft);
 
-	// ✅ เปลี่ยนส่วนนี้
+	// เปลี่ยนส่วนนี้
 	if (LevelScore >= TargetScore)
 	{
 		// แค่แจ้งว่าแต้มถึงเป้า แต่ยังไม่จบ
@@ -120,7 +120,7 @@ public partial class ScoreManager : Node2D
 		// GetNode<AudioStreamPlayer>("SfxTarget").Play();
 	}
 
-	// ❌ ไม่ emit LevelCleared และไม่ pause เกมที่นี่
+	//  ไม่ emit LevelCleared และไม่ pause เกมที่นี่
 	}
 
 
@@ -141,18 +141,19 @@ public partial class ScoreManager : Node2D
 	if (IsGameOver) return;
 	IsGameOver = true;
 	SaveHighScore();
+	
+	GameProgress.LastLevelScore = LevelScore;
 
 	// ถ้าผู้เล่นได้แต้มถึงเป้า → ถือว่าผ่านด่าน
 	if (LevelScore >= TargetScore)
 	{
+		IsLevelCleared = true;
 		GameProgress.Advance();   // ปลดล็อกด่านต่อไป
 		GD.Print("[ScoreManager] Level complete! Unlocked next checkpoint.");
 	}
-
 	EmitSignal(SignalName.GameOver, LevelScore, Level);
 	GetTree().Paused = true;
 	}
-
 
 	public void ResetForNewLevel(int newLevel, int newTarget, int lives)
 	{

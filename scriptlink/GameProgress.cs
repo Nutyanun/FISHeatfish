@@ -4,8 +4,9 @@ using System.Text.Json;
 
 public partial class GameProgress : Node
 {
-	public static int CurrentLevelIndex = 0;   // ใช้ปลดล็อกเลเวล
-	public static int CurrentPlayingLevel = 0; // ใช้จำว่าเพิ่งเล่นเลเวลไหนอยู่
+	public static int CurrentLevelIndex = 1;   // ใช้ปลดล็อกเลเวล
+	public static int CurrentPlayingLevel = 1; // ใช้จำว่าเพิ่งเล่นเลเวลไหนอยู่
+	public static int LastLevelScore = 0;  // คะแนนล่าสุดที่เพิ่งเล่นจบ
 
 	private static readonly string SavePath = "user://savegame.json";
 
