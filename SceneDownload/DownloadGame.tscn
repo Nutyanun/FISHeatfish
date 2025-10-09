@@ -1,0 +1,143 @@
+[gd_scene load_steps=14 format=3 uid="uid://bnsre4dxex3i3"]
+
+[ext_resource type="Script" uid="uid://byjmcd7j63hv7" path="res://Script/DownloadGame.cs" id="1_53fhd"]
+[ext_resource type="Texture2D" uid="uid://dt0o3prhbe1wy" path="res://SceneDownload/sea1.png" id="2_g0nyw"]
+[ext_resource type="FontFile" uid="uid://doguki6q6pi6q" path="res://SceneDownload/Pixeboy.ttf" id="3_dnjup"]
+[ext_resource type="Texture2D" uid="uid://b8cgtjinilmom" path="res://SceneDownload/mermaid.png" id="3_g0nyw"]
+[ext_resource type="Texture2D" uid="uid://c00ve02ccivq2" path="res://SceneDownload/Char/U.png" id="3_ne7mo"]
+[ext_resource type="Texture2D" uid="uid://dwfxyvfpyxsrq" path="res://SceneDownload/Char/N.png" id="4_nl3y3"]
+[ext_resource type="Texture2D" uid="uid://bk683mfkum1mm" path="res://SceneDownload/Char/D.png" id="5_6d8tm"]
+[ext_resource type="Texture2D" uid="uid://bufsx4h5md8mx" path="res://SceneDownload/Char/E.png" id="6_wcvmf"]
+[ext_resource type="Texture2D" uid="uid://doeb6m2ecx2j6" path="res://SceneDownload/Char/R.png" id="7_hk7a3"]
+[ext_resource type="Texture2D" uid="uid://se7msp1eqy65" path="res://SceneDownload/Char/S.png" id="8_oc7w8"]
+[ext_resource type="Texture2D" uid="uid://dgeq41us4y4s3" path="res://SceneDownload/Char/A.png" id="9_bbht7"]
+[ext_resource type="Texture2D" uid="uid://boi5lf6odawhx" path="res://SceneDownload/Char/H.png" id="10_0qqys"]
+[ext_resource type="Texture2D" uid="uid://u71hplqe7aex" path="res://SceneDownload/Char/T.png" id="11_6ecge"]
+
+[node name="DownloadGame" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_53fhd")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -305.0
+offset_top = -354.0
+offset_right = 79.0
+offset_bottom = 22.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_g0nyw")
+
+[node name="U1" type="Sprite2D" parent="TextureRect"]
+position = Vector2(405, 482)
+scale = Vector2(0.178467, 0.138062)
+texture = ExtResource("3_ne7mo")
+
+[node name="N1" type="Sprite2D" parent="TextureRect"]
+position = Vector2(543, 505)
+scale = Vector2(0.176758, 0.14209)
+texture = ExtResource("4_nl3y3")
+
+[node name="D" type="Sprite2D" parent="TextureRect"]
+position = Vector2(681, 484)
+scale = Vector2(0.17041, 0.147949)
+texture = ExtResource("5_6d8tm")
+
+[node name="E1" type="Sprite2D" parent="TextureRect"]
+position = Vector2(806, 456)
+scale = Vector2(0.179688, 0.15625)
+texture = ExtResource("6_wcvmf")
+
+[node name="R1" type="Sprite2D" parent="TextureRect"]
+position = Vector2(951.375, 448.484)
+scale = Vector2(0.19486, 0.160412)
+texture = ExtResource("7_hk7a3")
+
+[node name="S" type="Sprite2D" parent="TextureRect"]
+position = Vector2(1078, 497)
+scale = Vector2(0.201172, 0.169922)
+texture = ExtResource("8_oc7w8")
+
+[node name="E2" type="Sprite2D" parent="TextureRect"]
+position = Vector2(1217, 488)
+scale = Vector2(0.195313, 0.161133)
+texture = ExtResource("6_wcvmf")
+
+[node name="A" type="Sprite2D" parent="TextureRect"]
+position = Vector2(1344, 520)
+scale = Vector2(0.186523, 0.152344)
+texture = ExtResource("9_bbht7")
+
+[node name="H" type="Sprite2D" parent="TextureRect"]
+position = Vector2(426, 698)
+scale = Vector2(0.21679688, 0.18164064)
+texture = ExtResource("10_0qqys")
+
+[node name="U2" type="Sprite2D" parent="TextureRect"]
+position = Vector2(568, 680.00006)
+scale = Vector2(0.181641, 0.149414)
+texture = ExtResource("3_ne7mo")
+
+[node name="N2" type="Sprite2D" parent="TextureRect"]
+position = Vector2(698, 695)
+scale = Vector2(0.191406, 0.151367)
+texture = ExtResource("4_nl3y3")
+
+[node name="T" type="Sprite2D" parent="TextureRect"]
+position = Vector2(1044, 667)
+scale = Vector2(0.168213, 0.163086)
+texture = ExtResource("11_6ecge")
+
+[node name="E3" type="Sprite2D" parent="TextureRect"]
+position = Vector2(1166, 682)
+scale = Vector2(0.152344, 0.155273)
+texture = ExtResource("6_wcvmf")
+
+[node name="R2" type="Sprite2D" parent="TextureRect"]
+position = Vector2(1279, 656)
+scale = Vector2(0.166417, 0.170913)
+texture = ExtResource("7_hk7a3")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -195.0
+offset_top = -166.0
+offset_right = 195.0
+offset_bottom = 166.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_g0nyw")
+expand_mode = 5
+stretch_mode = 6
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0.952941, 1)
+theme_override_fonts/font = ExtResource("3_dnjup")
+theme_override_font_sizes/font_size = 20
+text = "Downloading.."
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+theme_override_fonts/font = ExtResource("3_dnjup")
+theme_override_font_sizes/font_size = 45
+step = 0.05
+rounded = true
