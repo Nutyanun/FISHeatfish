@@ -1,0 +1,101 @@
+[gd_scene load_steps=13 format=3 uid="uid://c26e32jg8pegl"]
+
+[ext_resource type="Script" uid="uid://bknxiwb0wa4qh" path="res://Script/HighScore.cs" id="1_dw5gy"]
+[ext_resource type="Texture2D" uid="uid://ejee8464wa76" path="res://SceneHighSc/seav2.png" id="2_oeidb"]
+[ext_resource type="Texture2D" uid="uid://dbudhnst5eses" path="res://SceneHighSc/return-Photoroom.png" id="3_mom7u"]
+[ext_resource type="Texture2D" uid="uid://btaer4q4o26y7" path="res://SceneHighSc/Hsc.png" id="4_qfr5h"]
+[ext_resource type="Texture2D" uid="uid://dgcqajqbo3ed3" path="res://SceneHighSc/CharH/H4.png" id="5_qfr5h"]
+[ext_resource type="Texture2D" uid="uid://bavxqxtg5e2so" path="res://SceneHighSc/CharH/I.png" id="6_m8u7e"]
+[ext_resource type="Texture2D" uid="uid://c1ul66p38owfl" path="res://SceneHighSc/CharH/G.png" id="7_oyths"]
+[ext_resource type="Texture2D" uid="uid://caox4ragbawyv" path="res://SceneHighSc/CharH/S2.png" id="8_vabya"]
+[ext_resource type="Texture2D" uid="uid://dg0i7qcw04fj6" path="res://SceneHighSc/CharH/C.png" id="9_5tdc3"]
+[ext_resource type="Texture2D" uid="uid://bhr8u0tfd2o8h" path="res://SceneHighSc/CharH/O.png" id="10_mi4gt"]
+[ext_resource type="Texture2D" uid="uid://5cmx1in12cvj" path="res://SceneHighSc/CharH/R2.png" id="11_6jevr"]
+[ext_resource type="Texture2D" uid="uid://c7bid21i7u8v3" path="res://SceneHighSc/CharH/E2.png" id="12_4tpu4"]
+
+[node name="Highscore" type="Node2D"]
+script = ExtResource("1_dw5gy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(578, 325)
+scale = Vector2(1.60446, 1.60396)
+texture = ExtResource("2_oeidb")
+
+[node name="TextureButton" type="TextureButton" parent="Sprite2D"]
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -358.377
+offset_top = -97.8827
+offset_right = -977.377
+offset_bottom = 0.117279
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("3_mom7u")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+position = Vector2(578.99994, 406.00003)
+scale = Vector2(0.9453125, 0.74414074)
+texture = ExtResource("4_qfr5h")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Sprite2D2"]
+layout_direction = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -313.1239
+offset_top = -186.7927
+offset_right = -1252.4958
+offset_bottom = -853.33344
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="H1" type="Sprite2D" parent="."]
+position = Vector2(133, 120.99999)
+scale = Vector2(0.1782227, 0.14208986)
+texture = ExtResource("5_qfr5h")
+
+[node name="I" type="Sprite2D" parent="."]
+position = Vector2(237, 121)
+scale = Vector2(0.16894531, 0.13525392)
+texture = ExtResource("6_m8u7e")
+
+[node name="G" type="Sprite2D" parent="."]
+position = Vector2(337, 123.99999)
+scale = Vector2(0.15661624, 0.14428705)
+texture = ExtResource("7_oyths")
+
+[node name="H2" type="Sprite2D" parent="."]
+position = Vector2(448.00003, 124)
+scale = Vector2(0.1842041, 0.14160158)
+texture = ExtResource("5_qfr5h")
+
+[node name="S" type="Sprite2D" parent="."]
+position = Vector2(571, 124.99999)
+scale = Vector2(0.15917967, 0.12353516)
+texture = ExtResource("8_vabya")
+
+[node name="C" type="Sprite2D" parent="."]
+position = Vector2(679, 130)
+scale = Vector2(0.19165038, 0.14941406)
+texture = ExtResource("9_5tdc3")
+
+[node name="O" type="Sprite2D" parent="."]
+position = Vector2(799, 129)
+scale = Vector2(0.17724608, 0.13964844)
+texture = ExtResource("10_mi4gt")
+
+[node name="R" type="Sprite2D" parent="."]
+position = Vector2(917, 130)
+scale = Vector2(0.17346196, 0.13244632)
+texture = ExtResource("11_6jevr")
+
+[node name="E" type="Sprite2D" parent="."]
+position = Vector2(1027, 135)
+scale = Vector2(0.17431635, 0.13940424)
+texture = ExtResource("12_4tpu4")
+
+[connection signal="pressed" from="Sprite2D/TextureButton" to="." method="_on_texture_button_pressed"]
