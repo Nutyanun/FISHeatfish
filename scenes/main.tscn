@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=33 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
@@ -13,9 +13,13 @@
 [ext_resource type="Script" uid="uid://dst8ehoc1274i" path="res://scripts/ScoreManager.cs" id="10_ya4ey"]
 [ext_resource type="Script" uid="uid://clrin8jr56gc8" path="res://scripts/PauseUi.cs" id="12_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://dydehfl5tb5wa" path="res://7 Dialogue Box/2.png" id="12_muem4"]
+[ext_resource type="FontFile" uid="uid://dratgsiu0d81y" path="res://BoldPixels/BoldPixels.ttf" id="13_gqmmt"]
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
+[ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/bonuscoinspawner.tscn" id="17_muem4"]
+[ext_resource type="PackedScene" uid="uid://bnaarab6ni7wp" path="res://scenes/coin_1.tscn" id="18_gqmmt"]
+[ext_resource type="PackedScene" uid="uid://dne2gy0sbgtd8" path="res://scenes/coin_3.tscn" id="20_jscy8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jbj1t"]
 bg_color = Color(0, 0.32941177, 0.7647059, 0.37254903)
@@ -62,6 +66,15 @@ font_size = 21
 font = ExtResource("10_choun")
 font_size = 23
 
+[sub_resource type="LabelSettings" id="LabelSettings_yc10j"]
+font = ExtResource("13_gqmmt")
+font_size = 25
+
+[sub_resource type="LabelSettings" id="LabelSettings_gqmmt"]
+font = ExtResource("13_gqmmt")
+font_size = 50
+font_color = Color(0.25490198, 1, 1, 1)
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_choun")
 
@@ -69,7 +82,7 @@ script = ExtResource("1_choun")
 position = Vector2(-1, 9)
 script = ExtResource("1_o5qli")
 FishScenes = Array[PackedScene]([ExtResource("2_jyhfs"), ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_o6xl0")])
-Weights = PackedFloat32Array(3, 6, 4, 2)
+Weights = PackedFloat32Array(3, 6, 4, 1)
 MaxFish = 150
 
 [node name="Player" parent="." instance=ExtResource("5_tbgi4")]
@@ -81,9 +94,8 @@ position = Vector2(362, 373)
 unique_name_in_owner = true
 position = Vector2(-1, 0)
 script = ExtResource("10_ya4ey")
-BaseTimeSeconds = 180
 
-[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel", "HighScoreLabel", "MultiplierLabel", "TimerLabel")]
+[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel", "HighScoreLabel", "MultiplierLabel", "TimerLabel", "BonusLabel")]
 unique_name_in_owner = true
 process_mode = 3
 script = ExtResource("10_eb6dy")
@@ -93,6 +105,7 @@ LevelLabel = NodePath("ScoreGroup2/LevelLabel")
 HighScoreLabel = NodePath("ScoreGroup5/HighScoreLabel")
 MultiplierLabel = NodePath("ScoreGroup6/MultiplierLabel")
 TimerLabel = NodePath("ScoreGroup4/TimerLabel")
+BonusLabel = NodePath("ScoreGroup7/BonusLabel")
 
 [node name="ScoreBg" type="TextureRect" parent="HUD"]
 offset_left = 13.0
@@ -220,9 +233,9 @@ label_settings = SubResource("LabelSettings_0ld40")
 horizontal_alignment = 1
 
 [node name="ScoreGroup5" type="PanelContainer" parent="HUD"]
-offset_left = 158.0
+offset_left = 93.0
 offset_top = 76.0
-offset_right = 452.0
+offset_right = 387.0
 offset_bottom = 118.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
@@ -233,9 +246,9 @@ label_settings = SubResource("LabelSettings_muem4")
 horizontal_alignment = 1
 
 [node name="ScoreGroup6" type="PanelContainer" parent="HUD"]
-offset_left = 591.0
+offset_left = 455.0
 offset_top = 74.0
-offset_right = 845.0
+offset_right = 709.0
 offset_bottom = 116.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
@@ -245,7 +258,30 @@ text = " Mult : xM | a/b | ts "
 label_settings = SubResource("LabelSettings_dp3eg")
 horizontal_alignment = 1
 
-[node name="Clock" type="Timer" parent="HUD"]
+[node name="ScoreGroup7" type="PanelContainer" parent="HUD"]
+offset_left = 748.0
+offset_top = 73.0
+offset_right = 880.0
+offset_bottom = 113.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
+
+[node name="BonusLabel" type="Label" parent="HUD/ScoreGroup7"]
+layout_mode = 2
+text = " Bonus : 0"
+label_settings = SubResource("LabelSettings_yc10j")
+horizontal_alignment = 1
+
+[node name="BonusBanner" type="Label" parent="HUD"]
+visible = false
+offset_left = 295.0
+offset_top = 152.0
+offset_right = 834.0
+offset_bottom = 203.0
+text = " B O N U S  T I M E !"
+label_settings = SubResource("LabelSettings_gqmmt")
+horizontal_alignment = 1
+
+[node name="Clock" type="Timer" parent="."]
 autostart = true
 
 [node name="PauseUI" type="CanvasLayer" parent="."]
@@ -305,6 +341,10 @@ theme_override_fonts/font = ExtResource("10_choun")
 text = "Quit"
 icon = ExtResource("16_dp3eg")
 flat = true
+
+[node name="BonusCoinSpawner" parent="." instance=ExtResource("17_muem4")]
+BronzeScene = ExtResource("20_jscy8")
+GoldScene = ExtResource("18_gqmmt")
 
 [connection signal="GameOver" from="ScoreManager" to="HUD" method="ShowGameOver"]
 [connection signal="LevelChanged" from="ScoreManager" to="HUD" method="UpdateLevel"]
