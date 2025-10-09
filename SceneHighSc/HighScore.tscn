@@ -1,20 +1,23 @@
-[gd_scene load_steps=10 format=3 uid="uid://c26e32jg8pegl"]
+[gd_scene load_steps=13 format=3 uid="uid://c26e32jg8pegl"]
 
-[ext_resource type="Script" uid="uid://bknxiwb0wa4qh" path="res://SceneHighSc/HighScore.cs" id="1_dw5gy"]
-[ext_resource type="Texture2D" uid="uid://ejee8464wa76" path="res://SceneHighSc/เนเธ•เนเธ—เธฐเน€เธฅv2.png" id="2_oeidb"]
+[ext_resource type="Script" uid="uid://bknxiwb0wa4qh" path="res://Script/HighScore.cs" id="1_dw5gy"]
+[ext_resource type="Texture2D" uid="uid://ejee8464wa76" path="res://SceneHighSc/seav2.png" id="2_oeidb"]
 [ext_resource type="Texture2D" uid="uid://dbudhnst5eses" path="res://SceneHighSc/return-Photoroom.png" id="3_mom7u"]
-[ext_resource type="Texture2D" uid="uid://bhn1yeorkgdyo" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Paper UI Pack/Plain/3 Item Holder/1.png" id="4_i45cl"]
-[ext_resource type="FontFile" uid="uid://nbiyo6o7uewn" path="res://SceneHighSc/Pixeboy.ttf" id="5_0t5tn"]
-[ext_resource type="Texture2D" uid="uid://bb0emn2jnuymn" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Paper UI Pack/Folding & Cutout/1 Paper/1.png" id="6_lvifv"]
-[ext_resource type="Texture2D" uid="uid://clokyn6o48a0y" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Content/6 Highlighter/1.png" id="7_i268c"]
-[ext_resource type="Texture2D" uid="uid://y72lb30yex54" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Content/6 Highlighter/2.png" id="8_5q86q"]
-[ext_resource type="Texture2D" uid="uid://dfq3xjf2dmsr1" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Content/6 Highlighter/3.png" id="9_8ud3t"]
+[ext_resource type="Texture2D" uid="uid://btaer4q4o26y7" path="res://SceneHighSc/Hsc.png" id="4_qfr5h"]
+[ext_resource type="Texture2D" uid="uid://dgcqajqbo3ed3" path="res://SceneHighSc/CharH/H4.png" id="5_qfr5h"]
+[ext_resource type="Texture2D" uid="uid://bavxqxtg5e2so" path="res://SceneHighSc/CharH/I.png" id="6_m8u7e"]
+[ext_resource type="Texture2D" uid="uid://c1ul66p38owfl" path="res://SceneHighSc/CharH/G.png" id="7_oyths"]
+[ext_resource type="Texture2D" uid="uid://caox4ragbawyv" path="res://SceneHighSc/CharH/S2.png" id="8_vabya"]
+[ext_resource type="Texture2D" uid="uid://dg0i7qcw04fj6" path="res://SceneHighSc/CharH/C.png" id="9_5tdc3"]
+[ext_resource type="Texture2D" uid="uid://bhr8u0tfd2o8h" path="res://SceneHighSc/CharH/O.png" id="10_mi4gt"]
+[ext_resource type="Texture2D" uid="uid://5cmx1in12cvj" path="res://SceneHighSc/CharH/R2.png" id="11_6jevr"]
+[ext_resource type="Texture2D" uid="uid://c7bid21i7u8v3" path="res://SceneHighSc/CharH/E2.png" id="12_4tpu4"]
 
 [node name="Highscore" type="Node2D"]
 script = ExtResource("1_dw5gy")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(578, 328)
+position = Vector2(578, 325)
 scale = Vector2(1.60446, 1.60396)
 texture = ExtResource("2_oeidb")
 
@@ -33,60 +36,66 @@ texture_normal = ExtResource("3_mom7u")
 ignore_texture_size = true
 stretch_mode = 0
 
-[node name="TextureRect" type="TextureRect" parent="Sprite2D"]
-offset_left = -206.0
-offset_top = -208.0
-offset_right = 234.0
-offset_bottom = -70.0
-texture = ExtResource("4_i45cl")
-expand_mode = 5
-flip_h = true
-flip_v = true
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+position = Vector2(578.99994, 406.00003)
+scale = Vector2(0.9453125, 0.74414074)
+texture = ExtResource("4_qfr5h")
 
-[node name="Label" type="Label" parent="."]
-offset_left = 382.0
-offset_top = 81.0
-offset_right = 803.0
-offset_bottom = 139.0
-theme_override_colors/font_color = Color(0.101961, 0.137255, 0.494118, 1)
-theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.993203, 0.982674, 0.997393, 1)
-theme_override_fonts/font = ExtResource("5_0t5tn")
-theme_override_font_sizes/font_size = 100
-text = "HIGHSCORE"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-text_overrun_behavior = 4
-uppercase = true
+[node name="VBoxContainer" type="VBoxContainer" parent="Sprite2D2"]
+layout_direction = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -313.1239
+offset_top = -186.7927
+offset_right = -1252.4958
+offset_bottom = -853.33344
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="."]
-offset_left = 194.0
-offset_top = 217.0
-offset_right = 1000.0
-offset_bottom = 596.0
-texture = ExtResource("6_lvifv")
-flip_v = true
+[node name="H1" type="Sprite2D" parent="."]
+position = Vector2(133, 120.99999)
+scale = Vector2(0.1782227, 0.14208986)
+texture = ExtResource("5_qfr5h")
 
-[node name="TextureRect2" type="TextureRect" parent="."]
-offset_left = 173.0
-offset_top = 205.0
-offset_right = 293.0
-offset_bottom = 304.0
-texture = ExtResource("7_i268c")
+[node name="I" type="Sprite2D" parent="."]
+position = Vector2(237, 121)
+scale = Vector2(0.16894531, 0.13525392)
+texture = ExtResource("6_m8u7e")
 
-[node name="TextureRect3" type="TextureRect" parent="."]
-offset_left = 894.0
-offset_top = 197.0
-offset_right = 1013.0
-offset_bottom = 314.0
-texture = ExtResource("8_5q86q")
+[node name="G" type="Sprite2D" parent="."]
+position = Vector2(337, 123.99999)
+scale = Vector2(0.15661624, 0.14428705)
+texture = ExtResource("7_oyths")
 
-[node name="TextureRect4" type="TextureRect" parent="."]
-offset_left = 905.0
-offset_top = 504.0
-offset_right = 1021.0
-offset_bottom = 623.0
-texture = ExtResource("9_8ud3t")
+[node name="H2" type="Sprite2D" parent="."]
+position = Vector2(448.00003, 124)
+scale = Vector2(0.1842041, 0.14160158)
+texture = ExtResource("5_qfr5h")
+
+[node name="S" type="Sprite2D" parent="."]
+position = Vector2(571, 124.99999)
+scale = Vector2(0.15917967, 0.12353516)
+texture = ExtResource("8_vabya")
+
+[node name="C" type="Sprite2D" parent="."]
+position = Vector2(679, 130)
+scale = Vector2(0.19165038, 0.14941406)
+texture = ExtResource("9_5tdc3")
+
+[node name="O" type="Sprite2D" parent="."]
+position = Vector2(799, 129)
+scale = Vector2(0.17724608, 0.13964844)
+texture = ExtResource("10_mi4gt")
+
+[node name="R" type="Sprite2D" parent="."]
+position = Vector2(917, 130)
+scale = Vector2(0.17346196, 0.13244632)
+texture = ExtResource("11_6jevr")
+
+[node name="E" type="Sprite2D" parent="."]
+position = Vector2(1027, 135)
+scale = Vector2(0.17431635, 0.13940424)
+texture = ExtResource("12_4tpu4")
 
 [connection signal="pressed" from="Sprite2D/TextureButton" to="." method="_on_texture_button_pressed"]
