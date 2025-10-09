@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://7j1q2104jr0q"]
 
-[ext_resource type="Script" uid="uid://c0mtcwb8qeupa" path="res://SceneLogin/LoginGame.cs" id="1_1qs31"]
+[ext_resource type="Script" uid="uid://c0mtcwb8qeupa" path="res://Script/LoginGame.cs" id="1_1qs31"]
 [ext_resource type="FontFile" uid="uid://djyxjv0jq58wp" path="res://SceneLogin/Pixeboy.ttf" id="2_ep11p"]
 [ext_resource type="Texture2D" uid="uid://csec8gjkucms0" path="res://SceneHighSc/Humble Gift - Paper UI System v1.1/Sprites/Paper UI Pack/Folding & Cutout/5 Mini Map/1.png" id="2_m368v"]
 [ext_resource type="Texture2D" uid="uid://b2i7pig85w2fy" path="res://SceneLogin/sea3.png" id="2_wdaoc"]
