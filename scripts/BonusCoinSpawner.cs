@@ -3,34 +3,38 @@ using System.Collections.Generic;
 
 public partial class BonusCoinSpawner : Node2D
 {
+	// ===== Signals =====
 	[Signal] public delegate void BonusStartedEventHandler();
 	[Signal] public delegate void BonusEndedEventHandler(int totalBonus);
+	[Signal] public delegate void BonusTickEventHandler(int value, int total);
 
-	// ซีนสำรอง (ใช้เมื่อไม่ได้ตั้งทั้ง 3 แบบ)
+	// ===== Scenes =====
 	[Export] public PackedScene CoinScene { get; set; }
-
-	// ซีนแยกตามชนิด
 	[Export] public PackedScene BronzeScene { get; set; }
 	[Export] public PackedScene SilverScene { get; set; }
 	[Export] public PackedScene GoldScene   { get; set; }
 
+	// ===== Tuning =====
 	[Export] public float SpawnEverySeconds { get; set; } = 0.15f;
 	[Export] public int   MaxAlive         { get; set; } = 40;
 	[Export] public float BonusDuration    { get; set; } = 5.0f;
 
-	// อัตราสุ่มชนิด (รวมกันเท่าไหร่ก็ได้)
+	// Weight (sum ไม่จำเป็นต้อง = 1)
 	[Export] public float BronzeWeight { get; set; } = 0.6f;
 	[Export] public float SilverWeight { get; set; } = 0.4f;
 	[Export] public float GoldWeight   { get; set; } = 0.2f;
 
-	// ขอบซ้าย/ขวาที่เว้นไว้ และ offset ให้เกิดเหนือขอบบนเล็กน้อย (ค่าติดลบ)
+	// Spawn bounds
 	[Export] public float SpawnXMargin { get; set; } = 24f;
 	[Export] public float SpawnYOffset { get; set; } = -40f;
 
+	// ===== Runtime =====
 	private Timer _spawnTimer;
 	private Timer _phaseTimer;
 
 	private bool _running;
+	public  bool IsRunning => _running;
+
 	private readonly HashSet<Coin> _alive = new();
 	private int _totalBonus;
 
@@ -45,10 +49,17 @@ public partial class BonusCoinSpawner : Node2D
 		_phaseTimer.Timeout += OnPhaseTimeout;
 	}
 
+	/// <summary>เริ่มเฟสโบนัส (durationOverride เป็นวินาที ถ้า null จะใช้ BonusDuration)</summary>
 	public void Start(float? durationOverride = null)
 	{
+		// กัน Start ซ้ำ: รีเซ็ตก่อน
+		if (_running)
+			ForceStopAndClear();
+
 		if (durationOverride.HasValue)
 			_phaseTimer.WaitTime = durationOverride.Value;
+		else
+			_phaseTimer.WaitTime = BonusDuration;
 
 		_totalBonus = 0;
 		_running = true;
@@ -58,14 +69,24 @@ public partial class BonusCoinSpawner : Node2D
 		_phaseTimer.Start();
 
 		EmitSignal(SignalName.BonusStarted);
+		// เริ่มต้นด้วยยอด 0 ไปให้ HUD (ถ้าต้องการอัปเดตทันที สามารถยิง BonusTick(0,0) ได้ แต่เรารอ coin แรกก็พอ)
 	}
 
-	public void StopNow()
+	/// <summary>หยุดทันทีและเคลียร์เหรียญทั้งหมด</summary>
+	public void ForceStopAndClear()
 	{
+		if (!_running && _alive.Count == 0) return;
+
 		_running = false;
 		_spawnTimer.Stop();
 		_phaseTimer.Stop();
 		CleanupAll();
+	}
+
+	public void StopNow()
+	{
+		if (!_running) return;
+		ForceStopAndClear();
 		EmitSignal(SignalName.BonusEnded, _totalBonus);
 	}
 
@@ -80,7 +101,10 @@ public partial class BonusCoinSpawner : Node2D
 	private void CleanupAll()
 	{
 		foreach (var c in _alive)
-			if (IsInstanceValid(c)) c.QueueFree();
+		{
+			if (IsInstanceValid(c))
+				c.QueueFree();
+		}
 		_alive.Clear();
 	}
 
@@ -93,28 +117,25 @@ public partial class BonusCoinSpawner : Node2D
 		var coin = InstantiateCoinForType(type);
 		if (coin == null) return;
 
-		// ใช้ "พื้นที่จอที่มองเห็นจริง" (รองรับกล้อง/พารัลแลกซ์)
+		// ใช้พื้นที่จอที่มองเห็นจริง (รองรับกล้อง/Parallax)
 		Rect2 vis = GetViewport().GetVisibleRect();
 
 		float xMin = vis.Position.X + SpawnXMargin;
 		float xMax = vis.End.X       - SpawnXMargin;
-		float x = (float)GD.RandRange(xMin, xMax);
+		float rx   = (float)GD.RandRange(xMin, xMax);
 
-		// เกิดเหนือขอบบนเล็กน้อย แล้วตกลงมา
-		float y = vis.Position.Y + SpawnYOffset;
+		float ry = vis.Position.Y + SpawnYOffset; // เกิดเหนือขอบบนเล็กน้อย
 
-		coin.GlobalPosition = new Vector2(x, y);
-		coin.ZIndex = 100; // ให้ทับฉากพื้นหลัง
+		coin.GlobalPosition = new Vector2(rx, ry);
+		coin.ZIndex = 100; // ป้องกันถูกฉากพื้นหลังบัง
 
+		// subscribe ต่อ coin events
 		coin.Eaten       += OnCoinEaten;
 		coin.Despawned   += OnCoinDespawned;
 		coin.TreeExiting += () => { _alive.Remove(coin); };
 
 		AddChild(coin);
 		_alive.Add(coin);
-
-		// ดีบัก (ถ้าอยากดู)
-		// GD.Print($"[Spawner] spawned {coin.Type} at {coin.GlobalPosition}, alive={_alive.Count}");
 	}
 
 	private Coin InstantiateCoinForType(Coin.CoinType type)
@@ -134,21 +155,17 @@ public partial class BonusCoinSpawner : Node2D
 		}
 
 		var node = scene.Instantiate();
-		var coin = node as Coin;
 
-		// เผื่อรากไม่ใช่ประเภท Coin ตรง ๆ
+		// รองรับกรณี root ไม่ได้เป็น Coin โดยตรง
+		var coin = node as Coin ?? node.GetNodeOrNull<Coin>(".");
 		if (coin == null)
 		{
-			coin = node.GetNodeOrNull<Coin>(".");
-			if (coin == null)
-			{
-				GD.PushError("BonusCoinSpawner: The assigned scene does not have a Coin script on the root.");
-				node.QueueFree();
-				return null;
-			}
+			GD.PushError("BonusCoinSpawner: The assigned scene does not have a Coin script on the root.");
+			node.QueueFree();
+			return null;
 		}
 
-		coin.Type = type; // บังคับชนิดตามที่สุ่มได้
+		coin.Type = type;
 		return coin;
 	}
 
@@ -157,7 +174,7 @@ public partial class BonusCoinSpawner : Node2D
 		float sum = BronzeWeight + SilverWeight + GoldWeight;
 		if (sum <= 0f) sum = 1f;
 
-		float r = (float)GD.RandRange(0.0, sum);
+		float r = (float)GD.RandRange(0.0, (double)sum);
 
 		if (r < BronzeWeight) return Coin.CoinType.Bronze;
 		r -= BronzeWeight;
@@ -168,10 +185,13 @@ public partial class BonusCoinSpawner : Node2D
 	private void OnCoinEaten(int value)
 	{
 		_totalBonus += value;
-		// GD.Print($"[Spawner] eaten +{value}, total={_totalBonus}");
+		EmitSignal(SignalName.BonusTick, value, _totalBonus); // แจ้ง HUD แบบเรียลไทม์
 	}
 
-	private void OnCoinDespawned() { /* noop */ }
+	private void OnCoinDespawned()
+	{
+		// ไม่ทำอะไรเป็นพิเศษ
+	}
 
 	public int GetTotalBonus() => _totalBonus;
 }

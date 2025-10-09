@@ -11,7 +11,11 @@ public partial class ScoreManager : Node2D
 	[Signal] public delegate void TimeLeftChangedEventHandler(float timeLeft);
 	[Signal] public delegate void LevelClearedEventHandler(int finalScore, int level);
 	[Signal] public delegate void GameOverEventHandler(int finalScore, int level);
+
+	// สำหรับ HUD โบนัส
 	[Signal] public delegate void BonusScoreChangedEventHandler(int totalBonus);
+	[Signal] public delegate void BonusPhaseStartedEventHandler();
+	[Signal] public delegate void BonusPhaseEndedEventHandler(int totalBonus);
 
 	// ===== Config ด่าน =====
 	[Export] public int  BaseTargetScore { get; set; } = 300;
@@ -80,6 +84,7 @@ public partial class ScoreManager : Node2D
 			{
 				_bonus.BonusStarted += OnBonusStarted;
 				_bonus.BonusEnded   += OnBonusEnded;
+				_bonus.BonusTick    += OnBonusTick;
 			}
 		}
 
@@ -193,7 +198,10 @@ public partial class ScoreManager : Node2D
 		if (_bonus == null) return;
 
 		_bonusStartedThisLevel = true;
-		_bonusRunning = true; // << สำคัญ
+		_bonusRunning = true;
+
+		_bonusScore = 0;
+		EmitSignal(SignalName.BonusScoreChanged, _bonusScore); // HUD: แสดง Bonus : 0 ตั้งแต่เริ่ม
 
 		float duration = Mathf.Max(0f, _timeLeft);
 		_bonus.Start(duration);
@@ -203,15 +211,23 @@ public partial class ScoreManager : Node2D
 
 	private void OnBonusStarted()
 	{
-		// แจ้ง HUD ได้ที่นี่ถ้าต้องการ
+		EmitSignal(SignalName.BonusPhaseStarted); // HUD แสดงแบนเนอร์
+	}
+
+	private void OnBonusTick(int value, int runningTotal)
+	{
+		_bonusScore = runningTotal;
+		EmitSignal(SignalName.BonusScoreChanged, _bonusScore); // HUD อัปเดตสด
 	}
 
 	private void OnBonusEnded(int totalBonus)
 	{
 		_bonusScore = totalBonus;
+
+		// HUD เห็นยอดสุดท้าย
 		EmitSignal(SignalName.BonusScoreChanged, _bonusScore);
 
-		// รวมโบนัสเข้าคะแนนรวม (ไม่ยุ่งกับ LevelScore)
+		// รวมโบนัสเข้าคะแนนรวม (ไม่แตะ LevelScore)
 		TotalScore += _bonusScore;
 		if (TotalScore > HighScore)
 		{
@@ -220,9 +236,12 @@ public partial class ScoreManager : Node2D
 		}
 		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
 
-		_bonusRunning = false; // << สำคัญ
+		_bonusRunning = false;
 
-		// ถ้าหมดเวลาแล้วและยังไม่ได้เคลียร์ด่าน ให้เคลียร์ตอนนี้
+		// แจ้ง HUD ให้ซ่อนแบนเนอร์ / เอฟเฟกต์
+		EmitSignal(SignalName.BonusPhaseEnded, _bonusScore);
+
+		// ถ้าเวลาหมดแล้วและยังไม่ได้เคลียร์ แต่ถึงเป้า → เคลียร์ตอนนี้
 		if (_timeLeft <= 0f && !IsLevelCleared && LevelScore >= TargetScore)
 			FinishCurrentLevel();
 
