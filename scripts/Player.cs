@@ -26,6 +26,7 @@ public partial class Player : CharacterBody2D
 
 	private readonly HashSet<Fish> _targetsInMouth = new();
 
+	// ===== Helpers =====
 	private ScoreManager GetSM()
 	{
 		return
@@ -47,6 +48,26 @@ public partial class Player : CharacterBody2D
 		return fish != null;
 	}
 
+	// ====== NEW: รองรับ Coin ======
+	private Coin ResolveCoin(Node n)
+	{
+		if (n is Coin c) return c;
+		if (n.GetParent() is Coin pc) return pc;
+		if (n.GetOwner() is Coin oc) return oc;
+		return n.GetParent()?.GetParent() as Coin;
+	}
+	private bool TryGetCoin(Node n, out Coin coin)
+	{
+		coin = ResolveCoin(n);
+		return coin != null;
+	}
+	private void EatCoin(Coin coin)
+	{
+		if (coin == null || !IsInstanceValid(coin)) return;
+		// ให้เหรียญจัดการคะแนนโบนัสเองผ่าน Coin.Eaten (ไม่บวกจาก Player เพื่อไม่ชนกลไกโบนัส)
+		coin.Consume();
+	}
+
 	public override void _Ready()
 	{
 		_anim      = GetNodeOrNull<AnimatedSprite2D>(AnimatedSpritePath);
@@ -61,11 +82,15 @@ public partial class Player : CharacterBody2D
 			_mouthArea.Monitoring  = true;
 			_mouthArea.Monitorable = true;
 
+			// เข้า/ออก: ปลา
 			_mouthArea.BodyEntered += body => { if (TryGetFish(body, out var fish)) _targetsInMouth.Add(fish); };
 			_mouthArea.BodyExited  += body => { if (TryGetFish(body, out var fish)) _targetsInMouth.Remove(fish); };
-
 			_mouthArea.AreaEntered += area => { if (TryGetFish(area, out var fish)) _targetsInMouth.Add(fish); };
 			_mouthArea.AreaExited  += area => { if (TryGetFish(area, out var fish)) _targetsInMouth.Remove(fish); };
+
+			// ====== NEW: เหรียญ — กินทันทีเมื่อแตะปาก ======
+			_mouthArea.BodyEntered += body => { if (TryGetCoin(body, out var coin)) EatCoin(coin); };
+			_mouthArea.AreaEntered += area => { if (TryGetCoin(area, out var coin)) EatCoin(coin); };
 		}
 
 		if (_hurtArea != null)
@@ -80,31 +105,30 @@ public partial class Player : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
-	var sm = GetSM();
-	if (sm != null && (sm.IsLevelCleared || sm.IsGameOver)) return;
+		var sm = GetSM();
+		if (sm != null && (sm.IsLevelCleared || sm.IsGameOver)) return;
 
-	Vector2 input = GetMoveInput();
-	Vector2 targetVel = input * MaxSpeed;
+		Vector2 input = GetMoveInput();
+		Vector2 targetVel = input * MaxSpeed;
 
-	Velocity = (input != Vector2.Zero)
-		? Velocity.MoveToward(targetVel, Accel * (float)delta)
-		: Velocity.MoveToward(Vector2.Zero, Friction * (float)delta);
+		Velocity = (input != Vector2.Zero)
+			? Velocity.MoveToward(targetVel, Accel * (float)delta)
+			: Velocity.MoveToward(Vector2.Zero, Friction * (float)delta);
 
-	MoveAndSlide();
+		MoveAndSlide();
 
-	if (_anim != null && MathF.Abs(Velocity.X) > 1f)
-		_anim.FlipH = Velocity.X < 0f;
+		if (_anim != null && MathF.Abs(Velocity.X) > 1f)
+			_anim.FlipH = Velocity.X < 0f;
 
-	if (ClampToViewport) ClampInsideViewport();
+		if (ClampToViewport) ClampInsideViewport();
 
-	if (_biteTimer > 0f) _biteTimer -= (float)delta;
-	if (Input.IsActionJustPressed("bite") || Input.IsActionJustPressed("ui_accept"))
-		TryBite();
+		if (_biteTimer > 0f) _biteTimer -= (float)delta;
+		if (Input.IsActionJustPressed("bite") || Input.IsActionJustPressed("ui_accept"))
+			TryBite();
 
-	// เพิ่มส่วนนี้ด้านล่างสุดของ _PhysicsProcess โค้ดเพิ่มขนาดปลา
-	UpdateSizeBasedOnScore(sm);
+		// ปรับขนาดตัวปลา
+		UpdateSizeBasedOnScore(sm);
 	}
-
 
 	private Vector2 GetMoveInput()
 	{
@@ -125,6 +149,7 @@ public partial class Player : CharacterBody2D
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(BiteAnimation) == true)
 			_anim.Play(BiteAnimation);
 
+		// กัดเฉพาะ "ปลา" ตามเดิม; เหรียญกินอัตโนมัติเมื่อสัมผัสแล้ว (ด้านบน)
 		var toCheck = new List<Fish>(_targetsInMouth);
 		foreach (var fish in toCheck)
 		{
@@ -175,22 +200,21 @@ public partial class Player : CharacterBody2D
 			Mathf.Clamp(GlobalPosition.Y, minY, maxY)
 		);
 	}
-	
+
 	private void UpdateSizeBasedOnScore(ScoreManager sm)
 	{
-	if (sm == null) return;
+		if (sm == null) return;
 
-	float targetScale = 1.0f; // ขนาดเริ่มต้น
+		float targetScale = 1.0f; // ขนาดเริ่มต้น
 
-	if (sm.Score >= 30)
-		targetScale = 2.4f; // ใหญ่สุด
-	else if (sm.Score >= 15)
-		targetScale = 1.9f;
-	else if (sm.Score >= 10)
-		targetScale = 1.3f;
+		if (sm.Score >= 30)
+			targetScale = 2.4f; // ใหญ่สุด
+		else if (sm.Score >= 15)
+			targetScale = 1.9f;
+		else if (sm.Score >= 10)
+			targetScale = 1.3f;
 
-	// ค่อย ๆ เปลี่ยนขนาดให้ดู smooth
-	Scale = Scale.Lerp(Vector2.One * targetScale, 0.05f);
+		// ค่อย ๆ เปลี่ยนขนาดให้ดู smooth
+		Scale = Scale.Lerp(Vector2.One * targetScale, 0.05f);
 	}
-
 }

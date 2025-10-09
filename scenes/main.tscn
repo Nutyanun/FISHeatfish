@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=30 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
@@ -16,6 +16,9 @@
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
+[ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/bonuscoinspawner.tscn" id="17_muem4"]
+[ext_resource type="PackedScene" uid="uid://bnaarab6ni7wp" path="res://scenes/coin_1.tscn" id="18_gqmmt"]
+[ext_resource type="PackedScene" uid="uid://dne2gy0sbgtd8" path="res://scenes/coin_3.tscn" id="20_jscy8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jbj1t"]
 bg_color = Color(0, 0.32941177, 0.7647059, 0.37254903)
@@ -30,15 +33,15 @@ corner_radius_bottom_left = 12
 
 [sub_resource type="LabelSettings" id="LabelSettings_trceg"]
 font = ExtResource("10_choun")
-font_size = 25
+font_size = 24
 
 [sub_resource type="LabelSettings" id="LabelSettings_eb6dy"]
 font = ExtResource("10_choun")
-font_size = 25
+font_size = 24
 
 [sub_resource type="LabelSettings" id="LabelSettings_ya4ey"]
 font = ExtResource("10_choun")
-font_size = 25
+font_size = 22
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a8y0u"]
 
@@ -52,15 +55,15 @@ font_size = 45
 
 [sub_resource type="LabelSettings" id="LabelSettings_0ld40"]
 font = ExtResource("10_choun")
-font_size = 25
+font_size = 24
 
 [sub_resource type="LabelSettings" id="LabelSettings_muem4"]
 font = ExtResource("10_choun")
-font_size = 25
+font_size = 21
 
 [sub_resource type="LabelSettings" id="LabelSettings_dp3eg"]
 font = ExtResource("10_choun")
-font_size = 25
+font_size = 23
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_choun")
@@ -69,11 +72,11 @@ script = ExtResource("1_choun")
 position = Vector2(-1, 9)
 script = ExtResource("1_o5qli")
 FishScenes = Array[PackedScene]([ExtResource("2_jyhfs"), ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_o6xl0")])
-Weights = PackedFloat32Array(3, 6, 4, 2)
+Weights = PackedFloat32Array(3, 6, 4, 1)
 MaxFish = 150
 
 [node name="Player" parent="." instance=ExtResource("5_tbgi4")]
-position = Vector2(368, 255)
+position = Vector2(362, 373)
 
 [node name="BG" parent="." instance=ExtResource("8_tipki")]
 
@@ -81,7 +84,6 @@ position = Vector2(368, 255)
 unique_name_in_owner = true
 position = Vector2(-1, 0)
 script = ExtResource("10_ya4ey")
-BaseTimeSeconds = 180
 
 [node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel", "HighScoreLabel", "MultiplierLabel", "TimerLabel")]
 unique_name_in_owner = true
@@ -165,17 +167,22 @@ alignment = 1
 
 [node name="Title" type="Label" parent="HUD/GameOverLabel/Center/root"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
 text = "GAME OVER"
 label_settings = SubResource("LabelSettings_jkv2x")
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="HUD/GameOverLabel/Center/root"]
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Press Enter to retry"
 label_settings = SubResource("LabelSettings_jbj1t")
 
 [node name="Buttons" type="HBoxContainer" parent="HUD/GameOverLabel/Center/root"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_override_constants/separation = 20
 alignment = 1
 
@@ -190,6 +197,15 @@ layout_mode = 2
 theme_override_fonts/font = ExtResource("10_choun")
 theme_override_font_sizes/font_size = 40
 text = "Quit"
+icon_alignment = 1
+
+[node name="Next" type="Button" parent="HUD/GameOverLabel/Center/root/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Next"
 icon_alignment = 1
 
 [node name="ScoreGroup4" type="PanelContainer" parent="HUD"]
@@ -291,6 +307,10 @@ theme_override_fonts/font = ExtResource("10_choun")
 text = "Quit"
 icon = ExtResource("16_dp3eg")
 flat = true
+
+[node name="BonusCoinSpawner" parent="." instance=ExtResource("17_muem4")]
+BronzeScene = ExtResource("20_jscy8")
+GoldScene = ExtResource("18_gqmmt")
 
 [connection signal="GameOver" from="ScoreManager" to="HUD" method="ShowGameOver"]
 [connection signal="LevelChanged" from="ScoreManager" to="HUD" method="UpdateLevel"]

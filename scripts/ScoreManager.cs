@@ -9,26 +9,37 @@ public partial class ScoreManager : Node2D
 	[Signal] public delegate void LevelChangedEventHandler(int level);
 	[Signal] public delegate void MultiplierChangedEventHandler(int mult, int fishInWindow, int needFish, float windowLeft);
 	[Signal] public delegate void TimeLeftChangedEventHandler(float timeLeft);
-	[Signal] public delegate void LevelClearedEventHandler(int finalScore, int level);   // ใช้ตอน "เวลาหมดและถึงเป้า"
-	[Signal] public delegate void GameOverEventHandler(int finalScore, int level);       // ใช้ตอน "ชีวิตหมด" หรือ "เวลาหมดแต่ไม่ถึงเป้า"
+	[Signal] public delegate void LevelClearedEventHandler(int finalScore, int level);
+	[Signal] public delegate void GameOverEventHandler(int finalScore, int level);
+	[Signal] public delegate void BonusScoreChangedEventHandler(int totalBonus);
 
 	// ===== Config ด่าน =====
-	[Export] public int  BaseTargetScore { get; set; } = 300;   // เป้าด่าน 1
-	[Export] public int  BaseTimeSeconds { get; set; } = 240;   // เวลาเริ่มด่าน 1 (4 นาที)
-	[Export] public int  TimeIncPerLevel { get; set; } = 120;   // +2 นาทีทุกด่าน
-	[Export] public bool AutoAdvanceOnTimeUp { get; set; } = false; // ผ่านด่านแล้วให้ไปด่านถัดไปทันที
+	[Export] public int  BaseTargetScore { get; set; } = 300;
+	[Export] public int  BaseTimeSeconds { get; set; } = 150;
+	[Export] public int  TimeIncPerLevel { get; set; } = 90;
+	[Export] public bool AutoAdvanceOnTimeUp { get; set; } = false;
 
 	// ===== ค่าเริ่มต้นชีวิตต่อเลเวล =====
-	[Export] public int StartingLives { get; set; } = 3; // [NEW] ชีวิตเริ่มต้นของทุกเลเวล
+	[Export] public int StartingLives { get; set; } = 3;
+
+	// ===== โปรยเหรียญช่วงท้ายเกม =====
+	[Export] public NodePath BonusSpawnerPath { get; set; } = "../BonusCoinSpawner";
+	[Export] public float BonusTriggerSeconds { get; set; } = 20f; // เริ่มโปรยเมื่อเวลาเหลือ <= ค่านี้
+	[Export] public int   BonusStartLevel    { get; set; } = 2;   // ใช้ระบบเหรียญตั้งแต่เลเวลนี้ขึ้นไป
+
+	private BonusCoinSpawner _bonus;
+	private bool _bonusStartedThisLevel = false; // กันสตาร์ตซ้ำ
+	private bool _bonusRunning = false;          // กำลังโปรยเหรียญอยู่หรือไม่
+	private int  _bonusScore = 0;                // คะแนนโบนัสของเลเวลนี้
 
 	// ===== สถานะหลัก =====
-	[Export] public int Level { get; set; } = 1;   // เริ่มด่าน (default = 1)
+	[Export] public int Level { get; set; } = 1;
 	[Export] public int Lives { get; set; } = 3;
 
-	public int TargetScore { get; private set; } = 300; // อัปเดตตามด่าน
-	public int LevelScore  { get; private set; } = 0;   // คะแนนของด่านปัจจุบัน
-	public int TotalScore  { get; private set; } = 0;   // สะสมตลอดรอบ
-	public int HighScore   { get; private set; } = 0;   // สถิติเก็บไฟล์
+	public int TargetScore { get; private set; } = 300;
+	public int LevelScore  { get; private set; } = 0;  // คะแนนจากปลาในเลเวลนี้
+	public int TotalScore  { get; private set; } = 0;  // คะแนนรวม (ปลา + โบนัส)
+	public int HighScore   { get; private set; } = 0;
 
 	public int Score => LevelScore;
 
@@ -58,6 +69,20 @@ public partial class ScoreManager : Node2D
 	public override void _Ready()
 	{
 		LoadHighScore();
+
+		if (GameProgress.CurrentPlayingLevel > 0)
+			Level = GameProgress.CurrentPlayingLevel;
+
+		if (!BonusSpawnerPath.IsEmpty)
+		{
+			_bonus = GetNodeOrNull<BonusCoinSpawner>(BonusSpawnerPath);
+			if (_bonus != null)
+			{
+				_bonus.BonusStarted += OnBonusStarted;
+				_bonus.BonusEnded   += OnBonusEnded;
+			}
+		}
+
 		StartLevel(Level);
 	}
 
@@ -65,13 +90,15 @@ public partial class ScoreManager : Node2D
 	{
 		Level = Mathf.Max(1, lvl);
 
-		// รีเซ็ตชีวิตทุกครั้งที่เริ่มเลเวลใหม่ (แนวทางที่ 1)
-		Lives = StartingLives; // [NEW]
-
+		Lives = StartingLives;
 		TargetScore     = TargetForLevel(Level);
 		LevelScore      = 0;
 		IsLevelCleared  = false;
 		IsGameOver      = false;
+
+		_bonusScore = 0;
+		_bonusStartedThisLevel = false;
+		_bonusRunning = false;
 
 		Mult           = Mathf.Clamp(MultMin, MultMin, MultMax);
 		_fishInWindow  = 0;
@@ -82,7 +109,7 @@ public partial class ScoreManager : Node2D
 		EmitSignal(SignalName.LevelChanged, Level);
 		EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
 		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
-		EmitSignal(SignalName.LivesChanged, Lives); // [CHANGED] เรียกหลังรีเซ็ตชีวิต
+		EmitSignal(SignalName.LivesChanged, Lives);
 		EmitSignal(SignalName.MultiplierChanged, Mult, _fishInWindow, FishPerStep, _windowLeft);
 		EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
 
@@ -107,25 +134,23 @@ public partial class ScoreManager : Node2D
 			EmitSignal(SignalName.MultiplierChanged, Mult, _fishInWindow, FishPerStep, _windowLeft);
 		}
 
-		// Time countdown per level
+		// Time countdown
 		_timeLeft = Mathf.Max(0, _timeLeft - (float)delta);
 		EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
 
+		// เริ่มโปรยเมื่อเข้า 20 วิสุดท้าย และเฉพาะเลเวลที่กำหนดขึ้นไป
+		if (!_bonusStartedThisLevel && Level >= BonusStartLevel && _timeLeft <= BonusTriggerSeconds)
+			StartBonusRainForRemainingTime();
+
+		// หมดเวลา → ถ้ากำลังโปรยอยู่ให้ "รอ" จนกว่าจะจบก่อนค่อยสรุปผล
 		if (_timeLeft <= 0f && !IsLevelCleared)
 		{
-			// เวลาหมด: เช็กว่าถึงเป้าหรือไม่
+			if (_bonusRunning) return;
+
 			if (LevelScore >= TargetScore)
-			{
-				// ผ่านด่าน
-				FinishCurrentLevel();      // emit LevelCleared
-				if (AutoAdvanceOnTimeUp)   // ไปด่านถัดไปทันที
-					AdvanceToNextLevel();
-			}
+				FinishCurrentLevel();
 			else
-			{
-				// ไม่ถึงเป้า → แพ้
-				FailByTimeUp();            // emit GameOver
-			}
+				FailByTimeUp();
 		}
 	}
 
@@ -149,10 +174,6 @@ public partial class ScoreManager : Node2D
 		EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
 		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
 		EmitSignal(SignalName.MultiplierChanged, Mult, _fishInWindow, FishPerStep, _windowLeft);
-
-		// ถึงเป้าก่อนเวลาหมด → แค่แจ้ง/ใส่เอฟเฟกต์ แต่ยังเล่นต่อ
-		if (LevelScore >= TargetScore)
-			GD.Print($"[ScoreManager] Target reached ({LevelScore}/{TargetScore}). Continue until time runs out.");
 	}
 
 	public void LoseLife(int amount = 1)
@@ -166,6 +187,48 @@ public partial class ScoreManager : Node2D
 			DoGameOver();
 	}
 
+	// ---------- Bonus: โปรยเหรียญช่วงท้าย ----------
+	private void StartBonusRainForRemainingTime()
+	{
+		if (_bonus == null) return;
+
+		_bonusStartedThisLevel = true;
+		_bonusRunning = true; // << สำคัญ
+
+		float duration = Mathf.Max(0f, _timeLeft);
+		_bonus.Start(duration);
+
+		GD.Print($"[ScoreManager] BONUS coins raining for last {duration:0.##}s.");
+	}
+
+	private void OnBonusStarted()
+	{
+		// แจ้ง HUD ได้ที่นี่ถ้าต้องการ
+	}
+
+	private void OnBonusEnded(int totalBonus)
+	{
+		_bonusScore = totalBonus;
+		EmitSignal(SignalName.BonusScoreChanged, _bonusScore);
+
+		// รวมโบนัสเข้าคะแนนรวม (ไม่ยุ่งกับ LevelScore)
+		TotalScore += _bonusScore;
+		if (TotalScore > HighScore)
+		{
+			HighScore = TotalScore;
+			SaveHighScore();
+		}
+		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
+
+		_bonusRunning = false; // << สำคัญ
+
+		// ถ้าหมดเวลาแล้วและยังไม่ได้เคลียร์ด่าน ให้เคลียร์ตอนนี้
+		if (_timeLeft <= 0f && !IsLevelCleared && LevelScore >= TargetScore)
+			FinishCurrentLevel();
+
+		GD.Print($"[ScoreManager] BONUS rain ended. Bonus={_bonusScore}, Total={TotalScore}");
+	}
+
 	// ---------- End-of-level / GameOver ----------
 	private void FinishCurrentLevel()
 	{
@@ -174,26 +237,27 @@ public partial class ScoreManager : Node2D
 		IsLevelCleared = true;
 		SaveHighScore();
 
-		GD.Print($"[ScoreManager] Level {Level} cleared at time-up. Score={{LevelScore}} (Target={{TargetScore}})");
+		GD.Print($"[ScoreManager] Level {Level} cleared at time-up. Score={LevelScore} (Target={TargetScore}), Bonus={_bonusScore}, Total={TotalScore}");
 		EmitSignal(SignalName.LevelCleared, LevelScore, Level);
+
+		if (AutoAdvanceOnTimeUp)
+			AdvanceToNextLevel();
 	}
 
 	private void AdvanceToNextLevel()
 	{
 		int nextLevel = Level + 1;
-		StartLevel(nextLevel); // เป้าคูณสอง เวลา +2 นาที และรีเซ็ตชีวิตตาม StartingLives
+		StartLevel(nextLevel);
 	}
 
 	private void FailByTimeUp()
 	{
-		// เวลาหมดแต่ไม่ถึงเป้า => แพ้ด่าน
 		IsGameOver = true;
 		SaveHighScore();
 
 		GD.Print($"[ScoreManager] Time up but target not met. Score={LevelScore}/{TargetScore} → GAME OVER");
 		EmitSignal(SignalName.GameOver, LevelScore, Level);
 
-		// ถ้าต้องหยุดทันทีให้ pause (HUD/ฉากอื่นสามารถเปลี่ยนฉากต่อ)
 		GetTree().Paused = true;
 	}
 
@@ -209,13 +273,10 @@ public partial class ScoreManager : Node2D
 		GetTree().Paused = true;
 	}
 
-	// ---------- External control (ถ้าต้องเรียกเอง) ----------
+	// ---------- External control ----------
 	public void ResetForNewLevel(int newLevel, int newTargetIgnored, int lives)
 	{
-		// ฟังก์ชันนี้ยังคงไว้เพื่อความเข้ากันได้เดิม
-		// แต่ตรรกะหลักย้ายไปใน StartLevel() แล้ว
-		// หากถูกเรียกจากโค้ดเก่า จะเคารพค่าชีวิตที่ส่งมา
-		Lives = lives; // [CHANGED] ให้ค่านี้ถูกแทนก่อน จากนั้น StartLevel จะรีเซ็ตเป็น StartingLives อีกครั้งถ้าต้องการ
+		Lives = lives;
 		StartLevel(newLevel);
 	}
 

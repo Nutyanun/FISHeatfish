@@ -1,0 +1,71 @@
+[gd_scene load_steps=10 format=3 uid="uid://dvqw613qi0qal"]
+
+[ext_resource type="Texture2D" uid="uid://drfmtx8hcncpw" path="res://Coin_Gems/MonedaP.png" id="1_4jjm1"]
+[ext_resource type="Script" uid="uid://sytj2wyhs6xt" path="res://scripts/Coin.cs" id="1_wyrsg"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pg3b4"]
+atlas = ExtResource("1_4jjm1")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5o6as"]
+atlas = ExtResource("1_4jjm1")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kl3r8"]
+atlas = ExtResource("1_4jjm1")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l1oca"]
+atlas = ExtResource("1_4jjm1")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ds4vu"]
+atlas = ExtResource("1_4jjm1")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wrnh3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pg3b4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5o6as")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kl3r8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l1oca")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ds4vu")
+}],
+"loop": true,
+"name": &"2",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_whxgd"]
+radius = 20.0
+height = 42.0
+
+[node name="coin2" type="CharacterBody2D"]
+collision_layer = 2
+script = ExtResource("1_wyrsg")
+Type = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(49, 47)
+scale = Vector2(2.5000005, 2.125)
+sprite_frames = SubResource("SpriteFrames_wrnh3")
+animation = &"2"
+autoplay = "2"
+frame_progress = 0.61166614
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(49, 48)
+shape = SubResource("CapsuleShape2D_whxgd")

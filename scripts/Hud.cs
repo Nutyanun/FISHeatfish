@@ -19,6 +19,7 @@ public partial class Hud : CanvasLayer
 	private Label _hint;
 	private Button _retry;
 	private Button _quit;
+	private Button _next;   // เพิ่มปุ่ม Next สำหรับตอนผ่านด่าน
 	private bool _isLevelClear = false;
 
 	// ===== Timer fallback (ใช้เฉพาะกรณีไม่มี ScoreManager ส่งเวลาให้) =====
@@ -53,6 +54,7 @@ public partial class Hud : CanvasLayer
 			_hint  = _overlay.GetNodeOrNull<Label>("%Hint")  ?? _overlay.GetNodeOrNull<Label>("Center/root/Hint");
 			_retry = _overlay.GetNodeOrNull<Button>("%Retry")?? _overlay.GetNodeOrNull<Button>("Center/root/Buttons/Retry");
 			_quit  = _overlay.GetNodeOrNull<Button>("%Quit") ?? _overlay.GetNodeOrNull<Button>("Center/root/Buttons/Quit");
+			_next  = _overlay.GetNodeOrNull<Button>("%Next") ?? _overlay.GetNodeOrNull<Button>("Center/root/Buttons/Next");
 
 			_overlay.ProcessMode = Node.ProcessModeEnum.Always;
 			_overlay.ZIndex = 1000;
@@ -71,6 +73,12 @@ public partial class Hud : CanvasLayer
 				_quit.ProcessMode = Node.ProcessModeEnum.Always;
 				_quit.MouseFilter = Control.MouseFilterEnum.Stop;
 				_quit.Pressed += OnQuitPressed;
+			}
+			if (_next != null)
+			{
+				_next.ProcessMode = Node.ProcessModeEnum.Always;
+				_next.MouseFilter = Control.MouseFilterEnum.Stop;
+				_next.Pressed += OnNextPressed;
 			}
 		}
 
@@ -177,49 +185,59 @@ public partial class Hud : CanvasLayer
 	// เวลาหมดและ "ถึงเป้า" → ScoreManager ยิง LevelCleared มาที่นี่
 	// เวลาหมดและ "คะแนนถึงเป้า" ScoreManager จะยิง event นี้มา
 	private void OnLevelCleared(int finalScore, int level)
-{
+	{
 	GD.Print($"[HUD] Level {level} cleared (score={finalScore}).");
 	HideOverlay();
 	GetTree().Paused = false;
 
 	// ถ้าต้องไปหน้าเช็คพอยต์ทันที ให้ปลดคอมเมนต์
 	// GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
-}
+	}
 
 
 	// (ยังเก็บเมธอดนี้ไว้ เผื่อเรียกใช้เองกรณีอื่น ๆ)
 	public void ShowLevelClear(int level, int finalScore)
 	{
-		if (_overlay == null) return;
-		_isLevelClear = true;
+	if (_overlay == null) return;
+	_isLevelClear = true;
 
-		if (_title != null) _title.Text = "LEVEL CLEAR!";
-		if (_hint  != null) _hint.Text  = "Press Enter for Next";
+	if (_title != null) _title.Text = "LEVEL CLEAR!";
+	if (_hint  != null) _hint.Text  = "Press Enter to Next";
 
-		_overlay.Visible = true;
-		_overlay.MouseFilter = Control.MouseFilterEnum.Stop;
-		_overlay.MoveToFront();
+	// ปิดปุ่ม Quit / เปิดปุ่ม Next
+	if (_quit != null) _quit.Visible = false;
+	if (_next != null) _next.Visible = true;
 
-		GetTree().Paused = true;
+	_overlay.Visible = true;
+	_overlay.MouseFilter = Control.MouseFilterEnum.Stop;
+	_overlay.MoveToFront();
+
+	GetTree().Paused = true;
 	}
+
 
 	// -- GameOver: แสดง overlay ให้กด Retry/Quit ได้
 	public void ShowGameOver(int finalScore, int level) => ShowGameOver();
 
 	public void ShowGameOver()
 	{
-		if (_overlay == null) return;
-		_isLevelClear = false;
+	if (_overlay == null) return;
+	_isLevelClear = false;
 
-		if (_title != null) _title.Text = "GAME OVER";
-		if (_hint  != null) _hint.Text  = "Press Enter to retry";
+	if (_title != null) _title.Text = "GAME OVER";
+	if (_hint  != null) _hint.Text  = "Press Enter to Retry";
 
-		_overlay.Visible = true;
-		_overlay.MouseFilter = Control.MouseFilterEnum.Stop;
-		_overlay.MoveToFront();
+	// ปิดปุ่ม Next / เปิดปุ่ม Quit
+	if (_next != null) _next.Visible = false;
+	if (_quit != null) _quit.Visible = true;
 
-		GetTree().Paused = true;
+	_overlay.Visible = true;
+	_overlay.MouseFilter = Control.MouseFilterEnum.Stop;
+	_overlay.MoveToFront();
+
+	GetTree().Paused = true;
 	}
+
 
 	public void HideOverlay()
 	{
@@ -266,21 +284,25 @@ public partial class Hud : CanvasLayer
 		}
 	}
 
-	private void OnNextPressed()
-	{
-		// ใช้ได้ในกรณีที่คุณเรียก ShowLevelClear เอง (ไม่ใช่กรณี auto-clear ตามเวลา)
-		var sm = GetNodeOrNull<ScoreManager>("%ScoreManager") ?? GetNodeOrNull<ScoreManager>("ScoreManager");
-		if (sm != null)
-		{
-			int nextLevel  = sm.Level + 1;
-			int lives      = sm.Lives;
-			// newTarget ไม่ใช้ตรงๆ ให้สูตรใน ScoreManager จัดการเอง
-			sm.ResetForNewLevel(nextLevel, 0, lives);
-		}
+	private async void OnNextPressed()
+{
+	GD.Print("[HUD] Next pressed");
 
-		HideOverlay();
-		GetTree().Paused = false;
+	var sm = GetNodeOrNull<ScoreManager>("%ScoreManager") ?? GetNodeOrNull<ScoreManager>("ScoreManager");
+	if (sm != null)
+	{
+		// บันทึกข้อมูลของด่านที่เพิ่งเล่นจบ
+		GameProgress.CurrentPlayingLevel = sm.Level;
+		GameProgress.LastLevelScore = sm.Score;
 	}
+
+	GetTree().Paused = false;
+	HideOverlay();
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+	//  ไปหน้า Score เดียวกันทุกด่าน
+	GetTree().ChangeSceneToFile("res://scenescore/score.tscn");
+}
 
 	// ===== Small visual effect when reaching target =====
 	private void FlashScoreLabel()
