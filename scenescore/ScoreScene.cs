@@ -27,12 +27,12 @@ public partial class ScoreScene : Node2D
 			HighScoreLabel.Text = $"High Score: {high}";
 
 		// อัปเดต high score ถ้าทำลายสถิติ
-		if (score > high)
-		{
-			SaveHighScoreForLevel(levelIndex, score);
-			if (HighScoreLabel != null)
-				HighScoreLabel.Text = $"High Score: {score} ";
-		}
+		//if (score > high)
+		//{
+			//SaveHighScoreForLevel(levelIndex, score);
+			//if (HighScoreLabel != null)
+				//HighScoreLabel.Text = $"High Score: {score} ";
+		//}
 	}
 
 	// -------- ระบบเก็บ High Score แยกแต่ละด่าน --------
@@ -54,4 +54,26 @@ public partial class ScoreScene : Node2D
 		using var f = FileAccess.Open(GetHighScorePath(levelIndex), FileAccess.ModeFlags.Write);
 		f.Store32((uint)score);
 	}
+	
+	public override void _UnhandledInput(InputEvent e)
+	{
+	if (e.IsActionPressed("ui_accept") || e.IsActionPressed("ui_cancel"))
+	{
+		// ปลดล็อกเฉพาะตอนเล่นด่านใหม่จริง
+		if (GameProgress.CurrentPlayingLevel == GameProgress.CurrentLevelIndex + 1)
+		{
+			GameProgress.Advance();
+			GD.Print($"[ScoreScene] Advance to Level {GameProgress.CurrentLevelIndex}");
+		}
+		else
+		{
+			GD.Print($"[ScoreScene] Replay level {GameProgress.CurrentPlayingLevel}, no advance.");
+		}
+
+		// กลับหน้า checkpoint
+		GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
+	}
+	}
+
+
 }

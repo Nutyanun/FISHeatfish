@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=27 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
@@ -12,21 +12,33 @@
 [ext_resource type="Script" uid="uid://c82ve4r8igw6p" path="res://scripts/Hud.cs" id="10_eb6dy"]
 [ext_resource type="Script" uid="uid://dst8ehoc1274i" path="res://scripts/ScoreManager.cs" id="10_ya4ey"]
 [ext_resource type="Script" uid="uid://clrin8jr56gc8" path="res://scripts/PauseUi.cs" id="12_eb6dy"]
+[ext_resource type="Texture2D" uid="uid://dydehfl5tb5wa" path="res://7 Dialogue Box/2.png" id="12_muem4"]
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_ya4ey"]
-font = ExtResource("10_choun")
-font_size = 35
-
-[sub_resource type="LabelSettings" id="LabelSettings_eb6dy"]
-font = ExtResource("10_choun")
-font_size = 35
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jbj1t"]
+bg_color = Color(0, 0.32941177, 0.7647059, 0.37254903)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="LabelSettings" id="LabelSettings_trceg"]
 font = ExtResource("10_choun")
-font_size = 35
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_eb6dy"]
+font = ExtResource("10_choun")
+font_size = 24
+
+[sub_resource type="LabelSettings" id="LabelSettings_ya4ey"]
+font = ExtResource("10_choun")
+font_size = 22
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a8y0u"]
 
@@ -38,28 +50,30 @@ font_size = 75
 font = ExtResource("10_choun")
 font_size = 45
 
+[sub_resource type="LabelSettings" id="LabelSettings_0ld40"]
+font = ExtResource("10_choun")
+font_size = 24
+
 [sub_resource type="LabelSettings" id="LabelSettings_muem4"]
 font = ExtResource("10_choun")
-font_size = 35
+font_size = 21
 
 [sub_resource type="LabelSettings" id="LabelSettings_dp3eg"]
 font = ExtResource("10_choun")
-font_size = 35
-
-[sub_resource type="LabelSettings" id="LabelSettings_0ld40"]
-font = ExtResource("10_choun")
-font_size = 35
+font_size = 23
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_choun")
 
 [node name="FishSpawner" type="Node2D" parent="."]
-position = Vector2(-1, 0)
+position = Vector2(-1, 9)
 script = ExtResource("1_o5qli")
 FishScenes = Array[PackedScene]([ExtResource("2_jyhfs"), ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_o6xl0")])
-Weights = PackedFloat32Array(1, 4, 2, 0.5)
+Weights = PackedFloat32Array(3, 6, 4, 2)
+MaxFish = 150
 
 [node name="Player" parent="." instance=ExtResource("5_tbgi4")]
+position = Vector2(362, 373)
 
 [node name="BG" parent="." instance=ExtResource("8_tipki")]
 
@@ -67,38 +81,64 @@ Weights = PackedFloat32Array(1, 4, 2, 0.5)
 unique_name_in_owner = true
 position = Vector2(-1, 0)
 script = ExtResource("10_ya4ey")
+BaseTimeSeconds = 180
 
-[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel")]
+[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel", "HighScoreLabel", "MultiplierLabel", "TimerLabel")]
 unique_name_in_owner = true
 process_mode = 3
 script = ExtResource("10_eb6dy")
-ScoreLabel = NodePath("ScoreLabel")
-LivesLabel = NodePath("LivesLabel")
-LevelLabel = NodePath("LevelLabel")
+ScoreLabel = NodePath("ScoreGroup1/ScoreLabel")
+LivesLabel = NodePath("ScoreGroup3/LivesLabel")
+LevelLabel = NodePath("ScoreGroup2/LevelLabel")
+HighScoreLabel = NodePath("ScoreGroup5/HighScoreLabel")
+MultiplierLabel = NodePath("ScoreGroup6/MultiplierLabel")
+TimerLabel = NodePath("ScoreGroup4/TimerLabel")
 
-[node name="ScoreLabel" type="Label" parent="HUD"]
-offset_left = 73.0
-offset_top = 17.0
-offset_right = 340.0
-offset_bottom = 57.0
-text = "Score : 0 / 500"
-label_settings = SubResource("LabelSettings_ya4ey")
+[node name="ScoreBg" type="TextureRect" parent="HUD"]
+offset_left = 13.0
+offset_top = 3.0
+offset_right = 1097.0
+offset_bottom = 131.0
+texture = ExtResource("12_muem4")
 
-[node name="LevelLabel" type="Label" parent="HUD"]
-offset_left = 815.0
-offset_top = 12.0
-offset_right = 979.0
-offset_bottom = 52.0
-text = "Level : 1"
-label_settings = SubResource("LabelSettings_eb6dy")
+[node name="ScoreGroup3" type="PanelContainer" parent="HUD"]
+offset_left = 366.0
+offset_top = 19.0
+offset_right = 499.0
+offset_bottom = 61.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
-[node name="LivesLabel" type="Label" parent="HUD"]
-offset_left = 513.0
-offset_top = 15.0
-offset_right = 677.0
-offset_bottom = 55.0
-text = "Lives : 3"
+[node name="LivesLabel" type="Label" parent="HUD/ScoreGroup3"]
+layout_mode = 2
+text = " Lives : 3"
 label_settings = SubResource("LabelSettings_trceg")
+horizontal_alignment = 1
+
+[node name="ScoreGroup2" type="PanelContainer" parent="HUD"]
+offset_left = 747.0
+offset_top = 19.0
+offset_right = 879.0
+offset_bottom = 61.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
+
+[node name="LevelLabel" type="Label" parent="HUD/ScoreGroup2"]
+layout_mode = 2
+text = " Level : 1 "
+label_settings = SubResource("LabelSettings_eb6dy")
+horizontal_alignment = 1
+
+[node name="ScoreGroup1" type="PanelContainer" parent="HUD"]
+offset_left = 95.0
+offset_top = 19.0
+offset_right = 311.0
+offset_bottom = 62.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
+
+[node name="ScoreLabel" type="Label" parent="HUD/ScoreGroup1"]
+layout_mode = 2
+text = " Score : 0 / 300 "
+label_settings = SubResource("LabelSettings_ya4ey")
+horizontal_alignment = 1
 
 [node name="GameOverLabel" type="Panel" parent="HUD"]
 unique_name_in_owner = true
@@ -125,17 +165,22 @@ alignment = 1
 
 [node name="Title" type="Label" parent="HUD/GameOverLabel/Center/root"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
 text = "GAME OVER"
 label_settings = SubResource("LabelSettings_jkv2x")
 horizontal_alignment = 1
 
 [node name="Hint" type="Label" parent="HUD/GameOverLabel/Center/root"]
 layout_mode = 2
+size_flags_horizontal = 4
 text = "Press Enter to retry"
 label_settings = SubResource("LabelSettings_jbj1t")
 
 [node name="Buttons" type="HBoxContainer" parent="HUD/GameOverLabel/Center/root"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_override_constants/separation = 20
 alignment = 1
 
@@ -152,29 +197,56 @@ theme_override_font_sizes/font_size = 40
 text = "Quit"
 icon_alignment = 1
 
-[node name="HighScoreLabel" type="Label" parent="HUD"]
-offset_left = 16.0
-offset_top = 69.0
-offset_right = 376.0
-offset_bottom = 109.0
-text = "Total : x   High : y"
-label_settings = SubResource("LabelSettings_muem4")
+[node name="Next" type="Button" parent="HUD/GameOverLabel/Center/root/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Next"
+icon_alignment = 1
 
-[node name="MultiplierLabel" type="Label" parent="HUD"]
-offset_left = 443.0
-offset_top = 68.0
-offset_right = 766.0
-offset_bottom = 108.0
-text = "Mult : xM | a/b | ts"
-label_settings = SubResource("LabelSettings_dp3eg")
+[node name="ScoreGroup4" type="PanelContainer" parent="HUD"]
+offset_left = 537.0
+offset_top = 19.0
+offset_right = 702.0
+offset_bottom = 61.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
-[node name="TimerLabel" type="Label" parent="HUD"]
-offset_left = 814.0
-offset_top = 68.0
-offset_right = 1002.0
-offset_bottom = 108.0
-text = "Time : mm:ss"
+[node name="TimerLabel" type="Label" parent="HUD/ScoreGroup4"]
+layout_mode = 2
+text = " Time : mm:ss "
 label_settings = SubResource("LabelSettings_0ld40")
+horizontal_alignment = 1
+
+[node name="ScoreGroup5" type="PanelContainer" parent="HUD"]
+offset_left = 158.0
+offset_top = 76.0
+offset_right = 452.0
+offset_bottom = 118.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
+
+[node name="HighScoreLabel" type="Label" parent="HUD/ScoreGroup5"]
+layout_mode = 2
+text = " Total : x   High  : y "
+label_settings = SubResource("LabelSettings_muem4")
+horizontal_alignment = 1
+
+[node name="ScoreGroup6" type="PanelContainer" parent="HUD"]
+offset_left = 591.0
+offset_top = 74.0
+offset_right = 845.0
+offset_bottom = 116.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
+
+[node name="MultiplierLabel" type="Label" parent="HUD/ScoreGroup6"]
+layout_mode = 2
+text = " Mult : xM | a/b | ts "
+label_settings = SubResource("LabelSettings_dp3eg")
+horizontal_alignment = 1
+
+[node name="Clock" type="Timer" parent="HUD"]
+autostart = true
 
 [node name="PauseUI" type="CanvasLayer" parent="."]
 process_mode = 3
@@ -196,10 +268,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = -1.833
 anchor_right = -1.833
-offset_left = -132.0
-offset_top = 2.0
-offset_right = -61.0
-offset_bottom = 73.0
+offset_left = -154.0
+offset_top = 39.0
+offset_right = -83.0
+offset_bottom = 110.0
 action_mode = 0
 icon = ExtResource("13_trceg")
 flat = true
@@ -211,14 +283,15 @@ visible = false
 z_index = 110
 layout_mode = 1
 anchors_preset = -1
-offset_left = -131.68
-offset_top = 2.0
-offset_right = -10.6799
-offset_bottom = 223.0
+offset_left = -155.0
+offset_top = 38.0
+offset_right = -33.99991
+offset_bottom = 259.0
 
 [node name="ResumeButton" type="Button" parent="PauseUI/Panel/SubMenu"]
 process_mode = 3
 layout_mode = 2
+theme_override_colors/font_color = Color(0.20837438, 0.56983906, 0.8460055, 1)
 theme_override_fonts/font = ExtResource("10_choun")
 text = "Resume"
 icon = ExtResource("14_jbj1t")
@@ -227,6 +300,7 @@ flat = true
 [node name="QuitGameButton" type="Button" parent="PauseUI/Panel/SubMenu"]
 process_mode = 3
 layout_mode = 2
+theme_override_colors/font_color = Color(0.529992, 0.9571354, 0.97504765, 1)
 theme_override_fonts/font = ExtResource("10_choun")
 text = "Quit"
 icon = ExtResource("16_dp3eg")

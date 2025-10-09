@@ -1,42 +1,42 @@
-[gd_scene load_steps=22 format=3 uid="uid://dug80gd7mun0b"]
+[gd_scene load_steps=22 format=3 uid="uid://6nvbds37x6es"]
 
-[ext_resource type="Texture2D" uid="uid://p23ohgxsxe11" path="res://sceneexplaingame/under the sea.png" id="1_n51ur"]
-[ext_resource type="Texture2D" uid="uid://j8bxrpprykaj" path="res://sceneexplaingame/map-Photoroom.png" id="2_tovr5"]
-[ext_resource type="Texture2D" uid="uid://d3ypvwjgv2law" path="res://scenecheckpoint/gobackbutton.png" id="3_6dx22"]
-[ext_resource type="Texture2D" uid="uid://dkws6bygyrwvn" path="res://scenecheckpoint/gobackbuttonnn.png" id="4_m2v3s"]
-[ext_resource type="Texture2D" uid="uid://dt4qgvsf1801v" path="res://scenecheckpoint/gobackbuttonn.png" id="5_rmdve"]
-[ext_resource type="Script" uid="uid://cenf353ke2i44" path="res://sceneexplaingame/Gobackbutton.cs" id="6_x436r"]
-[ext_resource type="Texture2D" uid="uid://elg3jrtmjyo2" path="res://scenecheckpoint/playbutton.png" id="7_klt3a"]
-[ext_resource type="Texture2D" uid="uid://d32ay3fvevl74" path="res://scenecheckpoint/playbuttonnn.png" id="8_k1jv2"]
-[ext_resource type="Texture2D" uid="uid://lhvr51rlvlt4" path="res://scenecheckpoint/playbuttonn.png" id="9_4l2wd"]
-[ext_resource type="Script" uid="uid://ckpjyuswhycx1" path="res://sceneexplaingame/Playbutton.cs" id="10_mhdph"]
-[ext_resource type="FontFile" uid="uid://bqb3tid7kns2e" path="res://Font/Silkscreen/slkscrb.ttf" id="11_qml06"]
-[ext_resource type="FontFile" uid="uid://djyxjv0jq58wp" path="res://SceneLogin/Pixeboy.ttf" id="12_x436r"]
-[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://JellyFish - 32x16/JellyFish.png" id="13_klt3a"]
-[ext_resource type="Texture2D" uid="uid://dc5vkjd5ijgea" path="res://Fish3 - 32x16/Orange.png" id="14_k1jv2"]
-[ext_resource type="Texture2D" uid="uid://26msx8ftsscn" path="res://Fish3 - 32x16/Blue.png" id="15_4l2wd"]
-[ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://Shark - 32x32/Shark.png" id="16_mhdph"]
+[ext_resource type="Texture2D" uid="uid://p23ohgxsxe11" path="res://sceneexplaingame/under the sea.png" id="1_4awrx"]
+[ext_resource type="Texture2D" uid="uid://j8bxrpprykaj" path="res://sceneexplaingame/map-Photoroom.png" id="2_3f38w"]
+[ext_resource type="Texture2D" uid="uid://d3ypvwjgv2law" path="res://scenecheckpoint/gobackbutton.png" id="3_sbckv"]
+[ext_resource type="Texture2D" uid="uid://dkws6bygyrwvn" path="res://scenecheckpoint/gobackbuttonnn.png" id="4_5t6v0"]
+[ext_resource type="Texture2D" uid="uid://dt4qgvsf1801v" path="res://scenecheckpoint/gobackbuttonn.png" id="5_h6mit"]
+[ext_resource type="Script" uid="uid://cenf353ke2i44" path="res://sceneexplaingame/Gobackbutton.cs" id="6_qebdo"]
+[ext_resource type="Texture2D" uid="uid://elg3jrtmjyo2" path="res://scenecheckpoint/playbutton.png" id="7_vp38t"]
+[ext_resource type="Texture2D" uid="uid://d32ay3fvevl74" path="res://scenecheckpoint/playbuttonnn.png" id="8_3lmmd"]
+[ext_resource type="Texture2D" uid="uid://lhvr51rlvlt4" path="res://scenecheckpoint/playbuttonn.png" id="9_5j1gp"]
+[ext_resource type="Script" uid="uid://ckpjyuswhycx1" path="res://sceneexplaingame/Playbutton.cs" id="10_ysyxd"]
+[ext_resource type="FontFile" uid="uid://bqb3tid7kns2e" path="res://Font/Silkscreen/slkscrb.ttf" id="11_rwaix"]
+[ext_resource type="FontFile" uid="uid://djyxjv0jq58wp" path="res://SceneLogin/Pixeboy.ttf" id="12_xy47k"]
+[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://JellyFish - 32x16/JellyFish.png" id="13_3ijnb"]
+[ext_resource type="Texture2D" uid="uid://dc5vkjd5ijgea" path="res://Fish3 - 32x16/Orange.png" id="14_0qwiu"]
+[ext_resource type="Texture2D" uid="uid://26msx8ftsscn" path="res://Fish3 - 32x16/Blue.png" id="15_o5ulb"]
+[ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://Shark - 32x32/Shark.png" id="16_nmdm5"]
 
 [sub_resource type="Theme" id="Theme_rc6d1"]
-default_font = ExtResource("11_qml06")
+default_font = ExtResource("11_rwaix")
 
 [sub_resource type="LabelSettings" id="LabelSettings_ljrbi"]
-font = ExtResource("12_x436r")
+font = ExtResource("12_xy47k")
 font_size = 22
 font_color = Color(0.6745098, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_s4sun"]
-font = ExtResource("12_x436r")
+font = ExtResource("12_xy47k")
 font_size = 22
 font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_uw42v"]
-font = ExtResource("12_x436r")
+font = ExtResource("12_xy47k")
 font_size = 22
 font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_4i1aw"]
-font = ExtResource("12_x436r")
+font = ExtResource("12_xy47k")
 font_size = 23
 
 [node name="Node2D" type="Node2D"]
@@ -44,7 +44,7 @@ font_size = 23
 [node name="bg" type="Sprite2D" parent="."]
 position = Vector2(579.5, 322.5)
 scale = Vector2(1.20313, 1.21082)
-texture = ExtResource("1_n51ur")
+texture = ExtResource("1_4awrx")
 
 [node name="Label" type="Label" parent="bg"]
 offset_right = 40.0
@@ -53,7 +53,7 @@ offset_bottom = 23.0
 [node name="explainpart" type="Sprite2D" parent="."]
 position = Vector2(546, 302)
 scale = Vector2(1.0591836, 0.5949619)
-texture = ExtResource("2_tovr5")
+texture = ExtResource("2_3f38w")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -68,11 +68,11 @@ offset_top = 529.0
 offset_right = 1674.0
 offset_bottom = 1169.0
 scale = Vector2(0.196095, 0.192092)
-texture_normal = ExtResource("3_6dx22")
-texture_pressed = ExtResource("4_m2v3s")
-texture_hover = ExtResource("5_rmdve")
+texture_normal = ExtResource("3_sbckv")
+texture_pressed = ExtResource("4_5t6v0")
+texture_hover = ExtResource("5_h6mit")
 stretch_mode = 0
-script = ExtResource("6_x436r")
+script = ExtResource("6_qebdo")
 
 [node name="playbutton" type="TextureButton" parent="Control"]
 layout_mode = 0
@@ -81,22 +81,22 @@ offset_top = 517.0
 offset_right = 1121.0
 offset_bottom = 1157.0
 scale = Vector2(0.226568, 0.205841)
-texture_normal = ExtResource("7_klt3a")
-texture_pressed = ExtResource("8_k1jv2")
-texture_hover = ExtResource("9_4l2wd")
-script = ExtResource("10_mhdph")
-LevelNumber = 4
+texture_normal = ExtResource("7_vp38t")
+texture_pressed = ExtResource("8_3lmmd")
+texture_hover = ExtResource("9_5j1gp")
+script = ExtResource("10_ysyxd")
+LevelNumber = 12
 
 [node name="Label" type="Label" parent="."]
-offset_left = 448.0
-offset_top = 25.999998
-offset_right = 595.0
-offset_bottom = 55.0
+offset_left = 437.99997
+offset_top = 28.0
+offset_right = 605.0
+offset_bottom = 57.0
 scale = Vector2(1.4011, 1.82698)
 size_flags_vertical = 0
 theme = SubResource("Theme_rc6d1")
 theme_type_variation = &"HeaderLarge"
-text = "LEVEL 4"
+text = "LEVEL 12"
 
 [node name="Label2" type="Label" parent="."]
 offset_left = 418.0
@@ -118,28 +118,28 @@ label_settings = SubResource("LabelSettings_s4sun")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(382, 345)
 scale = Vector2(2.0657368, 2.424173)
-texture = ExtResource("13_klt3a")
+texture = ExtResource("13_3ijnb")
 region_enabled = true
 region_rect = Rect2(0, 0, 35, 17.5)
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
 position = Vector2(375.75, 296.25)
 scale = Vector2(1.8906248, 2.7499995)
-texture = ExtResource("14_k1jv2")
+texture = ExtResource("14_0qwiu")
 region_enabled = true
 region_rect = Rect2(0, 0, 32, 18.5)
 
 [node name="Sprite2D3" type="Sprite2D" parent="."]
 position = Vector2(378, 247)
 scale = Vector2(1.7578139, 2.2499993)
-texture = ExtResource("15_4l2wd")
+texture = ExtResource("15_o5ulb")
 region_enabled = true
 region_rect = Rect2(0, 0, 32, 16.5)
 
 [node name="Sprite2D4" type="Sprite2D" parent="."]
 position = Vector2(384, 400)
 scale = Vector2(2.6142857, 2.3709676)
-texture = ExtResource("16_mhdph")
+texture = ExtResource("16_nmdm5")
 region_enabled = true
 region_rect = Rect2(0, 0, 35, 31.5)
 

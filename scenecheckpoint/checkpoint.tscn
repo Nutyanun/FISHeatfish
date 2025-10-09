@@ -34,74 +34,75 @@ script = ExtResource("4_sk1eg")
 LevelNumber = 2
 
 [node name="level3" type="Sprite2D" parent="."]
-position = Vector2(307, 373)
+position = Vector2(305, 364.99997)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 3
 
 [node name="level4" type="Sprite2D" parent="."]
-position = Vector2(384, 421)
+position = Vector2(389.00003, 423.99997)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 4
 
 [node name="level5" type="Sprite2D" parent="."]
-position = Vector2(443, 480)
+position = Vector2(472.00003, 476.99997)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 5
 
 [node name="level6" type="Sprite2D" parent="."]
-position = Vector2(528, 519)
+position = Vector2(557, 507)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 6
 
 [node name="level7" type="Sprite2D" parent="."]
-position = Vector2(616, 487)
+position = Vector2(649, 459)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 7
 
 [node name="level8" type="Sprite2D" parent="."]
-position = Vector2(717, 490)
+position = Vector2(741, 450)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 8
 
 [node name="level9" type="Sprite2D" parent="."]
-position = Vector2(740, 390)
+position = Vector2(752, 355)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 9
 
 [node name="level10" type="Sprite2D" parent="."]
-position = Vector2(670, 333)
+position = Vector2(673, 296)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 10
 
 [node name="level11" type="Sprite2D" parent="."]
-position = Vector2(582, 294)
+position = Vector2(602, 234)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 
 [node name="level12" type="Sprite2D" parent="."]
-position = Vector2(572, 204)
+position = Vector2(641, 162)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 
 [node name="level13" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(655, 143.999)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")

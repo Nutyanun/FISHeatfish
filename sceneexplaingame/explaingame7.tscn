@@ -1,31 +1,59 @@
-[gd_scene load_steps=13 format=3 uid="uid://rps2gm3oynrk"]
+[gd_scene load_steps=22 format=3 uid="uid://rps2gm3oynrk"]
 
-[ext_resource type="Texture2D" uid="uid://p23ohgxsxe11" path="res://sceneexplaingame/under the sea.png" id="1_fxvmx"]
-[ext_resource type="Texture2D" uid="uid://j8bxrpprykaj" path="res://sceneexplaingame/map-Photoroom.png" id="2_qpqnp"]
-[ext_resource type="Texture2D" uid="uid://d3ypvwjgv2law" path="res://scenecheckpoint/gobackbutton.png" id="3_4gxjb"]
-[ext_resource type="Texture2D" uid="uid://dkws6bygyrwvn" path="res://scenecheckpoint/gobackbuttonnn.png" id="4_dp774"]
-[ext_resource type="Texture2D" uid="uid://dt4qgvsf1801v" path="res://scenecheckpoint/gobackbuttonn.png" id="5_3s3un"]
-[ext_resource type="Script" uid="uid://cenf353ke2i44" path="res://sceneexplaingame/Gobackbutton.cs" id="6_na5d4"]
-[ext_resource type="Texture2D" uid="uid://elg3jrtmjyo2" path="res://scenecheckpoint/playbutton.png" id="7_tiqj7"]
-[ext_resource type="Texture2D" uid="uid://d32ay3fvevl74" path="res://scenecheckpoint/playbuttonnn.png" id="8_ae46u"]
-[ext_resource type="Texture2D" uid="uid://lhvr51rlvlt4" path="res://scenecheckpoint/playbuttonn.png" id="9_25xwo"]
-[ext_resource type="Script" uid="uid://ckpjyuswhycx1" path="res://sceneexplaingame/Playbutton.cs" id="10_yqcyh"]
-[ext_resource type="FontFile" uid="uid://bqb3tid7kns2e" path="res://Font/Silkscreen/slkscrb.ttf" id="11_y5i3h"]
+[ext_resource type="Texture2D" uid="uid://p23ohgxsxe11" path="res://sceneexplaingame/under the sea.png" id="1_na5d4"]
+[ext_resource type="Texture2D" uid="uid://j8bxrpprykaj" path="res://sceneexplaingame/map-Photoroom.png" id="2_tiqj7"]
+[ext_resource type="Texture2D" uid="uid://d3ypvwjgv2law" path="res://scenecheckpoint/gobackbutton.png" id="3_ae46u"]
+[ext_resource type="Texture2D" uid="uid://dkws6bygyrwvn" path="res://scenecheckpoint/gobackbuttonnn.png" id="4_25xwo"]
+[ext_resource type="Texture2D" uid="uid://dt4qgvsf1801v" path="res://scenecheckpoint/gobackbuttonn.png" id="5_yqcyh"]
+[ext_resource type="Script" uid="uid://cenf353ke2i44" path="res://sceneexplaingame/Gobackbutton.cs" id="6_y5i3h"]
+[ext_resource type="Texture2D" uid="uid://elg3jrtmjyo2" path="res://scenecheckpoint/playbutton.png" id="7_2qx2q"]
+[ext_resource type="Texture2D" uid="uid://d32ay3fvevl74" path="res://scenecheckpoint/playbuttonnn.png" id="8_xcap2"]
+[ext_resource type="Texture2D" uid="uid://lhvr51rlvlt4" path="res://scenecheckpoint/playbuttonn.png" id="9_u5ooc"]
+[ext_resource type="Script" uid="uid://ckpjyuswhycx1" path="res://sceneexplaingame/Playbutton.cs" id="10_lqdbh"]
+[ext_resource type="FontFile" uid="uid://bqb3tid7kns2e" path="res://Font/Silkscreen/slkscrb.ttf" id="11_i0jd7"]
+[ext_resource type="FontFile" uid="uid://djyxjv0jq58wp" path="res://SceneLogin/Pixeboy.ttf" id="12_jy2mi"]
+[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://JellyFish - 32x16/JellyFish.png" id="13_jsi2f"]
+[ext_resource type="Texture2D" uid="uid://dc5vkjd5ijgea" path="res://Fish3 - 32x16/Orange.png" id="14_w021o"]
+[ext_resource type="Texture2D" uid="uid://26msx8ftsscn" path="res://Fish3 - 32x16/Blue.png" id="15_0puue"]
+[ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://Shark - 32x32/Shark.png" id="16_wudoc"]
 
 [sub_resource type="Theme" id="Theme_rc6d1"]
-default_font = ExtResource("11_y5i3h")
+default_font = ExtResource("11_i0jd7")
+
+[sub_resource type="LabelSettings" id="LabelSettings_ljrbi"]
+font = ExtResource("12_jy2mi")
+font_size = 22
+font_color = Color(0.6745098, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_s4sun"]
+font = ExtResource("12_jy2mi")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_uw42v"]
+font = ExtResource("12_jy2mi")
+font_size = 22
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_4i1aw"]
+font = ExtResource("12_jy2mi")
+font_size = 23
 
 [node name="Node2D" type="Node2D"]
 
 [node name="bg" type="Sprite2D" parent="."]
 position = Vector2(579.5, 322.5)
 scale = Vector2(1.20313, 1.21082)
-texture = ExtResource("1_fxvmx")
+texture = ExtResource("1_na5d4")
+
+[node name="Label" type="Label" parent="bg"]
+offset_right = 40.0
+offset_bottom = 23.0
 
 [node name="explainpart" type="Sprite2D" parent="."]
-position = Vector2(562, 283)
-scale = Vector2(0.712245, 0.506378)
-texture = ExtResource("2_qpqnp")
+position = Vector2(546, 302)
+scale = Vector2(1.0591836, 0.5949619)
+texture = ExtResource("2_tiqj7")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -40,32 +68,110 @@ offset_top = 529.0
 offset_right = 1674.0
 offset_bottom = 1169.0
 scale = Vector2(0.196095, 0.192092)
-texture_normal = ExtResource("3_4gxjb")
-texture_pressed = ExtResource("4_dp774")
-texture_hover = ExtResource("5_3s3un")
+texture_normal = ExtResource("3_ae46u")
+texture_pressed = ExtResource("4_25xwo")
+texture_hover = ExtResource("5_yqcyh")
 stretch_mode = 0
-script = ExtResource("6_na5d4")
+script = ExtResource("6_y5i3h")
 
 [node name="playbutton" type="TextureButton" parent="Control"]
 layout_mode = 0
-offset_left = 486.0
-offset_top = 460.0
-offset_right = 1126.0
-offset_bottom = 1100.0
+offset_left = 481.00003
+offset_top = 517.0
+offset_right = 1121.0
+offset_bottom = 1157.0
 scale = Vector2(0.226568, 0.205841)
-texture_normal = ExtResource("7_tiqj7")
-texture_pressed = ExtResource("8_ae46u")
-texture_hover = ExtResource("9_25xwo")
-script = ExtResource("10_yqcyh")
+texture_normal = ExtResource("7_2qx2q")
+texture_pressed = ExtResource("8_xcap2")
+texture_hover = ExtResource("9_u5ooc")
+script = ExtResource("10_lqdbh")
 LevelNumber = 7
 
 [node name="Label" type="Label" parent="."]
-offset_left = 467.0
-offset_top = 31.0
-offset_right = 611.0
-offset_bottom = 60.0
+offset_left = 455.0
+offset_top = 25.999998
+offset_right = 599.0
+offset_bottom = 55.0
 scale = Vector2(1.4011, 1.82698)
 size_flags_vertical = 0
 theme = SubResource("Theme_rc6d1")
 theme_type_variation = &"HeaderLarge"
 text = "LEVEL 7"
+
+[node name="Label2" type="Label" parent="."]
+offset_left = 418.0
+offset_top = 188.0
+offset_right = 724.0
+offset_bottom = 220.0
+text = "                  The First Bite ! 
+Reach 500 points within 3 minutes"
+label_settings = SubResource("LabelSettings_ljrbi")
+
+[node name="Label3" type="Label" parent="."]
+offset_left = 443.0
+offset_top = 238.0
+offset_right = 508.0
+offset_bottom = 261.0
+text = "1 point"
+label_settings = SubResource("LabelSettings_s4sun")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(382, 345)
+scale = Vector2(2.0657368, 2.424173)
+texture = ExtResource("13_jsi2f")
+region_enabled = true
+region_rect = Rect2(0, 0, 35, 17.5)
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+position = Vector2(375.75, 296.25)
+scale = Vector2(1.8906248, 2.7499995)
+texture = ExtResource("14_w021o")
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 18.5)
+
+[node name="Sprite2D3" type="Sprite2D" parent="."]
+position = Vector2(378, 247)
+scale = Vector2(1.7578139, 2.2499993)
+texture = ExtResource("15_0puue")
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 16.5)
+
+[node name="Sprite2D4" type="Sprite2D" parent="."]
+position = Vector2(384, 400)
+scale = Vector2(2.6142857, 2.3709676)
+texture = ExtResource("16_wudoc")
+region_enabled = true
+region_rect = Rect2(0, 0, 35, 31.5)
+
+[node name="Label4" type="Label" parent="."]
+offset_left = 443.0
+offset_top = 287.0
+offset_right = 758.0
+offset_bottom = 310.0
+text = "5 points (unlocked after 10 points)"
+label_settings = SubResource("LabelSettings_uw42v")
+
+[node name="Label5" type="Label" parent="."]
+offset_left = 443.0
+offset_top = 336.0
+offset_right = 769.0
+offset_bottom = 359.0
+text = "10 points (unlocked after 15 points)"
+label_settings = SubResource("LabelSettings_uw42v")
+
+[node name="Label6" type="Label" parent="."]
+offset_left = 444.0
+offset_top = 393.0
+offset_right = 770.0
+offset_bottom = 416.0
+text = "15 points (unlocked after 30 points)"
+label_settings = SubResource("LabelSettings_uw42v")
+
+[node name="Label7" type="Label" parent="."]
+offset_left = 643.0
+offset_top = 538.0
+offset_right = 871.0
+offset_bottom = 569.0
+text = "Time Limit : 3:00 minutes
+Target Score : 300 points"
+label_settings = SubResource("LabelSettings_4i1aw")

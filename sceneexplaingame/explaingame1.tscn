@@ -85,7 +85,6 @@ texture_normal = ExtResource("5_jaop8")
 texture_pressed = ExtResource("10_d6ien")
 texture_hover = ExtResource("11_81gmy")
 script = ExtResource("12_d1n47")
-LevelNumber = 2
 
 [node name="Label" type="Label" parent="."]
 offset_left = 467.0
@@ -173,5 +172,5 @@ offset_top = 538.0
 offset_right = 871.0
 offset_bottom = 569.0
 text = "Time Limit : 3:00 minutes
-Target Score : 500 points"
+Target Score : 300 points"
 label_settings = SubResource("LabelSettings_4i1aw")

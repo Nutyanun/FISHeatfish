@@ -16,7 +16,6 @@ fill_to = Vector2(0, 0)
 metadata/_snap_enabled = true
 
 [node name="BG" type="ParallaxBackground"]
-scroll_ignore_camera_zoom = true
 script = ExtResource("1_5vsr6")
 
 [node name="Sky" type="ParallaxLayer" parent="."]
