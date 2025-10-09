@@ -11,7 +11,7 @@ public partial class PauseUi : CanvasLayer
  private Control _panel;   // node ชื่อ Panel แต่ type จริงคือ Control
  private Button _menuBtn;  // node ชื่อ MenuButton แต่ type จริงคือ Button
  private Control _subMenu;
- private BaseButton _resume, _quitToMenu, _quitGame;
+ private BaseButton _resume, _quitGame;
 
  public override void _Ready()
  {
@@ -26,7 +26,6 @@ public partial class PauseUi : CanvasLayer
   _menuBtn    = GetNode<Button>("Panel/MenuButton");
   _subMenu    = GetNode<Control>("Panel/SubMenu");
   _resume     = GetNode<BaseButton>("Panel/SubMenu/ResumeButton");
-  _quitToMenu = GetNode<BaseButton>("Panel/SubMenu/QuitToMenuButton");
   _quitGame   = GetNode<BaseButton>("Panel/SubMenu/QuitGameButton");
 
   // --- กันคลิกทะลุ + ซ้อนด้านบนใน canvas เดียวกัน ---
@@ -45,7 +44,6 @@ public partial class PauseUi : CanvasLayer
   _menuBtn.GuiInput   += OnMenuGuiInput;
 
   _resume.Pressed     += OnResume;
-  _quitToMenu.Pressed += OnQuitToMenu;
   _quitGame.Pressed   += OnQuitGame;
 
   // ซ่อนเมนูย่อยตอนเริ่ม
@@ -53,8 +51,6 @@ public partial class PauseUi : CanvasLayer
 
   if (OS.HasFeature("web"))
    _quitGame.Visible = false;
-  if (string.IsNullOrEmpty(MainMenuScenePath))
-   _quitToMenu.Visible = false;
 
   GD.Print("[PauseUi] Ready OK");
  }
@@ -138,22 +134,12 @@ public partial class PauseUi : CanvasLayer
   GD.Print("[PauseUi] Resume");
  }
 
- private void OnQuitToMenu()
- {
-  GetTree().Paused = false;
-  SetAudioPaused(false);
-  _subMenu.Visible = false;
-  if (!string.IsNullOrEmpty(MainMenuScenePath))
-   GetTree().ChangeSceneToFile(MainMenuScenePath);
-  GD.Print("[PauseUi] QuitToMenu");
- }
-
  private void OnQuitGame()
  {
   GetTree().Paused = false;
   SetAudioPaused(false);
   _subMenu.Visible = false;
-  GetTree().Quit();
+  GetTree().ChangeSceneToFile("res://scenecheckpoint/checkpoint.tscn");
   GD.Print("[PauseUi] QuitGame");
  }
 

@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class Bg : ParallaxBackground
+public partial class Bg : ParallaxBackground 
 {
 	[Export] public Vector2 Speed = new(-120f, 0f); // ลองแรงๆ ให้เห็นผล
 

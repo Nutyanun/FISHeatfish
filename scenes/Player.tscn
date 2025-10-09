@@ -1,10 +1,10 @@
 [gd_scene load_steps=38 format=3 uid="uid://cjlwti2qyeaf6"]
 
 [ext_resource type="Script" uid="uid://ykp4mjrofh1n" path="res://scripts/Player.cs" id="1_wa5b8"]
-[ext_resource type="Texture2D" uid="uid://dt7277imqp2bs" path="res://SpearFishing Assets Pack/Sprites/Fish1 - 16x16/Orange.png" id="2_yluv2"]
+[ext_resource type="Texture2D" uid="uid://dt7277imqp2bs" path="res://Fish1 - 16x16/Orange.png" id="2_yluv2"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_yluv2"]
-radius = 25.318
+[sub_resource type="CircleShape2D" id="CircleShape2D_v6fml"]
+radius = 12.083046
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jgys2"]
 size = Vector2(46, 52)
@@ -242,7 +242,6 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D"]
-position = Vector2(581, 329)
 collision_mask = 2
 script = ExtResource("1_wa5b8")
 
@@ -251,8 +250,11 @@ collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MouthArea"]
-position = Vector2(-399, -54)
-shape = SubResource("CircleShape2D_yluv2")
+position = Vector2(-387, -47)
+shape = SubResource("CircleShape2D_v6fml")
+
+[node name="BiteTimer" type="Timer" parent="MouthArea"]
+wait_time = 0.2
 
 [node name="HurtArea" type="Area2D" parent="."]
 light_mask = 4
@@ -261,11 +263,11 @@ collision_layer = 4
 collision_mask = 2
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="HurtArea"]
-position = Vector2(-399, -55)
+position = Vector2(-400, -53)
 shape = SubResource("RectangleShape2D_jgys2")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(-400, -56)
+position = Vector2(-401, -53)
 scale = Vector2(3, 3)
 sprite_frames = SubResource("SpriteFrames_jy2vl")
 autoplay = "default"
