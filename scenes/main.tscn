@@ -69,7 +69,7 @@ font_size = 23
 
 [sub_resource type="LabelSettings" id="LabelSettings_yc10j"]
 font = ExtResource("13_yc10j")
-font_size = 20
+font_size = 24
 
 [sub_resource type="LabelSettings" id="LabelSettings_gqmmt"]
 font = ExtResource("13_gqmmt")
@@ -116,6 +116,7 @@ offset_bottom = 131.0
 texture = ExtResource("12_muem4")
 
 [node name="ScoreGroup3" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.50980395, 0.8627451, 1, 1)
 offset_left = 366.0
 offset_top = 19.0
 offset_right = 499.0
@@ -129,6 +130,7 @@ label_settings = SubResource("LabelSettings_trceg")
 horizontal_alignment = 1
 
 [node name="ScoreGroup2" type="PanelContainer" parent="HUD"]
+self_modulate = Color(1, 1, 0.7529412, 1)
 offset_left = 747.0
 offset_top = 19.0
 offset_right = 879.0
@@ -142,6 +144,7 @@ label_settings = SubResource("LabelSettings_eb6dy")
 horizontal_alignment = 1
 
 [node name="ScoreGroup1" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.7135073, 0.8567279, 0.9956693, 1)
 offset_left = 95.0
 offset_top = 19.0
 offset_right = 311.0
@@ -221,6 +224,7 @@ text = "Next"
 icon_alignment = 1
 
 [node name="ScoreGroup4" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.8666667, 1, 0.81960785, 1)
 offset_left = 537.0
 offset_top = 19.0
 offset_right = 702.0
@@ -234,10 +238,11 @@ label_settings = SubResource("LabelSettings_0ld40")
 horizontal_alignment = 1
 
 [node name="ScoreGroup5" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.8627451, 0.8392157, 1, 1)
 offset_left = 93.0
-offset_top = 76.0
+offset_top = 72.0
 offset_right = 387.0
-offset_bottom = 118.0
+offset_bottom = 114.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="HighScoreLabel" type="Label" parent="HUD/ScoreGroup5"]
@@ -247,10 +252,11 @@ label_settings = SubResource("LabelSettings_muem4")
 horizontal_alignment = 1
 
 [node name="ScoreGroup6" type="PanelContainer" parent="HUD"]
+self_modulate = Color(1, 0.75914747, 0.8679129, 1)
 offset_left = 455.0
-offset_top = 74.0
+offset_top = 71.0
 offset_right = 709.0
-offset_bottom = 116.0
+offset_bottom = 113.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="MultiplierLabel" type="Label" parent="HUD/ScoreGroup6"]
@@ -260,7 +266,7 @@ label_settings = SubResource("LabelSettings_dp3eg")
 horizontal_alignment = 1
 
 [node name="ScoreGroup7" type="PanelContainer" parent="HUD"]
-self_modulate = Color(0.93, 0.7626, 0.88257, 1)
+self_modulate = Color(1, 0.8006883, 0.6899547, 1)
 offset_left = 748.0
 offset_top = 73.0
 offset_right = 880.0
@@ -269,7 +275,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="BonusLabel" type="Label" parent="HUD/ScoreGroup7"]
 layout_mode = 2
-text = "  Bonus : x  "
+text = " Bonus : x  "
 label_settings = SubResource("LabelSettings_yc10j")
 horizontal_alignment = 1
 
@@ -347,8 +353,3 @@ flat = true
 [node name="BonusCoinSpawner" parent="." instance=ExtResource("17_muem4")]
 BronzeScene = ExtResource("20_jscy8")
 GoldScene = ExtResource("18_gqmmt")
-
-[connection signal="GameOver" from="ScoreManager" to="HUD" method="ShowGameOver"]
-[connection signal="LevelChanged" from="ScoreManager" to="HUD" method="UpdateLevel"]
-[connection signal="LivesChanged" from="ScoreManager" to="HUD" method="UpdateLives"]
-[connection signal="ScoreChanged" from="ScoreManager" to="HUD" method="UpdateScore"]
