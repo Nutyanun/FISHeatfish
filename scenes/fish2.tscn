@@ -1,7 +1,7 @@
 [gd_scene load_steps=37 format=3 uid="uid://65d7a5r4eqfe"]
 
 [ext_resource type="Script" uid="uid://dk50rkr56pbfv" path="res://scripts/Fish.cs" id="1_gwup6"]
-[ext_resource type="Texture2D" uid="uid://c3ck820kdhwev" path="res://SpearFishing Assets Pack/Sprites/Fish2 - 32x16/Blue.png" id="2_o5pd5"]
+[ext_resource type="Texture2D" uid="uid://c3ck820kdhwev" path="res://Fish2 - 32x16/Blue.png" id="2_o5pd5"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cvom1"]
 atlas = ExtResource("2_o5pd5")

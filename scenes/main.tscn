@@ -1,12 +1,12 @@
-[gd_scene load_steps=33 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=34 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
-[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish1.tscn" id="2_jyhfs"]
-[ext_resource type="PackedScene" uid="uid://65d7a5r4eqfe" path="res://scenes/fish2.tscn" id="3_tbgi4"]
-[ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="4_tefeu"]
+[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish1.tscn" id="3_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://65d7a5r4eqfe" path="res://scenes/fish2.tscn" id="4_tefeu"]
 [ext_resource type="PackedScene" uid="uid://cckise0dr8nnj" path="res://scenes/shark.tscn" id="5_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://cjlwti2qyeaf6" path="res://scenes/Player.tscn" id="5_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="5_yc10j"]
 [ext_resource type="PackedScene" uid="uid://c7u54uhfrpmcj" path="res://scenes/bg.tscn" id="8_tipki"]
 [ext_resource type="FontFile" uid="uid://bc6cd5qpcylc6" path="res://BoldPixels/BoldPixels.otf" id="10_choun"]
 [ext_resource type="Script" uid="uid://c82ve4r8igw6p" path="res://scripts/Hud.cs" id="10_eb6dy"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://dydehfl5tb5wa" path="res://7 Dialogue Box/2.png" id="12_muem4"]
 [ext_resource type="FontFile" uid="uid://dratgsiu0d81y" path="res://BoldPixels/BoldPixels.ttf" id="13_gqmmt"]
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
+[ext_resource type="FontFile" uid="uid://b3b2cg78io2hp" path="res://BoldPixels/BoldPixels.woff" id="13_yc10j"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
 [ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/bonuscoinspawner.tscn" id="17_muem4"]
@@ -67,8 +68,8 @@ font = ExtResource("10_choun")
 font_size = 23
 
 [sub_resource type="LabelSettings" id="LabelSettings_yc10j"]
-font = ExtResource("13_gqmmt")
-font_size = 25
+font = ExtResource("13_yc10j")
+font_size = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_gqmmt"]
 font = ExtResource("13_gqmmt")
@@ -81,7 +82,7 @@ script = ExtResource("1_choun")
 [node name="FishSpawner" type="Node2D" parent="."]
 position = Vector2(-1, 9)
 script = ExtResource("1_o5qli")
-FishScenes = Array[PackedScene]([ExtResource("2_jyhfs"), ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_o6xl0")])
+FishScenes = Array[PackedScene]([ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_yc10j"), ExtResource("5_o6xl0")])
 Weights = PackedFloat32Array(3, 6, 4, 1)
 MaxFish = 150
 
@@ -259,6 +260,7 @@ label_settings = SubResource("LabelSettings_dp3eg")
 horizontal_alignment = 1
 
 [node name="ScoreGroup7" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.93, 0.7626, 0.88257, 1)
 offset_left = 748.0
 offset_top = 73.0
 offset_right = 880.0
@@ -267,7 +269,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="BonusLabel" type="Label" parent="HUD/ScoreGroup7"]
 layout_mode = 2
-text = " Bonus : 0"
+text = "  Bonus : x  "
 label_settings = SubResource("LabelSettings_yc10j")
 horizontal_alignment = 1
 

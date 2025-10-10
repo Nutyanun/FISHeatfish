@@ -1,38 +1,78 @@
 using Godot;
 using System;
+using System.Linq;
+using System.Text;
 
 public partial class ScoreScene : Node2D
 {
 	[Export] public Label TitleLabel { get; set; }
 	[Export] public Label ScoreLabel { get; set; }
 	[Export] public Label HighScoreLabel { get; set; }
+	[Export] public RichTextLabel FishSummary { get; set; }
+	[Export] public Label BonusLabel { get; set; }
+	[Export] public Label TotalLabel { get; set; }
+
 
 	public override void _Ready()
 	{
-		// ดึงข้อมูลจาก GameProgress
-		int levelIndex = GameProgress.CurrentPlayingLevel;
-		int score = GameProgress.LastLevelScore;
+	int levelIndex = GameProgress.CurrentPlayingLevel;
+	int score = GameProgress.LastLevelScore;
+	int bonus = GameProgress.LastBonusScore;
+	int total = GameProgress.LastTotalScore;
 
-		// แสดงชื่อด่าน
-		if (TitleLabel != null)
-			TitleLabel.Text = $"Level {levelIndex} Score";
+	// ✅ โหลด high score จากไฟล์จริงแทนที่จะใช้ GameProgress
+	int high = LoadHighScoreForLevel(levelIndex);
 
-		// แสดงคะแนนล่าสุด
-		if (ScoreLabel != null)
-			ScoreLabel.Text = $"Score: {score}";
+	// ถ้าได้คะแนนใหม่สูงกว่า → บันทึกแทน
+	if (total > high)
+	{
+		SaveHighScoreForLevel(levelIndex, total);
+		high = total;
+	}
 
-		// แสดง high score (อ่านจากไฟล์ถ้ามี)
-		int high = LoadHighScoreForLevel(levelIndex);
-		if (HighScoreLabel != null)
-			HighScoreLabel.Text = $"High Score: {high}";
+	if (TitleLabel != null)
+		TitleLabel.Text = $"Level {levelIndex} Summary";
 
-		// อัปเดต high score ถ้าทำลายสถิติ
-		//if (score > high)
-		//{
-			//SaveHighScoreForLevel(levelIndex, score);
-			//if (HighScoreLabel != null)
-				//HighScoreLabel.Text = $"High Score: {score} ";
-		//}
+	if (ScoreLabel != null)
+		ScoreLabel.Text = $"Score: {score}";
+
+	if (BonusLabel != null)
+		BonusLabel.Text = $"Bonus: {bonus}";
+
+	if (TotalLabel != null)
+		TotalLabel.Text = $"Total: {total}";
+
+	if (HighScoreLabel != null)
+	HighScoreLabel.Text = $"High Score: {high}";
+
+	ShowFishSummary();
+
+	GD.Print($"[ScoreScene] FishScore={score}, Bonus={bonus}, Total={total}, High={high}");
+	}
+	
+	private void ShowFishSummary()
+	{
+		if (FishSummary == null) return;
+		if (GameProgress.FishCountByType == null || GameProgress.FishCountByType.Count == 0)
+		{
+			FishSummary.Text = "0  0  0  0";
+			return;
+		}
+
+		// ✅ เรียงตามลำดับ fish1, fish2, fish3, shark
+		string[] order = { "fish2", "fish3", "fish1", "shark" };
+		var sb = new StringBuilder();
+
+		foreach (var type in order)
+		{
+			int count = GameProgress.FishCountByType.ContainsKey(type)
+				? GameProgress.FishCountByType[type]
+				: 0;
+
+			sb.Append(count.ToString().PadRight(6)); // เว้นช่องให้อ่านง่าย
+		}
+
+		FishSummary.Text = sb.ToString().TrimEnd();
 	}
 
 	// -------- ระบบเก็บ High Score แยกแต่ละด่าน --------

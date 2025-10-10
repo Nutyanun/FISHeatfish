@@ -96,7 +96,7 @@ texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 
 [node name="level12" type="Sprite2D" parent="."]
-position = Vector2(641, 162)
+position = Vector2(655, 146.99998)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
@@ -113,6 +113,14 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="ResetHighButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = -67.0
+offset_right = 180.0
+offset_bottom = -36.0
+text = "ResetHighButton"
 
 [node name="resetcheckpoint" type="Button" parent="Control"]
 layout_mode = 0

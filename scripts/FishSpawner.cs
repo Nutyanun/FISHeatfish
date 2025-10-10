@@ -54,7 +54,7 @@ public partial class FishSpawner : Node2D
 				string speciesGroup = $"fish_species_{speciesIndex}";
 				if (GetTree().GetNodesInGroup(speciesGroup).Count >= cap)
 					return;
-			}
+			} 
 		}
 
 		// ขอบจอ
