@@ -21,6 +21,7 @@ public partial class Hud : CanvasLayer
 
 	// ===== Overlay (GameOver / LevelClear) =====
 	private Control _overlay;
+	private Control _scoreGroup7;
 	private Label _title;
 	private Label _hint;
 	private Button _retry;
@@ -85,10 +86,23 @@ public partial class Hud : CanvasLayer
 			_overlay.Visible = false;
 			_overlay.MoveToFront();
 			_overlay.MouseFilter = Control.MouseFilterEnum.Ignore;
+			_scoreGroup7 = GetNodeOrNull<Control>("%ScoreGroup7") ?? GetNodeOrNull<Control>("ScoreGroup7");
+
+			if (_scoreGroup7 != null)
+			_scoreGroup7.Visible = false; // ซ่อนไว้ตอนเริ่มเกม
 
 			if (_retry != null) { _retry.ProcessMode = Node.ProcessModeEnum.Always; _retry.MouseFilter = Control.MouseFilterEnum.Stop; _retry.Pressed += OnRetryPressed; }
 			if (_quit  != null) { _quit.ProcessMode  = Node.ProcessModeEnum.Always; _quit.MouseFilter  = Control.MouseFilterEnum.Stop;  _quit.Pressed  += OnQuitPressed;  }
 			if (_next  != null) { _next.ProcessMode  = Node.ProcessModeEnum.Always; _next.MouseFilter  = Control.MouseFilterEnum.Stop;  _next.Pressed  += OnNextPressed;  }
+			
+			var resetBtn = GetNodeOrNull<Button>("%ResetHighButton") ?? GetNodeOrNull<Button>("ResetHighButton");
+			if (resetBtn != null)
+			{
+			resetBtn.ProcessMode = Node.ProcessModeEnum.Always;
+			resetBtn.MouseFilter = Control.MouseFilterEnum.Stop;
+			resetBtn.Pressed += OnResetHighPressed;
+			}
+
 		}
 
 		// ----- Connect ScoreManager signals -----
@@ -115,6 +129,19 @@ public partial class Hud : CanvasLayer
 		else
 		{
 			GD.PushWarning("[HUD] ScoreManager not found; using HUD fallback timer.");
+		}
+
+		// ✅ โหลดค่า High Score ของเลเวลปัจจุบันทันทีตอนเริ่มเกม
+		var smForHigh = GetNodeOrNull<ScoreManager>("%ScoreManager") ?? GetNodeOrNull<ScoreManager>("ScoreManager");
+		if (smForHigh != null)
+		{
+				int hi = smForHigh.LoadHighScoreForLevel(smForHigh.Level);
+				UpdateTotalScore(0, hi);
+				GD.Print($"[HUD] Loaded HighScore for Level {smForHigh.Level}: {hi}");
+		}
+		else
+		{
+				GD.PushWarning("[HUD] Could not find ScoreManager to load HighScore.");
 		}
 
 		// กันค้าง pause จากรอบก่อน
@@ -207,29 +234,44 @@ public partial class Hud : CanvasLayer
 	// ===== Bonus live update =====
 	private void OnBonusScoreChanged(int totalBonus)
 	{
-		if (BonusLabel == null) return;
+	if (BonusLabel == null) return;
+	
+	if (_scoreGroup7 != null && !_scoreGroup7.Visible)
+		_scoreGroup7.Visible = true;
+
+	// ✅ ถ้ายังไม่โชว์ (กันกรณีเริ่มกลางทาง) ให้เปิดเลย
+	if (!BonusLabel.Visible)
 		BonusLabel.Visible = true;
-		BonusLabel.Text = $"Bonus : {totalBonus}";
-		PulseBonusLabel();
+
+	BonusLabel.Text = $"Bonus : {totalBonus}";
+	PulseBonusLabel();
 	}
+
 
 	private void OnBonusPhaseStarted()
 	{
-		if (_bonusBanner == null) return;
-
-		_bonusBanner.Visible = true;
-		_bonusBanner.Modulate = new Color(1, 1, 1, 0);
-		_bonusBanner.Scale = new Vector2(0.85f, 0.85f);
-
-		var tw = CreateTween();
-		if (tw == null) return;
-
-		tw.SetParallel();
-		tw.TweenProperty(_bonusBanner, "modulate:a", 1f, 0.20);                   // fade in
-		tw.TweenProperty(_bonusBanner, "scale", new Vector2(1.15f, 1.15f), 0.15)  // pop
-		  .From(_bonusBanner.Scale);
-		tw.Chain().TweenProperty(_bonusBanner, "scale", Vector2.One, 0.10);
+	if (BonusLabel != null)
+	{
+		BonusLabel.Visible = true;     // ✅ โชว์ตอนเริ่มโบนัส
+		BonusLabel.Text = "Bonus : 0"; // เริ่มต้นที่ศูนย์
+		PulseBonusLabel();
 	}
+
+	if (_bonusBanner == null) return;
+
+	_bonusBanner.Visible = true;
+	_bonusBanner.Modulate = new Color(1, 1, 1, 0);
+	_bonusBanner.Scale = new Vector2(0.85f, 0.85f);
+
+	var tw = CreateTween();
+	if (tw == null) return;
+
+	tw.SetParallel();
+	tw.TweenProperty(_bonusBanner, "modulate:a", 1f, 0.20);
+	tw.TweenProperty(_bonusBanner, "scale", new Vector2(1.15f, 1.15f), 0.15).From(_bonusBanner.Scale);
+	tw.Chain().TweenProperty(_bonusBanner, "scale", Vector2.One, 0.10);
+	}
+
 
 	private void OnBonusPhaseEnded(int totalBonus)
 	{
@@ -356,20 +398,26 @@ public partial class Hud : CanvasLayer
 
 	private async void OnNextPressed()
 	{
-		GD.Print("[HUD] Next pressed");
+	GD.Print("[HUD] Next pressed");
 
-		var sm = GetNodeOrNull<ScoreManager>("%ScoreManager") ?? GetNodeOrNull<ScoreManager>("ScoreManager");
-		if (sm != null)
-		{
-			GameProgress.CurrentPlayingLevel = sm.Level;
-			GameProgress.LastLevelScore = sm.Score;
-		}
+	var sm = GetNodeOrNull<ScoreManager>("%ScoreManager") ?? GetNodeOrNull<ScoreManager>("ScoreManager");
+	if (sm != null)
+	{
+		GameProgress.CurrentPlayingLevel = sm.Level;
+		GameProgress.LastLevelScore = sm.Score;
 
-		GetTree().Paused = false;
-		HideOverlay();
-		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-		GetTree().ChangeSceneToFile("res://scenescore/score.tscn");
+		// ✅ เพิ่มสองบรรทัดนี้เก็บค่าก่อนเปลี่ยนซีน
+		GameProgress.LastBonusScore = sm.GetBonusScore();
+		GameProgress.LastTotalScore = sm.GetTotalWithBonus();
+		GameProgress.LastHighScore = sm.LoadHighScoreForLevel(sm.Level);
 	}
+
+	GetTree().Paused = false;
+	HideOverlay();
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+	GetTree().ChangeSceneToFile("res://scenescore/score.tscn");
+	}
+
 
 	// ===== Small visual effect when reaching target =====
 	private void FlashScoreLabel()
@@ -388,4 +436,19 @@ public partial class Hud : CanvasLayer
 		tween.Chain().TweenProperty(ScoreLabel, "modulate", toCol, 0.6f);
 		tween.Chain().TweenProperty(ScoreLabel, "scale", Vector2.One, 0.12f);
 	}
+	
+	private void OnResetHighPressed()
+{
+	GD.Print("Reset High Score pressed!");
+	for (int i = 1; i <= 10; i++)
+	{
+		string path = $"user://highscore_level{i}.dat";
+		if (FileAccess.FileExists(path))
+		{
+			DirAccess.RemoveAbsolute(path);
+			GD.Print($"Deleted {path}");
+		}
+	}
+}
+
 }
