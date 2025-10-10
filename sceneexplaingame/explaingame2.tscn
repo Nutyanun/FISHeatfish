@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://dp0uprjsttth8"]
+[gd_scene load_steps=43 format=3 uid="uid://dp0uprjsttth8"]
 
 [ext_resource type="Texture2D" uid="uid://p23ohgxsxe11" path="res://sceneexplaingame/under the sea.png" id="1_fhwyn"]
 [ext_resource type="Texture2D" uid="uid://j8bxrpprykaj" path="res://sceneexplaingame/map-Photoroom.png" id="2_33n2f"]
@@ -16,6 +16,9 @@
 [ext_resource type="Texture2D" uid="uid://dc5vkjd5ijgea" path="res://Fish3 - 32x16/Orange.png" id="14_6ydvq"]
 [ext_resource type="Texture2D" uid="uid://26msx8ftsscn" path="res://Fish3 - 32x16/Blue.png" id="15_n3dgr"]
 [ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://Shark - 32x32/Shark.png" id="16_yak4s"]
+[ext_resource type="Texture2D" uid="uid://ixxp6dtq8ud7" path="res://Coin_Gems/MonedaD.png" id="17_m3bi4"]
+[ext_resource type="Texture2D" uid="uid://drfmtx8hcncpw" path="res://Coin_Gems/MonedaP.png" id="18_n3dgr"]
+[ext_resource type="Texture2D" uid="uid://bde8kpv0tlpo0" path="res://Coin_Gems/MonedaR.png" id="19_yak4s"]
 
 [sub_resource type="Theme" id="Theme_rc6d1"]
 default_font = ExtResource("11_cspd0")
@@ -23,7 +26,7 @@ default_font = ExtResource("11_cspd0")
 [sub_resource type="LabelSettings" id="LabelSettings_ljrbi"]
 font = ExtResource("12_ncs2t")
 font_size = 22
-font_color = Color(0.6745098, 0, 0, 1)
+font_color = Color(0.050980393, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_s4sun"]
 font = ExtResource("12_ncs2t")
@@ -33,11 +36,140 @@ font_color = Color(0, 0, 0, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_uw42v"]
 font = ExtResource("12_ncs2t")
 font_size = 22
-font_color = Color(0, 0, 0, 1)
+font_color = Color(0.3882353, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_4i1aw"]
 font = ExtResource("12_ncs2t")
 font_size = 23
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yvvl2"]
+atlas = ExtResource("17_m3bi4")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7rp0a"]
+atlas = ExtResource("17_m3bi4")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8kr4h"]
+atlas = ExtResource("17_m3bi4")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_klowk"]
+atlas = ExtResource("17_m3bi4")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sb123"]
+atlas = ExtResource("17_m3bi4")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6ydvq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yvvl2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7rp0a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8kr4h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_klowk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sb123")
+}],
+"loop": true,
+"name": &"1",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pg3b4"]
+atlas = ExtResource("18_n3dgr")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5o6as"]
+atlas = ExtResource("18_n3dgr")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kl3r8"]
+atlas = ExtResource("18_n3dgr")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l1oca"]
+atlas = ExtResource("18_n3dgr")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ds4vu"]
+atlas = ExtResource("18_n3dgr")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cspd0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pg3b4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5o6as")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kl3r8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l1oca")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ds4vu")
+}],
+"loop": true,
+"name": &"2",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u42kg"]
+atlas = ExtResource("19_yak4s")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1705w"]
+atlas = ExtResource("19_yak4s")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u3jnu"]
+atlas = ExtResource("19_yak4s")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qdk5r"]
+atlas = ExtResource("19_yak4s")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4puaj"]
+atlas = ExtResource("19_yak4s")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hkb6d"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u42kg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1705w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u3jnu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qdk5r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4puaj")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [node name="Node2D" type="Node2D"]
 
@@ -99,72 +231,66 @@ text = "LEVEL 2
 "
 
 [node name="Label2" type="Label" parent="."]
-offset_left = 418.0
-offset_top = 188.0
-offset_right = 724.0
-offset_bottom = 220.0
-text = "                  The First Bite ! 
-Reach 500 points within 3 minutes"
+offset_left = 390.0
+offset_top = 189.0
+offset_right = 696.0
+offset_bottom = 221.0
+text = "                  The Second Wave ! 
+Reach 600 points within 4 minutes"
 label_settings = SubResource("LabelSettings_ljrbi")
 
 [node name="Label3" type="Label" parent="."]
-offset_left = 443.0
-offset_top = 238.0
-offset_right = 508.0
-offset_bottom = 261.0
+offset_left = 1105.0
+offset_top = 481.0
+offset_right = 1170.0
+offset_bottom = 504.0
 text = "1 point"
 label_settings = SubResource("LabelSettings_s4sun")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(382, 345)
+position = Vector2(577, 410.00003)
 scale = Vector2(2.0657368, 2.424173)
 texture = ExtResource("13_m3bi4")
 region_enabled = true
 region_rect = Rect2(0, 0, 35, 17.5)
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
-position = Vector2(375.75, 296.25)
+position = Vector2(479.00003, 413)
 scale = Vector2(1.8906248, 2.7499995)
 texture = ExtResource("14_6ydvq")
 region_enabled = true
 region_rect = Rect2(0, 0, 32, 18.5)
 
 [node name="Sprite2D3" type="Sprite2D" parent="."]
-position = Vector2(378, 247)
+position = Vector2(376, 410.00003)
 scale = Vector2(1.7578139, 2.2499993)
 texture = ExtResource("15_n3dgr")
 region_enabled = true
 region_rect = Rect2(0, 0, 32, 16.5)
 
 [node name="Sprite2D4" type="Sprite2D" parent="."]
-position = Vector2(384, 400)
+position = Vector2(697, 408.99997)
 scale = Vector2(2.6142857, 2.3709676)
 texture = ExtResource("16_yak4s")
 region_enabled = true
 region_rect = Rect2(0, 0, 35, 31.5)
 
 [node name="Label4" type="Label" parent="."]
-offset_left = 443.0
-offset_top = 287.0
-offset_right = 758.0
-offset_bottom = 310.0
-text = "5 points (unlocked after 10 points)"
-label_settings = SubResource("LabelSettings_uw42v")
+offset_left = 373.0
+offset_top = 328.0
+offset_right = 846.0
+offset_bottom = 392.0
+text = "Bonus : Coins will appear near the end!
 
-[node name="Label5" type="Label" parent="."]
-offset_left = 443.0
-offset_top = 336.0
-offset_right = 769.0
-offset_bottom = 359.0
-text = "10 points (unlocked after 15 points)"
+Grab them to boost your score!"
 label_settings = SubResource("LabelSettings_uw42v")
 
 [node name="Label6" type="Label" parent="."]
-offset_left = 444.0
-offset_top = 393.0
-offset_right = 770.0
-offset_bottom = 416.0
-text = "15 points (unlocked after 30 points)"
+offset_left = 386.0
+offset_top = 290.0
+offset_right = 417.0
+offset_bottom = 313.0
+text = "100"
 label_settings = SubResource("LabelSettings_uw42v")
 
 [node name="Label7" type="Label" parent="."]
@@ -172,6 +298,42 @@ offset_left = 643.0
 offset_top = 538.0
 offset_right = 871.0
 offset_bottom = 569.0
-text = "Time Limit : 5:00 minutes
+text = "Time Limit : 4:00 minutes
 Target Score : 600 points"
 label_settings = SubResource("LabelSettings_4i1aw")
+
+[node name="Label9" type="Label" parent="."]
+offset_left = 666.0
+offset_top = 285.0
+offset_right = 697.0
+offset_bottom = 308.0
+text = "500"
+label_settings = SubResource("LabelSettings_uw42v")
+
+[node name="Label8" type="Label" parent="."]
+offset_left = 526.0
+offset_top = 286.0
+offset_right = 557.0
+offset_bottom = 309.0
+text = "250"
+label_settings = SubResource("LabelSettings_uw42v")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(683, 257)
+scale = Vector2(2.1875005, 1.8750007)
+sprite_frames = SubResource("SpriteFrames_6ydvq")
+animation = &"1"
+autoplay = "1"
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="."]
+position = Vector2(542.99994, 255)
+scale = Vector2(2.3437471, 1.9062469)
+sprite_frames = SubResource("SpriteFrames_cspd0")
+animation = &"2"
+autoplay = "2"
+
+[node name="AnimatedSprite2D3" type="AnimatedSprite2D" parent="."]
+position = Vector2(404.0001, 257)
+scale = Vector2(2.1875005, 1.8749999)
+sprite_frames = SubResource("SpriteFrames_hkb6d")
+autoplay = "default"
