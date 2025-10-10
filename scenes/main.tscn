@@ -1,12 +1,12 @@
-[gd_scene load_steps=33 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=34 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
-[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish1.tscn" id="2_jyhfs"]
-[ext_resource type="PackedScene" uid="uid://65d7a5r4eqfe" path="res://scenes/fish2.tscn" id="3_tbgi4"]
-[ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="4_tefeu"]
+[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish1.tscn" id="3_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://65d7a5r4eqfe" path="res://scenes/fish2.tscn" id="4_tefeu"]
 [ext_resource type="PackedScene" uid="uid://cckise0dr8nnj" path="res://scenes/shark.tscn" id="5_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://cjlwti2qyeaf6" path="res://scenes/Player.tscn" id="5_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="5_yc10j"]
 [ext_resource type="PackedScene" uid="uid://c7u54uhfrpmcj" path="res://scenes/bg.tscn" id="8_tipki"]
 [ext_resource type="FontFile" uid="uid://bc6cd5qpcylc6" path="res://BoldPixels/BoldPixels.otf" id="10_choun"]
 [ext_resource type="Script" uid="uid://c82ve4r8igw6p" path="res://scripts/Hud.cs" id="10_eb6dy"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://dydehfl5tb5wa" path="res://7 Dialogue Box/2.png" id="12_muem4"]
 [ext_resource type="FontFile" uid="uid://dratgsiu0d81y" path="res://BoldPixels/BoldPixels.ttf" id="13_gqmmt"]
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
+[ext_resource type="FontFile" uid="uid://b3b2cg78io2hp" path="res://BoldPixels/BoldPixels.woff" id="13_yc10j"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
 [ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/bonuscoinspawner.tscn" id="17_muem4"]
@@ -67,8 +68,8 @@ font = ExtResource("10_choun")
 font_size = 23
 
 [sub_resource type="LabelSettings" id="LabelSettings_yc10j"]
-font = ExtResource("13_gqmmt")
-font_size = 25
+font = ExtResource("13_yc10j")
+font_size = 24
 
 [sub_resource type="LabelSettings" id="LabelSettings_gqmmt"]
 font = ExtResource("13_gqmmt")
@@ -81,7 +82,7 @@ script = ExtResource("1_choun")
 [node name="FishSpawner" type="Node2D" parent="."]
 position = Vector2(-1, 9)
 script = ExtResource("1_o5qli")
-FishScenes = Array[PackedScene]([ExtResource("2_jyhfs"), ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_o6xl0")])
+FishScenes = Array[PackedScene]([ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_yc10j"), ExtResource("5_o6xl0")])
 Weights = PackedFloat32Array(3, 6, 4, 1)
 MaxFish = 150
 
@@ -115,6 +116,7 @@ offset_bottom = 131.0
 texture = ExtResource("12_muem4")
 
 [node name="ScoreGroup3" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.50980395, 0.8627451, 1, 1)
 offset_left = 366.0
 offset_top = 19.0
 offset_right = 499.0
@@ -128,6 +130,7 @@ label_settings = SubResource("LabelSettings_trceg")
 horizontal_alignment = 1
 
 [node name="ScoreGroup2" type="PanelContainer" parent="HUD"]
+self_modulate = Color(1, 1, 0.7529412, 1)
 offset_left = 747.0
 offset_top = 19.0
 offset_right = 879.0
@@ -141,6 +144,7 @@ label_settings = SubResource("LabelSettings_eb6dy")
 horizontal_alignment = 1
 
 [node name="ScoreGroup1" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.7135073, 0.8567279, 0.9956693, 1)
 offset_left = 95.0
 offset_top = 19.0
 offset_right = 311.0
@@ -220,6 +224,7 @@ text = "Next"
 icon_alignment = 1
 
 [node name="ScoreGroup4" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.8666667, 1, 0.81960785, 1)
 offset_left = 537.0
 offset_top = 19.0
 offset_right = 702.0
@@ -233,10 +238,11 @@ label_settings = SubResource("LabelSettings_0ld40")
 horizontal_alignment = 1
 
 [node name="ScoreGroup5" type="PanelContainer" parent="HUD"]
+self_modulate = Color(0.8627451, 0.8392157, 1, 1)
 offset_left = 93.0
-offset_top = 76.0
+offset_top = 72.0
 offset_right = 387.0
-offset_bottom = 118.0
+offset_bottom = 114.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="HighScoreLabel" type="Label" parent="HUD/ScoreGroup5"]
@@ -246,10 +252,11 @@ label_settings = SubResource("LabelSettings_muem4")
 horizontal_alignment = 1
 
 [node name="ScoreGroup6" type="PanelContainer" parent="HUD"]
+self_modulate = Color(1, 0.75914747, 0.8679129, 1)
 offset_left = 455.0
-offset_top = 74.0
+offset_top = 71.0
 offset_right = 709.0
-offset_bottom = 116.0
+offset_bottom = 113.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="MultiplierLabel" type="Label" parent="HUD/ScoreGroup6"]
@@ -259,6 +266,7 @@ label_settings = SubResource("LabelSettings_dp3eg")
 horizontal_alignment = 1
 
 [node name="ScoreGroup7" type="PanelContainer" parent="HUD"]
+self_modulate = Color(1, 0.8006883, 0.6899547, 1)
 offset_left = 748.0
 offset_top = 73.0
 offset_right = 880.0
@@ -267,7 +275,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
 
 [node name="BonusLabel" type="Label" parent="HUD/ScoreGroup7"]
 layout_mode = 2
-text = " Bonus : 0"
+text = " Bonus : x  "
 label_settings = SubResource("LabelSettings_yc10j")
 horizontal_alignment = 1
 
@@ -345,8 +353,3 @@ flat = true
 [node name="BonusCoinSpawner" parent="." instance=ExtResource("17_muem4")]
 BronzeScene = ExtResource("20_jscy8")
 GoldScene = ExtResource("18_gqmmt")
-
-[connection signal="GameOver" from="ScoreManager" to="HUD" method="ShowGameOver"]
-[connection signal="LevelChanged" from="ScoreManager" to="HUD" method="UpdateLevel"]
-[connection signal="LivesChanged" from="ScoreManager" to="HUD" method="UpdateLives"]
-[connection signal="ScoreChanged" from="ScoreManager" to="HUD" method="UpdateScore"]
