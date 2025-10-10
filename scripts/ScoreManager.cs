@@ -22,7 +22,7 @@ public partial class ScoreManager : Node2D
 	// ====== Config ด่าน ======
 	[Export] public int  BaseTargetScore { get; set; } = 300;
 	[Export] public int  BaseTimeSeconds { get; set; } = 150;
-	[Export] public int  TimeIncPerLevel { get; set; } = 90;
+	[Export] public int  TimeIncPerLevel { get; set; } = 60;
 	[Export] public bool AutoAdvanceOnTimeUp { get; set; } = false;
 
 	// ====== ค่าเริ่มต้นชีวิตต่อเลเวล ======
