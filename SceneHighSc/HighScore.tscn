@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bknxiwb0wa4qh" path="res://Script/HighScore.cs" id="1_dw5gy"]
 [ext_resource type="Texture2D" uid="uid://ejee8464wa76" path="res://SceneHighSc/seav2.png" id="2_oeidb"]
 [ext_resource type="Texture2D" uid="uid://dbudhnst5eses" path="res://SceneHighSc/return-Photoroom.png" id="3_mom7u"]
-[ext_resource type="Texture2D" uid="uid://btaer4q4o26y7" path="res://SceneHighSc/Hsc.png" id="4_qfr5h"]
+[ext_resource type="Texture2D" uid="uid://bbdfof1s3s717" path="res://SceneHighSc/Hsc.png" id="4_qfr5h"]
 [ext_resource type="Texture2D" uid="uid://dgcqajqbo3ed3" path="res://SceneHighSc/CharH/H4.png" id="5_qfr5h"]
 [ext_resource type="Texture2D" uid="uid://bavxqxtg5e2so" path="res://SceneHighSc/CharH/I.png" id="6_m8u7e"]
 [ext_resource type="Texture2D" uid="uid://c1ul66p38owfl" path="res://SceneHighSc/CharH/G.png" id="7_oyths"]
@@ -15,6 +15,7 @@
 
 [node name="Highscore" type="Node2D"]
 script = ExtResource("1_dw5gy")
+ScrollPath = NodePath("ScrollContainer")
 VBoxPath = NodePath("ScrollContainer/VBoxContainer")
 BackButtonPath = NodePath("Sprite2D/BackButton")
 
@@ -84,18 +85,18 @@ scale = Vector2(0.108644865, 0.08691254)
 texture = ExtResource("12_4tpu4")
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
-position = Vector2(557, 407.00006)
-scale = Vector2(1.0664063, 0.7436522)
+position = Vector2(585.5, 408.5)
+scale = Vector2(0.9501953, 0.4736328)
 texture = ExtResource("4_qfr5h")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 227.0
-offset_top = 271.0
-offset_right = 631.0
-offset_bottom = 532.0
+offset_left = 318.0
+offset_top = 256.0
+offset_right = 886.0
+offset_bottom = 556.0
 grow_horizontal = 2
 grow_vertical = 2
 
