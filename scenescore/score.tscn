@@ -1,0 +1,228 @@
+[gd_scene load_steps=21 format=3 uid="uid://d2fnwmum1aahq"]
+
+[ext_resource type="Script" uid="uid://hpvlyvlanv0a" path="res://scenescore/ScoreScene.cs" id="1_2mmmf"]
+[ext_resource type="Texture2D" uid="uid://p23ohgxsxe11" path="res://sceneexplaingame/under the sea.png" id="2_qmius"]
+[ext_resource type="Texture2D" uid="uid://5y36pxkcclpb" path="res://ui/Humble Gift - Paper UI System/Humble Gift - Paper UI System v1.1/Sprites/Book Desk/6.png" id="3_mba4c"]
+[ext_resource type="FontFile" uid="uid://bc6cd5qpcylc6" path="res://BoldPixels/BoldPixels.otf" id="4_ebvwh"]
+[ext_resource type="FontFile" uid="uid://bqb3tid7kns2e" path="res://Font/Silkscreen/slkscrb.ttf" id="5_omkuv"]
+[ext_resource type="Texture2D" uid="uid://26msx8ftsscn" path="res://Fish3 - 32x16/Blue.png" id="8_2mmmf"]
+[ext_resource type="Texture2D" uid="uid://dc5vkjd5ijgea" path="res://Fish3 - 32x16/Orange.png" id="9_qmius"]
+[ext_resource type="Texture2D" uid="uid://d3ypvwjgv2law" path="res://scenecheckpoint/gobackbutton.png" id="10_i57di"]
+[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://JellyFish - 32x16/JellyFish.png" id="10_mba4c"]
+[ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://Shark - 32x32/Shark.png" id="11_ebvwh"]
+[ext_resource type="Script" uid="uid://bji1ihfrxl0wf" path="res://scenescore/ScoreGoback.cs" id="11_w4t7l"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_4qt48"]
+font = ExtResource("4_ebvwh")
+font_size = 50
+font_color = Color(0.92, 0.73293334, 0.3588, 1)
+
+[sub_resource type="Theme" id="Theme_xhfkp"]
+default_font = ExtResource("5_omkuv")
+
+[sub_resource type="LabelSettings" id="LabelSettings_xkmue"]
+font_size = 20
+font_color = Color(0.92967623, 0.38464794, 0.61443347, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_qltkp"]
+font = ExtResource("4_ebvwh")
+font_size = 35
+font_color = Color(0.11, 0.11, 0.11, 1)
+outline_color = Color(0.8544001, 0.37158376, 0.59144723, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_0cnb6"]
+font = ExtResource("4_ebvwh")
+font_size = 35
+font_color = Color(0.03, 0.03, 0.03, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_qmius"]
+font = ExtResource("4_ebvwh")
+font_size = 35
+font_color = Color(0.01, 0.01, 0.01, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_mba4c"]
+font = ExtResource("4_ebvwh")
+font_size = 35
+font_color = Color(0.04, 0.04, 0.04, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2mmmf"]
+font = ExtResource("4_ebvwh")
+font_size = 35
+font_color = Color(0.92941177, 0.38431373, 0.6156863, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2mmmf"]
+bg_color = Color(0, 0.32941177, 0.7647059, 0.37254903)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="Node2D" type="Node2D" node_paths=PackedStringArray("TitleLabel", "ScoreLabel", "HighScoreLabel", "FishSummary", "BonusLabel", "TotalLabel")]
+script = ExtResource("1_2mmmf")
+TitleLabel = NodePath("TitleLabel")
+ScoreLabel = NodePath("ScoreLabel")
+HighScoreLabel = NodePath("HighScoreLabel")
+FishSummary = NodePath("FishSummary")
+BonusLabel = NodePath("BonusLabel")
+TotalLabel = NodePath("TotalLabel")
+
+[node name="bg" type="Sprite2D" parent="."]
+position = Vector2(575.5, 323)
+scale = Vector2(1.19896, 1.20896)
+texture = ExtResource("2_qmius")
+
+[node name="6" type="Sprite2D" parent="."]
+position = Vector2(562, 328)
+scale = Vector2(0.846335, 0.701636)
+texture = ExtResource("3_mba4c")
+
+[node name="LevelClear" type="Label" parent="."]
+offset_left = 406.0
+offset_top = 53.0
+offset_right = 700.0
+offset_bottom = 104.0
+text = "Level Clear !"
+label_settings = SubResource("LabelSettings_4qt48")
+
+[node name="TitleLabel" type="Label" parent="."]
+offset_left = 334.00003
+offset_top = 152.0
+offset_right = 559.0
+offset_bottom = 176.0
+scale = Vector2(1.95392, 2.0312)
+theme = SubResource("Theme_xhfkp")
+theme_type_variation = &"HeaderLarge"
+text = "Level - Score"
+label_settings = SubResource("LabelSettings_xkmue")
+
+[node name="ScoreLabel" type="Label" parent="."]
+offset_left = 288.0
+offset_top = 216.0
+offset_right = 555.0
+offset_bottom = 256.0
+text = "Score : x"
+label_settings = SubResource("LabelSettings_qltkp")
+
+[node name="HighScoreLabel" type="Label" parent="."]
+offset_left = 286.0
+offset_top = 276.0
+offset_right = 646.0
+offset_bottom = 316.0
+text = "High Score : x"
+label_settings = SubResource("LabelSettings_0cnb6")
+
+[node name="BonusLabel" type="Label" parent="."]
+offset_left = 601.0
+offset_top = 219.0
+offset_right = 706.0
+offset_bottom = 255.0
+text = "Bonus: x"
+label_settings = SubResource("LabelSettings_qmius")
+
+[node name="TotalLabel" type="Label" parent="."]
+offset_left = 601.0
+offset_top = 276.0
+offset_right = 706.0
+offset_bottom = 312.0
+text = "Total: x"
+label_settings = SubResource("LabelSettings_mba4c")
+
+[node name="Fishsummary" type="Label" parent="."]
+offset_left = 402.0
+offset_top = 334.0
+offset_right = 704.0
+offset_bottom = 370.0
+text = "Fish Eaten Summary"
+label_settings = SubResource("LabelSettings_2mmmf")
+
+[node name="bgfish1" type="PanelContainer" parent="."]
+offset_left = 295.0
+offset_top = 436.0
+offset_right = 377.0
+offset_bottom = 491.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2mmmf")
+
+[node name="bgfish2" type="PanelContainer" parent="."]
+offset_left = 455.0
+offset_top = 436.0
+offset_right = 535.0
+offset_bottom = 492.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2mmmf")
+
+[node name="bgfish3" type="PanelContainer" parent="."]
+offset_left = 613.0
+offset_top = 436.0
+offset_right = 693.0
+offset_bottom = 492.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2mmmf")
+
+[node name="bgfish4" type="PanelContainer" parent="."]
+offset_left = 759.0
+offset_top = 438.0
+offset_right = 839.0
+offset_bottom = 494.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2mmmf")
+
+[node name="FishSummary" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(500, 60)
+offset_left = 314.0
+offset_top = 437.0
+offset_right = 814.0
+offset_bottom = 497.0
+theme_override_colors/default_color = Color(0.02, 0.02, 0.02, 1)
+theme_override_fonts/normal_font = ExtResource("4_ebvwh")
+theme_override_font_sizes/normal_font_size = 40
+text = "0 0 0 0"
+horizontal_alignment = 3
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="."]
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 3
+anchors_preset = 0
+offset_left = 95.0
+offset_top = 97.0
+offset_right = 495.0
+offset_bottom = 157.0
+
+[node name="scoregoback" type="TextureButton" parent="Control"]
+layout_mode = 0
+offset_left = 935.0
+offset_top = 438.00006
+offset_right = 1575.0
+offset_bottom = 1078.0
+scale = Vector2(0.18957, 0.1868)
+texture_normal = ExtResource("10_i57di")
+script = ExtResource("11_w4t7l")
+
+[node name="fish1" type="Sprite2D" parent="."]
+position = Vector2(330, 404.99997)
+scale = Vector2(2.17627, 2.8750021)
+texture = ExtResource("8_2mmmf")
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 16.5)
+
+[node name="fish2" type="Sprite2D" parent="."]
+position = Vector2(489, 408.00003)
+scale = Vector2(2.5175776, 3.2048604)
+texture = ExtResource("9_qmius")
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 18.5)
+
+[node name="fish3" type="Sprite2D" parent="."]
+position = Vector2(648, 404.99997)
+scale = Vector2(2.8878639, 3.2236888)
+texture = ExtResource("10_mba4c")
+region_enabled = true
+region_rect = Rect2(0, 0, 35, 17.5)
+
+[node name="Sprite2D4" type="Sprite2D" parent="."]
+position = Vector2(801, 400)
+scale = Vector2(3.4821413, 3.3508077)
+texture = ExtResource("11_ebvwh")
+region_enabled = true
+region_rect = Rect2(0, 0, 35, 31.5)
