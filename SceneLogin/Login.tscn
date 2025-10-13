@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://7j1q2104jr0q"]
+[gd_scene load_steps=7 format=3 uid="uid://7j1q2104jr0q"]
 
 [ext_resource type="Script" uid="uid://c0mtcwb8qeupa" path="res://Script/LoginGame.cs" id="1_1qs31"]
 [ext_resource type="FontFile" uid="uid://djyxjv0jq58wp" path="res://SceneLogin/Pixeboy.ttf" id="2_ep11p"]
 [ext_resource type="Texture2D" uid="uid://b2i7pig85w2fy" path="res://SceneLogin/sea3.png" id="2_wdaoc"]
 [ext_resource type="Texture2D" uid="uid://c70ven6hqtm8p" path="res://SceneLogin/1.png" id="3_pmmrg"]
+[ext_resource type="Texture2D" uid="uid://bfldjfeehcyvd" path="res://SceneLogin/eye.png" id="5_2kh04"]
+[ext_resource type="Script" uid="uid://bpqvdcxehdr8s" path="res://Script/EyeButton.cs" id="6_wcwui"]
 
 [node name="Login" type="Control"]
 layout_mode = 3
@@ -13,6 +15,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_1qs31")
+NameInputPath = NodePath("CenterContainer/VBoxContainer/NameInput")
+PasswordInputPath = NodePath("CenterContainer/VBoxContainer/HBoxPassword/PasswordInput")
+ErrorLabelPath = NodePath("CenterContainer/VBoxContainer/ErrorLabel")
+SubmitButtonPath = NodePath("CenterContainer/VBoxContainer/SubmitButton")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -63,9 +69,26 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.690196, 0.0705882, 0.0392157, 1)
 text = "name : "
 
-[node name="PasswordInput" type="LineEdit" parent="CenterContainer/VBoxContainer"]
+[node name="HBoxPassword" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="PasswordInput" type="LineEdit" parent="CenterContainer/VBoxContainer/HBoxPassword"]
+use_parent_material = true
+layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "ใส่ Password อย่างน้อย 6 ตัว"
+expand_to_text_length = true
+
+[node name="EyeButton" type="TextureButton" parent="CenterContainer/VBoxContainer/HBoxPassword"]
+custom_minimum_size = Vector2(5, 5)
+layout_mode = 2
+size_flags_horizontal = 3
+keep_pressed_outside = true
+texture_normal = ExtResource("5_2kh04")
+stretch_mode = 3
+script = ExtResource("6_wcwui")
+PasswordLineEditPath = NodePath("../PasswordInput")
+Icon = ExtResource("5_2kh04")
 
 [node name="SubmitButton" type="Button" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
