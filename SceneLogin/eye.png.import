@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://boi5lf6odawhx"
-path="res://.godot/imported/H.png-4a3490e47a4b196f1fc8cd76e774e2e5.ctex"
+uid="uid://bfldjfeehcyvd"
+path="res://.godot/imported/eye.png-10c27c005a05c59814e3ef2272212ac2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://SceneDownload/Char/H.png"
-dest_files=["res://.godot/imported/H.png-4a3490e47a4b196f1fc8cd76e774e2e5.ctex"]
+source_file="res://SceneLogin/eye.png"
+dest_files=["res://.godot/imported/eye.png-10c27c005a05c59814e3ef2272212ac2.ctex"]
 
 [params]
 
