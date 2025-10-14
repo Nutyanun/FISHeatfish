@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dj0uhrl3agpwi"]
+
+[ext_resource type="Script" uid="uid://dmc5r551avruj" path="res://CrystalTypes.cs" id="1_tbb4d"]
+
+[node name="CrystalTypes" type="Node2D"]
+script = ExtResource("1_tbb4d")

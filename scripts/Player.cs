@@ -16,12 +16,12 @@ public partial class Player : CharacterBody2D
 
 	// === NODE PATHS ===
 	[Export] public NodePath AnimatedSpritePath { get; set; } = "AnimatedSprite2D";
-	[Export] public NodePath MouthAreaPath     { get; set; } = "MouthArea";
-	[Export] public NodePath HurtAreaPath      { get; set; } = "HurtArea";
+	[Export] public NodePath MouthAreaPath { get; set; } = "MouthArea";
+	[Export] public NodePath HurtAreaPath { get; set; } = "HurtArea";
 
 	// === การจำกัดขอบจอ ===
-	[Export] public bool  ClampToViewport = false;
-	[Export] public float ClampMargin     = 8f;
+	[Export] public bool ClampToViewport = false;
+	[Export] public float ClampMargin = 8f;
 
 	// === ตัวแปรภายใน ===
 	private AnimatedSprite2D _anim;
@@ -108,7 +108,6 @@ public partial class Player : CharacterBody2D
 	private void EatCrystal(CrystalPickup cp)
 	{
 		if (cp == null || !IsInstanceValid(cp)) return;
-		// ให้คริสตัลจัดการหาตัว SkillManager เองและลบตัวเอง
 		cp.CollectBy(this);
 	}
 
@@ -117,12 +116,14 @@ public partial class Player : CharacterBody2D
 	// ===========================================
 	public override void _Ready()
 	{
-		_anim      = GetNodeOrNull<AnimatedSprite2D>(AnimatedSpritePath);
+		 // ✅ ให้ Player หยุดตาม pause เสมอ
+	ProcessMode = Node.ProcessModeEnum.Inherit;
+		_anim = GetNodeOrNull<AnimatedSprite2D>(AnimatedSpritePath);
 		_mouthArea = GetNodeOrNull<Area2D>(MouthAreaPath);
-		_hurtArea  = GetNodeOrNull<Area2D>(HurtAreaPath);
+		_hurtArea = GetNodeOrNull<Area2D>(HurtAreaPath);
 
 		_biteCooldownBase = BiteCooldown;
-		_baseMaxSpeed     = MaxSpeed;
+		_baseMaxSpeed = MaxSpeed;
 		_originalModulate = Modulate;
 
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(SwimAnimation) == true)
@@ -131,20 +132,17 @@ public partial class Player : CharacterBody2D
 		// --- Mouth Area ---
 		if (_mouthArea != null)
 		{
-			_mouthArea.Monitoring  = true;
+			_mouthArea.Monitoring = true;
 			_mouthArea.Monitorable = true;
 
-			// 🐟 ตรวจการชนของปลา
 			_mouthArea.BodyEntered += body => { if (TryGetFish(body, out var fish)) _targetsInMouth.Add(fish); };
-			_mouthArea.BodyExited  += body => { if (TryGetFish(body, out var fish)) _targetsInMouth.Remove(fish); };
+			_mouthArea.BodyExited += body => { if (TryGetFish(body, out var fish)) _targetsInMouth.Remove(fish); };
 			_mouthArea.AreaEntered += area => { if (TryGetFish(area, out var fish)) _targetsInMouth.Add(fish); };
-			_mouthArea.AreaExited  += area => { if (TryGetFish(area, out var fish)) _targetsInMouth.Remove(fish); };
+			_mouthArea.AreaExited += area => { if (TryGetFish(area, out var fish)) _targetsInMouth.Remove(fish); };
 
-			// 💰 Coin: กินทันทีเมื่อโดนปาก
 			_mouthArea.BodyEntered += body => { if (TryGetCoin(body, out var coin)) EatCoin(coin); };
 			_mouthArea.AreaEntered += area => { if (TryGetCoin(area, out var coin)) EatCoin(coin); };
 
-			// 💎 Crystal: กินทันทีเมื่อโดนปาก
 			_mouthArea.BodyEntered += body => { if (TryGetCrystal(body, out var cp)) EatCrystal(cp); };
 			_mouthArea.AreaEntered += area => { if (TryGetCrystal(area, out var cp)) EatCrystal(cp); };
 		}
@@ -152,7 +150,7 @@ public partial class Player : CharacterBody2D
 		// --- Hurt Area ---
 		if (_hurtArea != null)
 		{
-			_hurtArea.Monitoring  = true;
+			_hurtArea.Monitoring = true;
 			_hurtArea.Monitorable = true;
 
 			_hurtArea.BodyEntered += body => { if (TryGetFish(body, out var fish)) CheckDeathOnTouch(fish); };
@@ -165,10 +163,13 @@ public partial class Player : CharacterBody2D
 	// ===========================================
 	public override void _PhysicsProcess(double delta)
 	{
+		// ถ้าเกมหยุดชั่วคราว → อย่าขยับ
+		if (GetTree().Paused)
+		return;
+		
 		var sm = GetSM();
 		if (sm != null && (sm.IsLevelCleared || sm.IsGameOver)) return;
 
-		// --- เคลื่อนที่ ---
 		Vector2 input = GetMoveInput();
 		Vector2 targetVel = input * MaxSpeed;
 
@@ -178,36 +179,31 @@ public partial class Player : CharacterBody2D
 
 		MoveAndSlide();
 
-		// --- พลิก sprite ตามทิศทาง ---
 		if (_anim != null && MathF.Abs(Velocity.X) > 1f)
 			_anim.FlipH = Velocity.X < 0f;
 
-		// --- จำกัดไม่ให้ออกนอกจอ ---
 		if (ClampToViewport) ClampInsideViewport();
 
-		// --- คูลดาวน์กัด ---
 		if (_biteTimer > 0f) _biteTimer -= (float)delta;
 		if (Input.IsActionJustPressed("bite") || Input.IsActionJustPressed("ui_accept"))
 			TryBite();
 
-		// --- Magnet: ดูดเหรียญ/พิคอัป ---
 		if (_magnet && _magnetRadius > 0f)
 			PullCoinsTowardSelf((float)delta);
 
-		// --- ปรับขนาดตัวปลา ---
 		UpdateSizeBasedOnScore(sm);
 	}
 
 	private Vector2 GetMoveInput()
 	{
 		float x = Input.GetActionStrength("ui_right") - Input.GetActionStrength("ui_left");
-		float y = Input.GetActionStrength("ui_down")  - Input.GetActionStrength("ui_up");
+		float y = Input.GetActionStrength("ui_down") - Input.GetActionStrength("ui_up");
 		var v = new Vector2(x, y);
 		return v == Vector2.Zero ? v : v.Normalized();
 	}
 
 	// ===========================================
-	// 🟥 TryBite(): การกัดปลา (รองรับ Berserk + Chain)
+	// 🟥 TryBite(): การกัดปลา
 	// ===========================================
 	private void TryBite()
 	{
@@ -217,32 +213,26 @@ public partial class Player : CharacterBody2D
 		if (_biteTimer > 0f) return;
 		_biteTimer = BiteCooldown;
 
-		// --- เล่น animation กัด ---
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(BiteAnimation) == true)
 			_anim.Play(BiteAnimation);
 
-		// --- เช็กปลาที่อยู่ในปากทั้งหมด ---
 		var toCheck = new List<Fish>(_targetsInMouth);
 		foreach (var fish in toCheck)
 		{
 			if (!IsInstanceValid(fish)) { _targetsInMouth.Remove(fish); continue; }
 
-			// ถ้าเล็กเกินไป → ตาย (ยกเว้นมีโล่ หรือ Phase)
-			if (sm != null && sm.Score < fish.RequiredScore)
+			if (sm != null && sm.LevelScore < fish.RequiredScore)
 			{
 				AttemptDieOrSpendShield(fish, reason: "Too small to bite");
 				return;
 			}
 
-			// ✅ บวกคะแนน (คิดโบนัส Berserk)
 			int gained = CalcBiteScore(fish.Points);
 			sm?.AddScore(gained, fish.FishType);
 
-			// ✅ อัปเดตปลา
 			fish.OnEaten();
 			GD.Print($"[Player] Eat {fish.FishType}, +{gained}");
 
-			// 🔴 กัดลามเล็ก ๆ เมื่อ Berserk
 			if (_berserk)
 				ChainBiteNearby(fish.GlobalPosition, 60f, maxChain: 2);
 
@@ -250,27 +240,19 @@ public partial class Player : CharacterBody2D
 			break;
 		}
 
-		// --- กลับไปแอนิเมชันว่าย ---
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(SwimAnimation) == true)
 			_anim.Play(SwimAnimation);
 	}
 
-	// ===========================================
-	// ☠️ การตาย/กันตาย (โล่ & Phase)
-	// ===========================================
 	private void CheckDeathOnTouch(Fish fish)
 	{
 		var sm = GetSM();
 		if (sm == null || sm.IsLevelCleared || sm.IsGameOver) return;
 		if (!IsInstanceValid(fish)) return;
-
-		// Phase: ทะลุผ่าน ไม่โดน
 		if (_phase) return;
 
-		if (sm.Score < fish.RequiredScore)
-		{
+		if (sm.LevelScore < fish.RequiredScore)
 			AttemptDieOrSpendShield(fish, reason: "Touch bigger fish");
-		}
 	}
 
 	private void AttemptDieOrSpendShield(Fish source, string reason)
@@ -282,7 +264,6 @@ public partial class Player : CharacterBody2D
 		{
 			_shieldStacks--;
 			ShowShieldFx(_shieldStacks > 0);
-			// ผลักศัตรูเล็กน้อยเพื่อบอกฟีดแบ็ก
 			if (IsInstanceValid(source))
 			{
 				Vector2 dir = (source.GlobalPosition - GlobalPosition).Normalized();
@@ -296,16 +277,13 @@ public partial class Player : CharacterBody2D
 		sm.LoseLife(1);
 	}
 
-	// ===========================================
-	// 🟩 ClampInsideViewport(): ป้องกันออกนอกจอ
-	// ===========================================
 	private void ClampInsideViewport()
 	{
 		var rect = GetViewportRect();
 		float minX = rect.Position.X + ClampMargin;
-		float maxX = rect.End.X     - ClampMargin;
+		float maxX = rect.End.X - ClampMargin;
 		float minY = rect.Position.Y + ClampMargin;
-		float maxY = rect.End.Y     - ClampMargin;
+		float maxY = rect.End.Y - ClampMargin;
 
 		GlobalPosition = new Vector2(
 			Mathf.Clamp(GlobalPosition.X, minX, maxX),
@@ -317,97 +295,19 @@ public partial class Player : CharacterBody2D
 	{
 		if (sm == null) return;
 
-		float targetScale = 1.0f; // ขนาดเริ่มต้น
+		float targetScale = 1.0f;
 
-		if (sm.Score >= 30)
-			targetScale = 2.4f; // ใหญ่สุด
-		else if (sm.Score >= 15)
+		if (sm.LevelScore >= 30)
+			targetScale = 2.4f;
+		else if (sm.LevelScore >= 15)
 			targetScale = 1.9f;
-		else if (sm.Score >= 10)
+		else if (sm.LevelScore >= 10)
 			targetScale = 1.3f;
 
-		// ค่อย ๆ เปลี่ยนขนาดให้ smooth
 		Scale = Scale.Lerp(Vector2.One * targetScale, 0.05f);
 	}
 
-	// =====================================================
-	// ====== 🔧 เมธอด "สลับสถานะ" สำหรับสกิลแต่ละแบบ ======
-	// =====================================================
-
-	// — Berserk: เพิ่มแต้มกัด 2x และลดคูลดาวน์กัด 30%
-	public void SetBerserk(bool on)
-	{
-		_berserk = on;
-		BiteCooldown = on ? _biteCooldownBase * 0.7f : _biteCooldownBase;
-	}
-
-	// — Time Freeze: ชะลอโลก (ระวังผลทั้งเกม)
-	public void SetTimeFreeze(bool on, float worldScale = 0.35f)
-	{
-		if (on)
-		{
-			_timeScaleBefore = Engine.TimeScale;                   // double -> double (ปลอดภัย)
-			float clamped = Mathf.Clamp(worldScale, 0.1f, 1f);     // clamp เป็น float
-			Engine.TimeScale = (double)clamped;                    // ใส่เป็น double
-		}
-		else
-		{
-			Engine.TimeScale = (_timeScaleBefore <= 0.0) ? 1.0 : _timeScaleBefore;
-		}
-	}
-
-	// — Shield: โล่กันตาย 1 ชั้น (ซ้อนสูงสุด 1)
-	public void GiveThornShield(int stacks)
-	{
-		_shieldStacks = Math.Min(_shieldStacks + stacks, 1);
-		ShowShieldFx(_shieldStacks > 0);
-	}
-	public void RemoveThornIfAny()
-	{
-		_shieldStacks = 0;
-		ShowShieldFx(false);
-	}
-
-	// — Magnet: ดูดเหรียญ/ไอเท็ม + ปรับความเร็ว
-	public void SetMagnet(bool on, float radius = 260f, float speedBoost = 0.15f)
-	{
-		_magnet = on;
-		_magnetRadius = on ? radius : 0f;
-		MaxSpeed = _baseMaxSpeed * (on ? (1f + speedBoost) : 1f);
-	}
-
-	// — Phase: ทะลุผ่านอันตราย (ปิดตรวจชนใน HurtArea) + โปร่งแสงนิดหน่อย
-	public void SetPhase(bool on)
-	{
-		_phase = on;
-
-		if (_hurtArea != null)
-		{
-			if (on)
-			{
-				_hurtAreaWasMonitoring = _hurtArea.Monitoring;
-				_hurtArea.Monitoring = false;
-			}
-			else
-			{
-				_hurtArea.Monitoring = _hurtAreaWasMonitoring;
-			}
-		}
-
-		Modulate = on ? new Color(1, 1, 1, 0.7f) : _originalModulate;
-	}
-
-	// ====== เอฟเฟกต์ย่อย ๆ ======
-	private void ShowShieldFx(bool enabled)
-	{
-		// TODO: แปะสไปรต์/พาร์ติเคิลโล่ เปิด/ปิดที่นี่
-		// ถ้ายังไม่มี VFX ก็เว้นไว้ก่อน
-	}
-
-	// คะแนนกัดรวม (Berserk = x2)
-	private int CalcBiteScore(int baseScore) => _berserk ? (int)MathF.Round(baseScore * 2f) : baseScore;
-
-	// กัดลาม: หา "ปลา" ใกล้ตำแหน่งที่เพิ่งกัด แล้วกำจัดเพิ่มเล็กน้อย
+	// กัดลาม: หา "ปลา" ใกล้ตำแหน่งที่เพิ่งกัด
 	private void ChainBiteNearby(Vector2 at, float radius = 60f, int maxChain = 2)
 	{
 		if (!_berserk) return;
@@ -423,8 +323,7 @@ public partial class Player : CharacterBody2D
 				var sm = GetSM();
 				if (sm == null) break;
 
-				// เฉพาะปลาที่เรากัดได้เท่านั้น
-				if (sm.Score >= f.RequiredScore)
+				if (sm.LevelScore >= f.RequiredScore)
 				{
 					int gained = CalcBiteScore(f.Points);
 					sm.AddScore(gained, f.FishType);
@@ -436,10 +335,11 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
-	// Magnet: ดึง Coin/พิคอัปในกลุ่ม "coins" เข้าหาตัว
+	private int CalcBiteScore(int baseScore) => _berserk ? (int)MathF.Round(baseScore * 2f) : baseScore;
+	private void ShowShieldFx(bool enabled) { }
 	private void PullCoinsTowardSelf(float delta)
 	{
-		const float pullSpeed = 900f; // ความเร็วที่เหรียญบินเข้าหาเรา
+		const float pullSpeed = 900f;
 		foreach (var n in GetTree().GetNodesInGroup("coins"))
 		{
 			if (n is not Node2D node || !IsInstanceValid(node)) continue;
@@ -451,4 +351,71 @@ public partial class Player : CharacterBody2D
 			}
 		}
 	}
+	// =====================================================
+// ===== 🔮 Skill Methods used by SkillManager.cs =====
+// =====================================================
+
+// — Time Freeze: ชะลอเวลา (ลดความเร็วทั้งเกม)
+public void SetTimeFreeze(bool on, float worldScale = 0.35f)
+{
+	if (on)
+	{
+		_timeScaleBefore = Engine.TimeScale;  // จำค่าสปีดเดิมไว้
+		float clamped = Mathf.Clamp(worldScale, 0.1f, 1f);
+		Engine.TimeScale = (double)clamped;   // ลด TimeScale ของโลกทั้งเกม
+		GD.Print($"[Player] Time Freeze ON (scale={clamped})");
+	}
+	else
+	{
+		Engine.TimeScale = (_timeScaleBefore <= 0.0) ? 1.0 : _timeScaleBefore;
+		GD.Print("[Player] Time Freeze OFF");
+	}
+}
+
+// — Thorn Shield: โล่กันตาย (ซ้อนสูงสุด 1 ชั้น)
+public void GiveThornShield(int stacks)
+{
+	_shieldStacks = Math.Min(_shieldStacks + stacks, 1);
+	ShowShieldFx(_shieldStacks > 0);
+	GD.Print($"[Player] Shield applied ({_shieldStacks} stack)");
+}
+
+// — เอาโล่ออก (เมื่อหมดเวลา)
+public void RemoveThornIfAny()
+{
+	_shieldStacks = 0;
+	ShowShieldFx(false);
+	GD.Print("[Player] Shield removed");
+}
+
+// — Magnet: ดูดเหรียญและเพิ่มความเร็วชั่วคราว
+public void SetMagnet(bool on, float radius = 260f, float speedBoost = 0.15f)
+{
+	_magnet = on;
+	_magnetRadius = on ? radius : 0f;
+	MaxSpeed = _baseMaxSpeed * (on ? (1f + speedBoost) : 1f);
+	GD.Print($"[Player] Magnet {(on ? "ON" : "OFF")}");
+}
+
+// — Phase: ทะลุผ่านศัตรูได้ (ปิด HurtArea + โปร่งแสง)
+public void SetPhase(bool on)
+{
+	_phase = on;
+
+	if (_hurtArea != null)
+	{
+		if (on)
+		{
+			_hurtAreaWasMonitoring = _hurtArea.Monitoring;
+			_hurtArea.Monitoring = false;
+		}
+		else
+		{
+			_hurtArea.Monitoring = _hurtAreaWasMonitoring;
+		}
+	}
+
+	Modulate = on ? new Color(1, 1, 1, 0.7f) : _originalModulate;
+	GD.Print($"[Player] Phase {(on ? "ON" : "OFF")}");
+}
 }

@@ -364,13 +364,14 @@ public partial class Hud : CanvasLayer
 
 	// ===== Buttons / Input =====
 	private async void OnRetryPressed()
-	{
-		GD.Print("[HUD] Retry pressed");
-		GetTree().Paused = false;
-		HideOverlay();
-		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-		GetTree().ReloadCurrentScene();
-	}
+{
+	GD.Print("[HUD] Retry pressed");
+	GetTree().Paused = false; // ✅ ปลด pause ก่อน
+	HideOverlay();
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+	GetTree().ReloadCurrentScene();
+}
+
 
 	private async void OnQuitPressed()
 	{
@@ -404,7 +405,7 @@ public partial class Hud : CanvasLayer
 	if (sm != null)
 	{
 		GameProgress.CurrentPlayingLevel = sm.Level;
-		GameProgress.LastLevelScore = sm.Score;
+		GameProgress.LastLevelScore = sm.LevelScore;
 
 		// ✅ เพิ่มสองบรรทัดนี้เก็บค่าก่อนเปลี่ยนซีน
 		GameProgress.LastBonusScore = sm.GetBonusScore();

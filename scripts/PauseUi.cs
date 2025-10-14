@@ -56,13 +56,18 @@ public partial class PauseUi : CanvasLayer
  }
 
  public override void _UnhandledInput(InputEvent e)
- {
-  // Hotkey ทดสอบ: Enter/Space -> toggle เมนูย่อย
-  if (e.IsActionPressed("ui_accept"))
-  {
-   GD.Print("[PauseUi] ui_accept toggle");
-   ToggleSubMenuImmediate();
-  }
+{
+	// ✅ ถ้ามี HUD overlay โชว์อยู่ → ไม่ให้ PauseUI รับ input
+	var hudCard = GetTree().Root.FindChild("HudCard", true, false) as Control;
+	if (hudCard != null && hudCard.Visible)
+		return;
+
+	// Hotkey ทดสอบ: Enter/Space -> toggle เมนูย่อย
+	if (e.IsActionPressed("ui_accept"))
+	{
+		GD.Print("[PauseUi] ui_accept toggle");
+		ToggleSubMenuImmediate();
+	}
 
   // ESC -> Pause/Unpause
   if (e.IsActionPressed("ui_cancel"))

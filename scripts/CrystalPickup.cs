@@ -1,9 +1,11 @@
 using Godot;
+using Game;
 
 public partial class CrystalPickup : Area2D
 {
-	[Export] public CrystalType Type = CrystalType.Blue;
+	[Export] public CrystalType Type = CrystalType.Blue; 
 	[Export] public float Duration = 6f;
+	
 
 	// เปิดไว้: เดาสีจากชื่อโหนด/ซีนอัตโนมัติถ้าลืมตั้ง Type ใน Inspector
 	// จะ "ไม่ทับ" ค่า Type ที่ตั้งไว้ ยกเว้นกรณี Type ยังเป็น Blue แต่ชื่อบอกว่าเป็นสีอื่น

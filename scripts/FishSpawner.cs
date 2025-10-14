@@ -1,6 +1,7 @@
 // res://scripts/FishSpawner.cs
 using Godot;
 using System;
+using Game;
 
 public partial class FishSpawner : Node2D
 {
@@ -17,10 +18,19 @@ public partial class FishSpawner : Node2D
 	[Export] public Vector2 WaveAmpRange = new(8, 24);
 	[Export] public Vector2 WaveFreqRange = new(0.6f, 1.4f);
 
+	// ==== เพิ่ม: การปลดล็อกคริสตัล ====
+	[Export] public NodePath ScoreManagerPath { get; set; } = null; // ถ้าเว้นว่างจะลองหา %ScoreManager
+	[Export] public int CrystalSpeciesIndex { get; set; } = -1;     // index ของซีนที่เป็น "คริสตัล" (-1 = ไม่มี)
+	[Export] public int CrystalUnlockLevel  { get; set; } = 3;      // เริ่มปล่อยตั้งแต่เลเวลนี้ขึ้นไป
+
+	private ScoreManager _sm; // อ้างอิง ScoreManager เพื่อเช็คเลเวล/ปลดล็อก
+
 	private readonly RandomNumberGenerator _rng = new();
 
 	public override void _Ready()
 	{
+		ProcessMode = Node.ProcessModeEnum.Inherit;
+
 		_rng.Randomize();
 
 		var timer = new Timer
@@ -32,6 +42,11 @@ public partial class FishSpawner : Node2D
 		};
 		AddChild(timer);
 		timer.Timeout += SpawnFish;
+
+		// หา ScoreManager (ถ้าไม่ได้ตั้ง NodePath จะลองหา by name)
+		_sm = (!string.IsNullOrEmpty(ScoreManagerPath))
+			? GetNodeOrNull<ScoreManager>(ScoreManagerPath)
+			: GetNodeOrNull<ScoreManager>("%ScoreManager");
 	}
 
 	private void SpawnFish()
@@ -41,7 +56,7 @@ public partial class FishSpawner : Node2D
 		// จำกัดจำนวนรวม
 		if (GetTree().GetNodesInGroup("fish").Count >= MaxFish) return;
 
-		// เลือกชนิดปลาตามน้ำหนัก
+		// เลือกชนิดปลาตามน้ำหนัก (คำนึงถึงการปลดล็อกคริสตัล)
 		int speciesIndex = PickSpeciesIndex();
 
 		// จำกัดจำนวนรายชนิด (ถ้าตั้งไว้)
@@ -91,19 +106,65 @@ public partial class FishSpawner : Node2D
 
 	private int PickSpeciesIndex()
 	{
-		if (Weights == null || Weights.Length != FishScenes.Length)
-			return _rng.RandiRange(0, FishScenes.Length - 1); // เท่ากันหมด
+		// เช็คว่าคริสตัลยังล็อกอยู่ไหม
+		bool crystalLocked = false;
+		if (CrystalSpeciesIndex >= 0 && FishScenes != null && CrystalSpeciesIndex < FishScenes.Length)
+		{
+			// ถ้ามี ScoreManager และเลเวลยังไม่ถึง → ล็อก
+			if (_sm != null)
+				crystalLocked = _sm.Level < CrystalUnlockLevel;
+			else
+				crystalLocked = true; // หา SM ไม่เจอ → เซฟไว้ก่อนถือว่ายังล็อก
+		}
 
-		// roulette wheel
+		// กรณีไม่ได้ตั้ง Weights (หรือยาวไม่เท่า) → สุ่มเท่ากัน แต่ "ตัดคริสตัลออก" ถ้ายังล็อก
+		if (Weights == null || Weights.Length != FishScenes.Length)
+		{
+			System.Collections.Generic.List<int> pool = new();
+			for (int i = 0; i < FishScenes.Length; i++)
+			{
+				if (crystalLocked && i == CrystalSpeciesIndex) continue;
+				pool.Add(i);
+			}
+			// ถ้าโดนตัดหมด → fallback สุ่มจากทั้งหมด
+			if (pool.Count == 0)
+				return _rng.RandiRange(0, FishScenes.Length - 1);
+
+			int pick = _rng.RandiRange(0, pool.Count - 1);
+			return pool[pick];
+		}
+
+		// มี Weights → ใช้ roulette wheel โดย "ชั่งน้ำหนักเป็น 0" ให้คริสตัลถ้ายังล็อก
 		float sum = 0f;
-		foreach (var w in Weights) sum += Mathf.Max(0f, w);
-		if (sum <= 0f) return _rng.RandiRange(0, FishScenes.Length - 1);
+		for (int i = 0; i < Weights.Length; i++)
+		{
+			float w = Mathf.Max(0f, Weights[i]);
+			if (crystalLocked && i == CrystalSpeciesIndex) w = 0f;
+			sum += w;
+		}
+		if (sum <= 0f)
+		{
+			// น้ำหนักหลังตัดเป็น 0 หมด → fallback สุ่มเท่ากัน (ยกเว้นคริสตัลถ้ายังล็อก)
+			System.Collections.Generic.List<int> pool = new();
+			for (int i = 0; i < FishScenes.Length; i++)
+			{
+				if (crystalLocked && i == CrystalSpeciesIndex) continue;
+				pool.Add(i);
+			}
+			if (pool.Count == 0)
+				return _rng.RandiRange(0, FishScenes.Length - 1);
+
+			int pick = _rng.RandiRange(0, pool.Count - 1);
+			return pool[pick];
+		}
 
 		float r = _rng.Randf() * sum;
 		float acc = 0f;
 		for (int i = 0; i < Weights.Length; i++)
 		{
-			acc += Mathf.Max(0f, Weights[i]);
+			float w = Mathf.Max(0f, Weights[i]);
+			if (crystalLocked && i == CrystalSpeciesIndex) w = 0f;
+			acc += w;
 			if (r <= acc) return i;
 		}
 		return Weights.Length - 1;

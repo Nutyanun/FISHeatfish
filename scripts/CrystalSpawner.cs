@@ -1,72 +1,46 @@
 using Godot;
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using Game; // ⬅️ ใช้ enum Global: Game.CrystalType
 
-/// <summary>
-/// สปอว์นคริสตัลแบบสุ่ม: ทุก ๆ IntervalSec จะสุ่มเกิด 1 สี (จำกัดจำนวนบนจอ)
-/// วางโหนดนี้ไว้ในฉากหลัก แล้วลากซีนคริสตัล 5 สีลง Inspector ให้ครบ
-/// แนะนำให้คริสตัลอยู่กลุ่ม "pickups" (หรือเปลี่ยนเป็น "coins" ได้ใน UsePickupsGroup)
-/// </summary>
 public partial class CrystalSpawner : Node2D
 {
-	// --- ตั้งค่า ---
-	[Export] public float IntervalSec = 45f;   // เวลาห่างระหว่างการเกิด (วินาที)
-	[Export] public int   MaxOnScreen = 2;     // จำนวนคริสตัลบนจอได้สูงสุด
-	[Export] public bool  UsePickupsGroup = true; // true => นับจาก "pickups", false => "coins"
+	[Export] public float   IntervalSec = 45f;
+	[Export] public int     MaxOnScreen = 2;
+	[Export] public bool    UsePickupsGroup = true;
 
-	// พื้นที่สุ่ม X บนขอบจอด้านบน
-	[Export] public float MarginX = 32f;
-	[Export] public float SpawnYOffset = -32f; // เริ่มเหนือขอบบนเล็กน้อย
-
-	// ความเร็วตกแบบ "ค่อยๆ เร็วขึ้น"
-	[Export] public float FallStartSpeed = 12f;   // เริ่มช้ามาก
-	[Export] public float FallTargetSpeed = 50f;  // เร็วสุดที่อยากได้
-	[Export] public float FallEaseTime   = 2.5f;  // ใช้เวลากี่วิจากช้า -> เร็ว
-
-	// ถ้าอยากสุ่มช่วงเวลา ให้ตั้งค่า 2 ค่านี้ แล้วติ๊ก UseRandomInterval = true
-	[Export] public bool  UseRandomInterval = false;
+	[Export] public bool    UseRandomInterval = false;
 	[Export] public Vector2 RandomIntervalRange = new Vector2(50f, 70f);
 
-	// --- ซีนของคริสตัลแต่ละสี (ลากมาวางใน Inspector) ---
+	// ซีนคริสตัลแต่ละสี
 	[Export] public PackedScene RedScene;
 	[Export] public PackedScene BlueScene;
 	[Export] public PackedScene GreenScene;
-	[Export] public PackedScene PinkScene;    // โปรเจกต์นี้ใช้ Pink แทน Yellow
+	[Export] public PackedScene PinkScene;
 	[Export] public PackedScene PurpleScene;
 
-	// ✅ เงื่อนไขพิเศษ: 20 วินาทีสุดท้าย สปอว์นชมพู 1 ชิ้น
+	// เงื่อนไข: 20 วิท้าย (ด่าน >= 4) บังคับมีชมพู 1 ชิ้น
 	[Export] public bool  SpawnOnePinkInLastSeconds = true;
 	[Export] public float LastSeconds = 20f;
-	private bool _finalPinkSpawned = false;
-	private double _accum; // เวลาสะสมไว้เช็คถี่ๆ
 
-	private Timer _timer;
+	private bool   _finalPinkSpawned = false;
+	private double _accum;
+	private Timer  _timer;
+
+	// สีที่อนุญาตในด่านนี้ (null = ใช้ทุกสีที่มีซีน)
+	private HashSet<CrystalType> _allowed = null;
 
 	public override void _Ready()
 	{
-		// ตั้งค่า RNG ให้ไม่ซ้ำ
 		GD.Seed(Time.GetTicksUsec());
-
-		// --- ตั้ง Timer ---
-		_timer = new Timer
-		{
-			WaitTime = IntervalSec,
-			Autostart = true,
-			OneShot = false
-		};
-		_timer.ProcessCallback = Timer.TimerProcessCallback.Idle;  // ทำงานในเฟรม idle
-		_timer.ProcessMode = Node.ProcessModeEnum.Inherit;         // หยุดตอน pause (ถ้าอยากให้ทำงานตอน pause ใช้ Always)
-
+		_timer = new Timer { WaitTime = Math.Max(0.05f, IntervalSec), OneShot = false, Autostart = true };
 		AddChild(_timer);
 		_timer.Timeout += OnTimeout;
-
-		// ถ้าอยากให้เกิดทันทีตอนเริ่มด่าน ให้ปลดคอมเมนต์บรรทัดนี้:
-		// SpawnOne();
 	}
 
 	public override void _Process(double delta)
 	{
-		// เช็คเงื่อนไข 20 วินาทีสุดท้าย ทุก ๆ ~0.25 วิ เพื่อไม่โพลหนัก
 		if (!SpawnOnePinkInLastSeconds || _finalPinkSpawned || PinkScene == null) return;
 
 		_accum += delta;
@@ -75,7 +49,12 @@ public partial class CrystalSpawner : Node2D
 
 		if (TryGetTimeLeftSeconds(out var left) && left <= LastSeconds)
 		{
-			// ถ้าบนจอยังไม่มี "ชมพู" อยู่ค่อยสปอว์น (กันซ้ำ)
+			// ถ้าด่านนี้ไม่ได้เปิด Pink ปกติ ให้ยกเว้นเฉพาะด่าน >= 4
+			if (_allowed != null && !_allowed.Contains(CrystalType.Pink))
+			{
+				if (!TryGetLevel(out int lv) || lv < 4) return;
+			}
+
 			if (!PinkExistsOnScreen())
 			{
 				SpawnSpecific(PinkScene);
@@ -86,16 +65,29 @@ public partial class CrystalSpawner : Node2D
 
 	private void OnTimeout()
 	{
-		// จำกัดจำนวนคริสตัลบนจอ
 		string groupName = UsePickupsGroup ? "pickups" : "coins";
-		int count = GetTree().GetNodesInGroup(groupName).Count;
-		if (count >= MaxOnScreen)
+		int alive = GetTree().GetNodesInGroup(groupName).Count;
+
+		// เต็มเพดานแล้ว ข้ามรอบนี้
+		if (alive >= MaxOnScreen)
 		{
 			if (UseRandomInterval) ResetTimerRandomInterval();
 			return;
 		}
 
-		SpawnOne();
+		int allowedCount = GetAllowedColorCount();
+		if (allowedCount <= 0)
+		{
+			if (UseRandomInterval) ResetTimerRandomInterval();
+			return;
+		}
+
+		// สุ่มจำนวนในรอบนี้ = 1..N แต่ไม่เกินช่องว่างบนจอ
+		int want    = 1 + (int)(GD.Randi() % (uint)allowedCount);
+		int room    = Math.Max(0, MaxOnScreen - alive);
+		int toSpawn = Math.Min(want, room);
+
+		SpawnBatch(toSpawn);
 
 		if (UseRandomInterval) ResetTimerRandomInterval();
 	}
@@ -108,60 +100,100 @@ public partial class CrystalSpawner : Node2D
 		_timer.Start();
 	}
 
-	private void SpawnOne()
+	// ===== รับกติกาจาก ScoreManager =====
+	public void ApplyRule(CrystalType[] colors, float intervalSec, int maxOnScreen)
 	{
-		// เลือกซีนแบบสุ่มจาก 5 สี
-		var pool = new PackedScene[] { RedScene, BlueScene, GreenScene, PinkScene, PurpleScene }
-				   .Where(s => s != null).ToArray();
+		_allowed = (colors == null || colors.Length == 0)
+			? new HashSet<CrystalType>()          // ไม่อนุญาตสีใดเลย = ไม่สปอว์น
+			: new HashSet<CrystalType>(colors);   // ใช้ชุดสีที่อนุญาต
 
-		if (pool.Length == 0)
-		{
-			GD.PushWarning("[CrystalSpawner] No crystal scenes assigned in Inspector.");
-			return;
-		}
+		IntervalSec = Math.Max(0.05f, intervalSec);
+		MaxOnScreen = Math.Max(0, maxOnScreen);
+		_finalPinkSpawned = false;
 
-		var scene = pool[GD.Randi() % pool.Length];
-		SpawnSpecific(scene);
+		if (_timer != null) { _timer.WaitTime = IntervalSec; _timer.Start(); }
 	}
 
-	// --------- Helpers ----------
+	// สปอว์นเป็น “ชุด” ตามจำนวนที่กำหนด
+	private void SpawnBatch(int count)
+	{
+		if (count <= 0) return;
 
-	// สปอว์นตำแหน่งบนขอบบน แล้วใส่ FallController ให้ตก
+		var pairs = new List<(CrystalType type, PackedScene scene)>
+		{
+			(CrystalType.Red,    RedScene),
+			(CrystalType.Blue,   BlueScene),
+			(CrystalType.Green,  GreenScene),
+			(CrystalType.Pink,   PinkScene),
+			(CrystalType.Purple, PurpleScene)
+		};
+
+		bool allowAll = (_allowed == null);
+
+		var pool = pairs
+			.Where(p => p.scene != null && (allowAll || (_allowed.Count > 0 && _allowed.Contains(p.type))))
+			.Select(p => p.scene)
+			.ToArray();
+
+		if ((!allowAll && _allowed.Count == 0) || pool.Length == 0) return;
+
+		for (int i = 0; i < count; i++)
+		{
+			var scene = pool[GD.Randi() % (uint)pool.Length];
+			SpawnSpecific(scene);
+		}
+	}
+
+	private int GetAllowedColorCount()
+	{
+		if (_allowed != null) return _allowed.Count;
+
+		// ถ้าไม่ได้รับ rule → fallback = จำนวน scene ที่ตั้งค่าไว้จริง
+		int c = 0;
+		if (RedScene    != null) c++;
+		if (BlueScene   != null) c++;
+		if (GreenScene  != null) c++;
+		if (PinkScene   != null) c++;
+		if (PurpleScene != null) c++;
+		return c;
+	}
+
 	private void SpawnSpecific(PackedScene scene)
 	{
 		if (scene == null) return;
 
 		var node = scene.Instantiate<Node2D>();
-		if (node == null)
-		{
-			GD.PushWarning("[CrystalSpawner] Scene root is not Node2D.");
-			return;
-		}
+		AddChild(node);
 
-		// สุ่มตำแหน่ง X บนขอบบน
+		// วางแบบสุ่มแกน X เหนือขอบบนเล็กน้อย
 		var vp = GetViewportRect();
-		float xMin = vp.Position.X + MarginX;
-		float xMax = vp.End.X     - MarginX;
-		float x = (float)GD.RandRange(xMin, xMax);
-		float y = vp.Position.Y + SpawnYOffset;
+		float x = (float)GD.RandRange(vp.Position.X + 32, vp.End.X - 32);
+		float y = vp.Position.Y - 48;
 		node.GlobalPosition = new Vector2(x, y);
 
-		// เพิ่มเข้าฉากหลัก
-		GetTree().CurrentScene?.AddChild(node);
+		AddFallController(node);
+	}
 
-		// ใส่คอมโพเนนต์ "ตกแบบค่อยๆ เร็วขึ้น" และลบเมื่อหลุดจอ
+	private void AddFallController(Node2D node)
+	{
 		var fall = new FallController
 		{
-			StartSpeed      = FallStartSpeed,
-			TargetSpeed     = FallTargetSpeed,
-			EaseTime        = FallEaseTime,
+			StartSpeed      = 90f,
+			TargetSpeed     = 160f,
+			EaseTime        = 8f,
 			OffscreenMargin = 64f
 		};
-		fall.ProcessMode = Node.ProcessModeEnum.Inherit;
 		node.AddChild(fall);
 	}
 
-	// มี Pink อยู่บนจอแล้วหรือยัง (เช็คทั้งจากชนิด CrystalPickup.Type และจากชื่อโหนด)
+	private bool TryGetLevel(out int level)
+	{
+		level = 0;
+		var sm = FindScoreManager() as ScoreManager;
+		if (sm == null) return false;
+		level = sm.Level; return true;
+	}
+
 	private bool PinkExistsOnScreen()
 	{
 		string groupName = UsePickupsGroup ? "pickups" : "coins";
@@ -169,39 +201,26 @@ public partial class CrystalSpawner : Node2D
 		{
 			if (obj is Node n)
 			{
-				// ถ้ามีสคริปต์ CrystalPickup ให้ดู Type
-				var cp = n as CrystalPickup ?? n.GetNodeOrNull<CrystalPickup>("Hit") ?? n.FindChild("Hit", true, false) as CrystalPickup;
+				var cp = n as CrystalPickup
+					?? n.GetNodeOrNull<CrystalPickup>("Hit")
+					?? n.FindChild("Hit", true, false) as CrystalPickup;
+
 				if (cp != null && cp.Type == CrystalType.Pink) return true;
 
-				// เผื่อไม่มีสคริปต์ ให้เดาจากชื่อ
-				var name = n.Name.ToString().ToLower();
-				if (name.Contains("pink") || name.Contains("yellow")) return true;
+				// กรณีไม่มีสคริปต์ระบุชนิด ดูจากชื่อโหนดแทน
+				var nm = n.Name.ToString().ToLower();
+				if (nm.Contains("pink") || nm.Contains("yellow")) return true;
 			}
 		}
 		return false;
 	}
 
-	// อ่านเวลาที่เหลือจาก ScoreManager แบบยืดหยุ่น (รองรับหลายชื่อพร็อพ/เมธอด)
 	private bool TryGetTimeLeftSeconds(out double secs)
 	{
 		secs = 0;
-		var sm = FindScoreManager();
+		var sm = FindScoreManager() as ScoreManager;
 		if (sm == null) return false;
-
-		// ลอง property หลายชื่อ
-		foreach (var key in new[] { "TimeLeftSec", "TimeLeft", "TimeRemaining", "RemainingTime", "time_left" })
-		{
-			var v = sm.Get(key);
-			if (v.VariantType != Variant.Type.Nil)
-			{
-				try { secs = Convert.ToDouble(v); return true; } catch { }
-			}
-		}
-		// ลองเมธอด
-		if (sm.HasMethod("GetTimeLeft"))       { secs = Convert.ToDouble(sm.Call("GetTimeLeft")); return true; }
-		if (sm.HasMethod("GetRemainingTime"))  { secs = Convert.ToDouble(sm.Call("GetRemainingTime")); return true; }
-
-		return false;
+		secs = sm.GetTimeLeft(); return true;
 	}
 
 	private Node FindScoreManager()
@@ -211,60 +230,28 @@ public partial class CrystalSpawner : Node2D
 	}
 }
 
-/// <summary>
-/// คอมโพเนนต์ช่วยให้โหนดแม่ "ตกลงมา" ทุกเฟรมแบบค่อยๆ เร็วขึ้น:
-/// - ถ้าแม่เป็น CharacterBody2D: ใช้ Physics + MoveAndSlide()
-/// - ถ้าแม่เป็น Node2D (ทั่วไป): ขยับตำแหน่งใน _Process()
-/// และจะลบตัวเองเมื่อหลุดขอบล่างของจอ
-/// </summary>
+// ตัวควบคุมการตกอย่างง่าย
 public partial class FallController : Node
 {
-	[Export] public float StartSpeed = 12f;    // เริ่มช้า
-	[Export] public float TargetSpeed = 50f;   // เร็วสุด
-	[Export] public float EaseTime = 2.5f;     // วินาทีจากช้า -> เร็ว
+	[Export] public float StartSpeed = 90f;
+	[Export] public float TargetSpeed = 160f;
+	[Export] public float EaseTime = 8f;
 	[Export] public float OffscreenMargin = 64f;
 
-	private float _t; // เวลาที่ผ่านไปสะสม (ใช้คำนวณอีซิง)
-
-	public override void _Ready()
-	{
-		SetProcess(true);
-		SetPhysicsProcess(true);
-	}
-
-	private float CurrentSpeed(float delta)
-	{
-		_t += (float)delta;
-		float k = Mathf.Clamp(_t / Mathf.Max(EaseTime, 0.0001f), 0f, 1f); // 0→1
-		return Mathf.Lerp(StartSpeed, TargetSpeed, k);
-	}
+	private float _t;
 
 	public override void _Process(double delta)
 	{
-		var parent = GetParent();
-		if (parent is Node2D n2d && parent is not CharacterBody2D)
-		{
-			float spd = CurrentSpeed((float)delta);
-			n2d.GlobalPosition += new Vector2(0, spd * (float)delta);
-			DespawnIfOffscreen(n2d);
-		}
-	}
+		if (GetParent() is not Node2D n2d) return;
 
-	public override void _PhysicsProcess(double delta)
-	{
-		if (GetParent() is CharacterBody2D body)
-		{
-			float spd = CurrentSpeed((float)delta);
-			body.Velocity = new Vector2(0, spd);
-			body.MoveAndSlide();
-			DespawnIfOffscreen(body);
-		}
-	}
+		_t += (float)delta;
+		float k = Mathf.Clamp(_t / Mathf.Max(EaseTime, 0.0001f), 0f, 1f);
+		float speed = Mathf.Lerp(StartSpeed, TargetSpeed, k);
 
-	private void DespawnIfOffscreen(Node2D node)
-	{
-		var vp = node.GetViewportRect();
-		if (node.GlobalPosition.Y > vp.End.Y + OffscreenMargin)
-			node.QueueFree();
+		n2d.GlobalPosition += new Vector2(0, speed * (float)delta);
+
+		var vp = n2d.GetViewportRect();
+		if (n2d.GlobalPosition.Y > vp.End.Y + OffscreenMargin)
+			n2d.QueueFree();
 	}
 }

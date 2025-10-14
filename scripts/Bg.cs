@@ -1,4 +1,5 @@
 using Godot;
+using Game;
 
 public partial class Bg : ParallaxBackground 
 {
