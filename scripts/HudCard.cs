@@ -141,16 +141,53 @@ public partial class HudCard : CanvasLayer
 		_sm.GameOver += OnGameOver;
 
 		_sm.SyncRequestFromHud();
+		
+		// === Show player name from PlayerLogin or GameProgress ===
+string playerName = "Guest";
+
+// ถ้ามี PlayerLogin.Instance ใช้งานอยู่
+if (PlayerLogin.Instance != null)
+	playerName = PlayerLogin.Instance.CurrentPlayerName;
+
+// ถ้า GameProgress มีข้อมูลชื่อ
+else if (!string.IsNullOrEmpty(PlayerLogin.Instance.CurrentPlayerName))
+	playerName = PlayerLogin.Instance.CurrentPlayerName;
+
+// อัปเดตชื่อใน Label
+if (_nameLabel != null)
+	_nameLabel.Text = playerName;
+else
+	GD.PushWarning("[HUD] NameLabel not found, cannot show player name.");
 	}
 
 	public override void _UnhandledInput(InputEvent e)
+{
+	// ถ้า overlay ยังไม่ขึ้น → ไม่รับ input
+	if (_overlay == null || !_overlay.Visible)
+		return;
+
+	// ป้องกัน pause ซ้ำจากระบบอื่น (PauseUI)
+	GetViewport().SetInputAsHandled();  // บอกว่า input นี้ถูกจัดการแล้ว (จะไม่ส่งต่อให้ node อื่น)
+
+	// ตรวจปุ่ม Enter
+	if (e.IsActionPressed("ui_accept"))
 	{
-		if (e.IsActionPressed("ui_accept") && _overlay != null && _overlay.Visible)
+		if (_next != null && _next.Visible && !_next.Disabled)
 		{
-			if (_next != null && _next.Visible && !_next.Disabled) { OnNextPressed(); GetViewport().SetInputAsHandled(); }
-			else if (_retry != null && _retry.Visible && !_retry.Disabled) { OnRetryPressed(); GetViewport().SetInputAsHandled(); }
+			OnNextPressed();
+		}
+		else if (_retry != null && _retry.Visible && !_retry.Disabled)
+		{
+			OnRetryPressed();
 		}
 	}
+
+	// ตรวจปุ่มออก
+	if (e.IsActionPressed("ui_cancel") || e.IsActionPressed("quit"))
+	{
+		OnQuitPressed();
+	}
+}
 
 	// ===== Handlers =====
 	private void OnLevelChanged(int level)
@@ -275,19 +312,33 @@ public partial class HudCard : CanvasLayer
 	}
 
 	// ===== Buttons =====
-	private void OnRetryPressed()
-	{
-		GD.Print("[HUD] Retry pressed");
-		if (RetryReloadsScene) GetTree().ReloadCurrentScene();
-		else HideOverlay();
-	}
+	private async void OnRetryPressed()
+{
+	GD.Print("[HUD] Retry pressed");
 
-	private void OnNextPressed()
-	{
-		GD.Print("[HUD] Next pressed");
-		if (!string.IsNullOrEmpty(NextScenePath)) GetTree().ChangeSceneToFile(NextScenePath);
-		else HideOverlay(); // ระบบคุณเริ่มด่านถัดไปเองอยู่แล้ว
-	}
+	// ✅ ปลด pause ก่อน reload (สำคัญมาก!)
+	GetTree().Paused = false;
+
+	// ✅ ถ้ามี overlay ก็ซ่อน
+	HideOverlay();
+
+	// ✅ รอให้ process frame นึง เพื่อให้ tree resume แล้วค่อย reload
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+	GetTree().ReloadCurrentScene();
+}
+
+
+	private async void OnNextPressed()
+{
+	GD.Print("[HUD] Next pressed");
+
+	GetTree().Paused = false;
+	HideOverlay();
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+	GetTree().ChangeSceneToFile("res://scenescore/score.tscn");
+}
+
 
 	private void OnQuitPressed()
 {

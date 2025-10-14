@@ -30,8 +30,21 @@ public partial class ScoreScene : Node2D             // ซีนสรุปค
 
 		TitleLabel     ?.SetText($"Level {levelIndex} Summary");  // ตั้งหัวข้อสรุปผล
 		ScoreLabel     ?.SetText($"Score: {score}");              // แสดงคะแนนดิบ
-		BonusLabel     ?.SetText($"Bonus: {bonus}");              // แสดงโบนัส
-		TotalLabel     ?.SetText($"Total: {total}");              // แสดงคะแนนรวม
+		// ✅ โชว์ Bonus และ Total เฉพาะตั้งแต่ด่าน 2 ขึ้นไป
+if (levelIndex >= 2)
+{
+	BonusLabel.Visible = true;
+	TotalLabel.Visible = true;
+	BonusLabel.SetText($"Bonus: {bonus}");
+	TotalLabel.SetText($"Total: {total}");
+}
+else
+{
+	BonusLabel.Visible = false;
+	TotalLabel.Visible = false;
+}
+
+HighScoreLabel?.SetText($"High Score: {Math.Max(personalHigh, total)}");
 		HighScoreLabel ?.SetText($"High Score: {Math.Max(personalHigh, total)}"); // แสดงค่าสูงสุดระหว่าง high เดิมกับรอบนี้
 
 		ShowFishSummary();                                     // แสดงสรุปจำนวนปลาตามชนิด

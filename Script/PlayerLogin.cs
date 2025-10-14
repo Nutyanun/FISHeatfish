@@ -9,10 +9,12 @@ using GDict = Godot.Collections.Dictionary;       // alias ให้พิมพ
 public partial class PlayerLogin : Node           // คลาสซิงเกิลตัน (Autoload) เก็บสถานะผู้เล่น/ล็อกอิน
 {
 	public static PlayerLogin Instance { get; private set; } // ตัวชี้ global ของซิงเกิลตัน
+	
+	public string CurrentPlayerName { get; private set; } = "Guest";
 
 	// ✅ เปลี่ยนให้ set ได้จากไฟล์อื่น (เพื่อแก้ Error CS0272)
 	public SaveData CurrentUser { get; set; }      // ผู้ใช้ที่ล็อกอินอยู่ปัจจุบัน
-	public string TodayKey { get; private set; }   // คีย์วันที่วันนี้ (yyyy-MM-dd) ใช้จัดกลุ่ม high score รายวัน
+	public string TodayKey { get; internal set; }   // คีย์วันที่วันนี้ (yyyy-MM-dd) ใช้จัดกลุ่ม high score รายวัน
 
 	// อ่าน/เขียน “ข้อมูลผู้เล่นจริง” เฉพาะใน user:// เท่านั้น
 	private string SavePathUser = "user://players.json"; // path ไฟล์ข้อมูลรวม (players + leaderboards) ในโฟลเดอร์ user
@@ -137,7 +139,10 @@ public partial class PlayerLogin : Node           // คลาสซิงเก
 		players[name] = new GDict {                                   // สร้างเรคคอร์ดผู้เล่นใหม่
 			{ "password",      password },                             // เก็บรหัส (plain-text ตามเวอร์ชันนี้)
 			{ "registered_at", nowIso },                               // เวลาเริ่มต้นใช้งาน
-			{ "levels",        new GDict() }                           // ที่ว่างไว้เก็บความคืบหน้าด่าน
+			{ "levels",        new GDict() },                           // ที่ว่างไว้เก็บความคืบหน้าด่าน
+			{ "current_level", 1 },              // เพิ่ม: เริ่มต้นที่ด่าน 1
+			{ "high_scores",   new GDict() }     // เพิ่ม: เก็บ high score รายเลเวล
+			
 		};
 
 		// เซฟกลับเอกสารรวม (ตำแหน่งไฟล์ถูกกำหนดใน LeaderboardStore เอง)
@@ -150,6 +155,9 @@ public partial class PlayerLogin : Node           // คลาสซิงเก
 			Password   = password,
 			CreatedAt  = nowIso
 		});
+		
+		// 🟢 เพิ่มบรรทัดนี้ (ตั้งชื่อให้ HUD ใช้)
+		CurrentPlayerName = name;
 
 		return true;                                                   // สมัครสำเร็จ
 	}
@@ -162,6 +170,39 @@ public partial class PlayerLogin : Node           // คลาสซิงเก
 		if (user == null) return false;                                  // ไม่พบ → ล็อกอินล้มเหลว
 
 		SetCurrentUserAndStampToday(user);                                // ตั้งผู้ใช้+คีย์วันที่
+		
+		// เพิ่ม : โหลดข้อมูล progress เดิมของผู้เล่น
+var doc = LeaderboardStore.LoadDoc();
+if (doc.ContainsKey("players"))
+{
+	var players = (GDict)doc["players"];
+	if (players.ContainsKey(name))
+	{
+		var p = (GDict)players[name];
+
+		// ถ้ามี current_level → โหลดกลับ
+		if (p.ContainsKey("current_level"))
+			GameProgress.CurrentLevelIndex = (int)(long)p["current_level"];
+		else
+			GameProgress.CurrentLevelIndex = 1;
+
+		// โหลด high score รายเลเวลถ้ามี
+		if (p.ContainsKey("high_scores"))
+		{
+			var hs = (GDict)p["high_scores"];
+			foreach (var kv in hs)
+			{
+				int level = int.Parse(kv.Key.AsString());
+				int score = (int)(long)kv.Value;
+				GameProgress.LastHighScore = Math.Max(GameProgress.LastHighScore, score);
+			}
+		}
+	}
+}
+
+// 🟢 เพิ่มตรงนี้เลย เพื่อให้ HUD อ่านชื่อผู้เล่นได้
+	CurrentPlayerName = name;
+
 		return true;                                                      // สำเร็จ
 	}
 }

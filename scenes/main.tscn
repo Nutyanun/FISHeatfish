@@ -162,7 +162,7 @@ unique_name_in_owner = true
 script = ExtResource("28_c6pm6")
 ScoreManagerPath = NodePath("../ScoreManager")
 MenuScenePath = "uid://bcjj2ssuhcf86"
-NextScenePath = "uid://bcjj2ssuhcf86"
+NextScenePath = "uid://d2fnwmum1aahq"
 LevelLabelPath = NodePath("theme style/FreeLayer/LevelLabel")
 ScoreLabelPath = NodePath("theme style/FreeLayer/ScoreLabel")
 NameLabelPath = NodePath("theme style/FreeLayer/NameLabel")
@@ -172,10 +172,10 @@ HintPath = NodePath("GameOverLabel/Center/root/Hint")
 RetryPath = NodePath("GameOverLabel/Center/root/Buttons/Retry")
 QuitPath = NodePath("GameOverLabel/Center/root/Buttons/Quit")
 NextPath = NodePath("GameOverLabel/Center/root/Buttons/Next")
-MultFilledPaths = Array[NodePath]([NodePath("theme style/FreeLayer/MULT/1"), NodePath("theme style/FreeLayer/MULT/2"), NodePath("theme style/FreeLayer/MULT/3"), NodePath("theme style/FreeLayer/MULT/4"), NodePath("theme style/FreeLayer/MULT/5")])
-MultEmptyPaths = Array[NodePath]([NodePath("theme style/FreeLayer/MultE/1"), NodePath("theme style/FreeLayer/MultE/2"), NodePath("theme style/FreeLayer/MultE/3"), NodePath("theme style/FreeLayer/MultE/4"), NodePath("theme style/FreeLayer/MultE/5")])
-LifeFilledPaths = Array[NodePath]([NodePath("theme style/FreeLayer/LivesRow/1"), NodePath("theme style/FreeLayer/LivesRow/2"), NodePath("theme style/FreeLayer/LivesRow/5")])
-LifeEmptyPaths = Array[NodePath]([NodePath("theme style/FreeLayer/Lives/1"), NodePath("theme style/FreeLayer/Lives/2"), NodePath("theme style/FreeLayer/Lives/3")])
+MultFilledPaths = [NodePath("theme style/FreeLayer/MULT/1"), NodePath("theme style/FreeLayer/MULT/2"), NodePath("theme style/FreeLayer/MULT/3"), NodePath("theme style/FreeLayer/MULT/4"), NodePath("theme style/FreeLayer/MULT/5")]
+MultEmptyPaths = [NodePath("theme style/FreeLayer/MultE/1"), NodePath("theme style/FreeLayer/MultE/2"), NodePath("theme style/FreeLayer/MultE/3"), NodePath("theme style/FreeLayer/MultE/4"), NodePath("theme style/FreeLayer/MultE/5")]
+LifeFilledPaths = [NodePath("theme style/FreeLayer/LivesRow/1"), NodePath("theme style/FreeLayer/LivesRow/2"), NodePath("theme style/FreeLayer/LivesRow/5")]
+LifeEmptyPaths = [NodePath("theme style/FreeLayer/Lives/1"), NodePath("theme style/FreeLayer/Lives/2"), NodePath("theme style/FreeLayer/Lives/3")]
 
 [node name="theme style" type="NinePatchRect" parent="HudCard"]
 offset_left = -18.0

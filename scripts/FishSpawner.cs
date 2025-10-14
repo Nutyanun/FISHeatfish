@@ -21,6 +21,8 @@ public partial class FishSpawner : Node2D
 
 	public override void _Ready()
 	{
+		ProcessMode = Node.ProcessModeEnum.Inherit;
+
 		_rng.Randomize();
 
 		var timer = new Timer

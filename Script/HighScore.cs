@@ -59,6 +59,8 @@ public partial class HighScore : Node2D        // ประกาศคลาส
 		}
 
 		var lbs = (GDict)doc["leaderboards"];                                // อ้างอิงอ็อบเจ็กต์ลีดเดอร์บอร์ด (เป็น Dictionary)
+		
+		string currentUser = PlayerLogin.Instance?.CurrentUser?.PlayerName ?? "";
 
 		// วันที่ (ใหม่ → เก่า)
 		var dateKeys = new List<string>();                                   // เตรียมลิสต์เก็บคีย์วันที่ (string)
@@ -92,9 +94,15 @@ public partial class HighScore : Node2D        // ประกาศคลาส
 					// แถวหลัก
 					var rowBox = new HBoxContainer { CustomMinimumSize = new Vector2(0, RowH) }; // สร้างกล่องแนวนอน เป็นแถวหนึ่ง
 					rowBox.AddThemeConstantOverride("separation", 4);                            // ระยะห่างระหว่างคอลัมน์ในแถว
+					
+					var nameCell = MakeCell($"{rank}. {name}", expand: false, alignRight: false);
+
+					// 💙 ถ้าเป็นชื่อผู้เล่นปัจจุบัน → เปลี่ยนสีฟ้า
+					if (name == currentUser)
+					nameCell.AddThemeColorOverride("font_color", new Color(0.4f, 0.8f, 1f));
 
 					// ซ้าย: ชื่อ (ไม่ยืด) → ให้กลุ่มขวาเข้ามาใกล้ชื่อ
-					rowBox.AddChild(MakeCell($"{rank}. {name}", expand: false, alignRight: false)); // ช่องชื่อ + อันดับ ไม่ยืด
+					rowBox.AddChild(nameCell); // ช่องชื่อ + อันดับ ไม่ยืด
 
 					// ขวา: กลุ่ม [level][score] วางต่อจากชื่อ
 					var rightGroup = new HBoxContainer();                                         // กล่องย่อยทางขวา
