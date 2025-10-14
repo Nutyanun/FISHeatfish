@@ -238,7 +238,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_klbbs"]
 size = Vector2(89.5, 55)
 
-[node name="fish3" type="CharacterBody2D"]
+[node name="fish3" type="CharacterBody2D" groups=["fish"]]
 collision_layer = 2
 script = ExtResource("1_klbbs")
 Speed = 100.0

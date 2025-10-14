@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=46 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
@@ -9,41 +9,53 @@
 [ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="5_yc10j"]
 [ext_resource type="PackedScene" uid="uid://c7u54uhfrpmcj" path="res://scenes/bg.tscn" id="8_tipki"]
 [ext_resource type="FontFile" uid="uid://bc6cd5qpcylc6" path="res://BoldPixels/BoldPixels.otf" id="10_choun"]
-[ext_resource type="Script" uid="uid://c82ve4r8igw6p" path="res://scripts/Hud.cs" id="10_eb6dy"]
 [ext_resource type="Script" uid="uid://dst8ehoc1274i" path="res://scripts/ScoreManager.cs" id="10_ya4ey"]
 [ext_resource type="Script" uid="uid://clrin8jr56gc8" path="res://scripts/PauseUi.cs" id="12_eb6dy"]
-[ext_resource type="Texture2D" uid="uid://dydehfl5tb5wa" path="res://7 Dialogue Box/2.png" id="12_muem4"]
-[ext_resource type="FontFile" uid="uid://dratgsiu0d81y" path="res://BoldPixels/BoldPixels.ttf" id="13_gqmmt"]
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
-[ext_resource type="FontFile" uid="uid://b3b2cg78io2hp" path="res://BoldPixels/BoldPixels.woff" id="13_yc10j"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
 [ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/bonuscoinspawner.tscn" id="17_muem4"]
 [ext_resource type="PackedScene" uid="uid://bnaarab6ni7wp" path="res://scenes/coin_1.tscn" id="18_gqmmt"]
 [ext_resource type="PackedScene" uid="uid://dne2gy0sbgtd8" path="res://scenes/coin_3.tscn" id="20_jscy8"]
+[ext_resource type="Script" uid="uid://bc6pacbt80rvq" path="res://scripts/CrystalSpawner.cs" id="22_jscy8"]
+[ext_resource type="PackedScene" uid="uid://cjc11il5f206n" path="res://scenes/Red.tscn" id="23_2wyq8"]
+[ext_resource type="PackedScene" uid="uid://ccp3i7ypkgbmt" path="res://scenes/Blue.tscn" id="24_vxglm"]
+[ext_resource type="PackedScene" uid="uid://bw38kq88mu2n" path="res://scenes/Green.tscn" id="25_2f3dj"]
+[ext_resource type="PackedScene" uid="uid://cmys4tn7xruko" path="res://scenes/Pink.tscn" id="26_vxglm"]
+[ext_resource type="PackedScene" uid="uid://cjrw5fglgbb5h" path="res://scenes/Purple.tscn" id="26_yq6so"]
+[ext_resource type="Script" uid="uid://8sj24y0plf8d" path="res://scripts/HudCard.cs" id="28_c6pm6"]
+[ext_resource type="Texture2D" uid="uid://bafw1nuaqteuw" path="res://7 Dialogue Box/1.png" id="29_5he1u"]
+[ext_resource type="Texture2D" uid="uid://yjpbpd5oxl4f" path="res://3 Progress Bars/7.png" id="30_2cjbq"]
+[ext_resource type="Texture2D" uid="uid://bhpm62m68lgef" path="res://2 Icons/21.png" id="30_5poiv"]
+[ext_resource type="Texture2D" uid="uid://bfj8lrvpnx24n" path="res://5 Holders/19.png" id="31_2cjbq"]
+[ext_resource type="Texture2D" uid="uid://cmowiq6h3d3wy" path="res://5 Holders/3.png" id="32_chjal"]
+[ext_resource type="Texture2D" uid="uid://do42leox0fibx" path="res://3 Progress Bars/8.png" id="32_cjqg0"]
+[ext_resource type="Texture2D" uid="uid://dc5ohfb3mlv8c" path="res://2 Icons/25.png" id="33_cjqg0"]
+[ext_resource type="Texture2D" uid="uid://bllnwek2gysej" path="res://3 Progress Bars/9.png" id="34_txyw0"]
+[ext_resource type="Texture2D" uid="uid://bqxni5ftsmr7d" path="res://3 Progress Bars/1.png" id="34_vchkt"]
+[ext_resource type="Texture2D" uid="uid://6no83ql0erjt" path="res://3 Progress Bars/2.png" id="35_txyw0"]
+[ext_resource type="Texture2D" uid="uid://bqy0fjginmhlp" path="res://3 Progress Bars/3.png" id="36_vc5cj"]
+[ext_resource type="Texture2D" uid="uid://6ek5dpvfxs4k" path="res://3 Progress Bars/4.png" id="37_nvyfr"]
+[ext_resource type="Texture2D" uid="uid://cnchphv1yxruo" path="res://3 Progress Bars/5.png" id="38_ty1g6"]
+[ext_resource type="Texture2D" uid="uid://cg71x4auhkydp" path="res://3 Progress Bars/6.png" id="39_j2jfr"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jbj1t"]
-bg_color = Color(0, 0.32941177, 0.7647059, 0.37254903)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
-[sub_resource type="LabelSettings" id="LabelSettings_trceg"]
+[sub_resource type="LabelSettings" id="LabelSettings_bu4jf"]
 font = ExtResource("10_choun")
-font_size = 24
+font_size = 15
+font_color = Color(0.03529412, 0.47058824, 0.3529412, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_eb6dy"]
+[sub_resource type="LabelSettings" id="LabelSettings_o7ddy"]
 font = ExtResource("10_choun")
-font_size = 24
+font_size = 15
+font_color = Color(0.03529412, 0.47058824, 0.3529412, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_ya4ey"]
+[sub_resource type="LabelSettings" id="LabelSettings_bjg73"]
 font = ExtResource("10_choun")
-font_size = 22
+font_color = Color(0.033529807, 0.47190136, 0.3516449, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_pibwh"]
+font = ExtResource("10_choun")
+font_size = 20
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a8y0u"]
 
@@ -54,27 +66,6 @@ font_size = 75
 [sub_resource type="LabelSettings" id="LabelSettings_jbj1t"]
 font = ExtResource("10_choun")
 font_size = 45
-
-[sub_resource type="LabelSettings" id="LabelSettings_0ld40"]
-font = ExtResource("10_choun")
-font_size = 24
-
-[sub_resource type="LabelSettings" id="LabelSettings_muem4"]
-font = ExtResource("10_choun")
-font_size = 21
-
-[sub_resource type="LabelSettings" id="LabelSettings_dp3eg"]
-font = ExtResource("10_choun")
-font_size = 23
-
-[sub_resource type="LabelSettings" id="LabelSettings_yc10j"]
-font = ExtResource("13_yc10j")
-font_size = 24
-
-[sub_resource type="LabelSettings" id="LabelSettings_gqmmt"]
-font = ExtResource("13_gqmmt")
-font_size = 50
-font_color = Color(0.25490198, 1, 1, 1)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_choun")
@@ -95,203 +86,6 @@ position = Vector2(489, 263)
 unique_name_in_owner = true
 position = Vector2(-1, 0)
 script = ExtResource("10_ya4ey")
-TimeIncPerLevel = 60
-
-[node name="HUD" type="CanvasLayer" parent="." node_paths=PackedStringArray("ScoreLabel", "LivesLabel", "LevelLabel", "HighScoreLabel", "MultiplierLabel", "TimerLabel", "BonusLabel")]
-unique_name_in_owner = true
-process_mode = 3
-script = ExtResource("10_eb6dy")
-ScoreLabel = NodePath("ScoreGroup1/ScoreLabel")
-LivesLabel = NodePath("ScoreGroup3/LivesLabel")
-LevelLabel = NodePath("ScoreGroup2/LevelLabel")
-HighScoreLabel = NodePath("ScoreGroup5/HighScoreLabel")
-MultiplierLabel = NodePath("ScoreGroup6/MultiplierLabel")
-TimerLabel = NodePath("ScoreGroup4/TimerLabel")
-BonusLabel = NodePath("ScoreGroup7/BonusLabel")
-
-[node name="ScoreBg" type="TextureRect" parent="HUD"]
-offset_left = 13.0
-offset_top = 3.0
-offset_right = 1097.0
-offset_bottom = 131.0
-texture = ExtResource("12_muem4")
-
-[node name="ScoreGroup3" type="PanelContainer" parent="HUD"]
-self_modulate = Color(0.50980395, 0.8627451, 1, 1)
-offset_left = 366.0
-offset_top = 19.0
-offset_right = 499.0
-offset_bottom = 61.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="LivesLabel" type="Label" parent="HUD/ScoreGroup3"]
-layout_mode = 2
-text = " Lives : 3"
-label_settings = SubResource("LabelSettings_trceg")
-horizontal_alignment = 1
-
-[node name="ScoreGroup2" type="PanelContainer" parent="HUD"]
-self_modulate = Color(1, 1, 0.7529412, 1)
-offset_left = 747.0
-offset_top = 19.0
-offset_right = 879.0
-offset_bottom = 61.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="LevelLabel" type="Label" parent="HUD/ScoreGroup2"]
-layout_mode = 2
-text = " Level : 1 "
-label_settings = SubResource("LabelSettings_eb6dy")
-horizontal_alignment = 1
-
-[node name="ScoreGroup1" type="PanelContainer" parent="HUD"]
-self_modulate = Color(0.7135073, 0.8567279, 0.9956693, 1)
-offset_left = 95.0
-offset_top = 19.0
-offset_right = 311.0
-offset_bottom = 62.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="ScoreLabel" type="Label" parent="HUD/ScoreGroup1"]
-layout_mode = 2
-text = " Score : 0 / 300 "
-label_settings = SubResource("LabelSettings_ya4ey")
-horizontal_alignment = 1
-
-[node name="GameOverLabel" type="Panel" parent="HUD"]
-unique_name_in_owner = true
-process_mode = 3
-visible = false
-z_index = 1000
-offset_left = 351.0
-offset_top = 274.0
-offset_right = 816.0
-offset_bottom = 394.0
-theme_override_styles/panel = SubResource("StyleBoxEmpty_a8y0u")
-
-[node name="Center" type="CenterContainer" parent="HUD/GameOverLabel"]
-process_mode = 3
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="root" type="VBoxContainer" parent="HUD/GameOverLabel/Center"]
-process_mode = 3
-z_index = 1000
-layout_mode = 2
-alignment = 1
-
-[node name="Title" type="Label" parent="HUD/GameOverLabel/Center/root"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 1
-text = "GAME OVER"
-label_settings = SubResource("LabelSettings_jkv2x")
-horizontal_alignment = 1
-
-[node name="Hint" type="Label" parent="HUD/GameOverLabel/Center/root"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Press Enter to retry"
-label_settings = SubResource("LabelSettings_jbj1t")
-
-[node name="Buttons" type="HBoxContainer" parent="HUD/GameOverLabel/Center/root"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 20
-alignment = 1
-
-[node name="Retry" type="Button" parent="HUD/GameOverLabel/Center/root/Buttons"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("10_choun")
-theme_override_font_sizes/font_size = 40
-text = "Retry"
-
-[node name="Quit" type="Button" parent="HUD/GameOverLabel/Center/root/Buttons"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("10_choun")
-theme_override_font_sizes/font_size = 40
-text = "Quit"
-icon_alignment = 1
-
-[node name="Next" type="Button" parent="HUD/GameOverLabel/Center/root/Buttons"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
-theme_override_fonts/font = ExtResource("10_choun")
-theme_override_font_sizes/font_size = 40
-text = "Next"
-icon_alignment = 1
-
-[node name="ScoreGroup4" type="PanelContainer" parent="HUD"]
-self_modulate = Color(0.8666667, 1, 0.81960785, 1)
-offset_left = 537.0
-offset_top = 19.0
-offset_right = 702.0
-offset_bottom = 61.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="TimerLabel" type="Label" parent="HUD/ScoreGroup4"]
-layout_mode = 2
-text = " Time : mm:ss "
-label_settings = SubResource("LabelSettings_0ld40")
-horizontal_alignment = 1
-
-[node name="ScoreGroup5" type="PanelContainer" parent="HUD"]
-self_modulate = Color(0.8627451, 0.8392157, 1, 1)
-offset_left = 93.0
-offset_top = 72.0
-offset_right = 387.0
-offset_bottom = 114.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="HighScoreLabel" type="Label" parent="HUD/ScoreGroup5"]
-layout_mode = 2
-text = " Total : x   High  : y "
-label_settings = SubResource("LabelSettings_muem4")
-horizontal_alignment = 1
-
-[node name="ScoreGroup6" type="PanelContainer" parent="HUD"]
-self_modulate = Color(1, 0.75914747, 0.8679129, 1)
-offset_left = 455.0
-offset_top = 71.0
-offset_right = 709.0
-offset_bottom = 113.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="MultiplierLabel" type="Label" parent="HUD/ScoreGroup6"]
-layout_mode = 2
-text = " Mult : xM | a/b | ts "
-label_settings = SubResource("LabelSettings_dp3eg")
-horizontal_alignment = 1
-
-[node name="ScoreGroup7" type="PanelContainer" parent="HUD"]
-self_modulate = Color(1, 0.8006883, 0.6899547, 1)
-offset_left = 748.0
-offset_top = 73.0
-offset_right = 880.0
-offset_bottom = 113.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_jbj1t")
-
-[node name="BonusLabel" type="Label" parent="HUD/ScoreGroup7"]
-layout_mode = 2
-text = " Bonus : x  "
-label_settings = SubResource("LabelSettings_yc10j")
-horizontal_alignment = 1
-
-[node name="BonusBanner" type="Label" parent="HUD"]
-visible = false
-offset_left = 295.0
-offset_top = 152.0
-offset_right = 834.0
-offset_bottom = 203.0
-text = " B O N U S  T I M E !"
-label_settings = SubResource("LabelSettings_gqmmt")
-horizontal_alignment = 1
-
-[node name="Clock" type="Timer" parent="."]
-autostart = true
 
 [node name="PauseUI" type="CanvasLayer" parent="."]
 process_mode = 3
@@ -313,10 +107,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_left = -1.833
 anchor_right = -1.833
-offset_left = -154.0
-offset_top = 39.0
-offset_right = -83.0
-offset_bottom = 110.0
+offset_left = -153.0
+offset_top = 9.0
+offset_right = -82.0
+offset_bottom = 80.0
 action_mode = 0
 icon = ExtResource("13_trceg")
 flat = true
@@ -328,10 +122,10 @@ visible = false
 z_index = 110
 layout_mode = 1
 anchors_preset = -1
-offset_left = -155.0
-offset_top = 38.0
-offset_right = -33.99991
-offset_bottom = 259.0
+offset_left = -153.0
+offset_top = 7.0
+offset_right = -31.999908
+offset_bottom = 228.0
 
 [node name="ResumeButton" type="Button" parent="PauseUI/Panel/SubMenu"]
 process_mode = 3
@@ -355,7 +149,314 @@ flat = true
 BronzeScene = ExtResource("20_jscy8")
 GoldScene = ExtResource("18_gqmmt")
 
-[connection signal="GameOver" from="ScoreManager" to="HUD" method="ShowGameOver"]
-[connection signal="LevelChanged" from="ScoreManager" to="HUD" method="UpdateLevel"]
-[connection signal="LivesChanged" from="ScoreManager" to="HUD" method="UpdateLives"]
-[connection signal="ScoreChanged" from="ScoreManager" to="HUD" method="UpdateScore"]
+[node name="CrystalSpawner" type="Node2D" parent="."]
+script = ExtResource("22_jscy8")
+RedScene = ExtResource("23_2wyq8")
+BlueScene = ExtResource("24_vxglm")
+GreenScene = ExtResource("25_2f3dj")
+PinkScene = ExtResource("26_vxglm")
+PurpleScene = ExtResource("26_yq6so")
+
+[node name="HudCard" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+script = ExtResource("28_c6pm6")
+ScoreManagerPath = NodePath("../ScoreManager")
+MenuScenePath = "uid://bcjj2ssuhcf86"
+NextScenePath = "uid://bcjj2ssuhcf86"
+LevelLabelPath = NodePath("theme style/FreeLayer/LevelLabel")
+ScoreLabelPath = NodePath("theme style/FreeLayer/ScoreLabel")
+NameLabelPath = NodePath("theme style/FreeLayer/NameLabel")
+TimerLabelPath = NodePath("theme style/FreeLayer/TimerLabel")
+TitlePath = NodePath("GameOverLabel/Center/root/Title")
+HintPath = NodePath("GameOverLabel/Center/root/Hint")
+RetryPath = NodePath("GameOverLabel/Center/root/Buttons/Retry")
+QuitPath = NodePath("GameOverLabel/Center/root/Buttons/Quit")
+NextPath = NodePath("GameOverLabel/Center/root/Buttons/Next")
+MultFilledPaths = Array[NodePath]([NodePath("theme style/FreeLayer/MULT/1"), NodePath("theme style/FreeLayer/MULT/2"), NodePath("theme style/FreeLayer/MULT/3"), NodePath("theme style/FreeLayer/MULT/4"), NodePath("theme style/FreeLayer/MULT/5")])
+MultEmptyPaths = Array[NodePath]([NodePath("theme style/FreeLayer/MultE/1"), NodePath("theme style/FreeLayer/MultE/2"), NodePath("theme style/FreeLayer/MultE/3"), NodePath("theme style/FreeLayer/MultE/4"), NodePath("theme style/FreeLayer/MultE/5")])
+LifeFilledPaths = Array[NodePath]([NodePath("theme style/FreeLayer/LivesRow/1"), NodePath("theme style/FreeLayer/LivesRow/2"), NodePath("theme style/FreeLayer/LivesRow/5")])
+LifeEmptyPaths = Array[NodePath]([NodePath("theme style/FreeLayer/Lives/1"), NodePath("theme style/FreeLayer/Lives/2"), NodePath("theme style/FreeLayer/Lives/3")])
+
+[node name="theme style" type="NinePatchRect" parent="HudCard"]
+offset_left = -18.0
+offset_top = -21.0
+offset_right = 323.0
+offset_bottom = 203.0
+texture = ExtResource("29_5he1u")
+
+[node name="FreeLayer" type="Control" parent="HudCard/theme style"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect4" type="TextureRect" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 128.0
+offset_right = 96.0
+offset_bottom = 148.0
+texture = ExtResource("30_5poiv")
+expand_mode = 1
+
+[node name="TextureRect" type="TextureRect" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 151.0
+offset_top = 61.0
+offset_right = 231.0
+offset_bottom = 81.0
+texture = ExtResource("31_2cjbq")
+
+[node name="TextureRect3" type="TextureRect" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 142.0
+offset_right = 160.0
+offset_bottom = 162.0
+texture = ExtResource("31_2cjbq")
+
+[node name="LevelLabel" type="Label" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 77.0
+offset_top = 50.0
+offset_right = 145.0
+offset_bottom = 70.0
+text = "LV.1"
+label_settings = SubResource("LabelSettings_bu4jf")
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 98.0
+offset_top = 133.0
+offset_right = 168.0
+offset_bottom = 153.0
+text = "SCORE :"
+label_settings = SubResource("LabelSettings_o7ddy")
+
+[node name="NameLabel" type="Label" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 53.0
+offset_right = 225.0
+offset_bottom = 73.0
+text = "GG"
+label_settings = SubResource("LabelSettings_bjg73")
+horizontal_alignment = 1
+
+[node name="Bgp" type="NinePatchRect" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 67.0
+offset_right = 139.0
+offset_bottom = 128.0
+texture = ExtResource("32_chjal")
+
+[node name="p" type="NinePatchRect" parent="HudCard/theme style/FreeLayer/Bgp"]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 11.0
+offset_right = 57.0
+offset_bottom = 57.0
+texture = ExtResource("33_cjqg0")
+
+[node name="LivesRow" type="HBoxContainer" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 139.0
+offset_top = 79.0
+offset_right = 307.0
+offset_bottom = 102.0
+theme_override_constants/separation = 0
+
+[node name="1" type="TextureRect" parent="HudCard/theme style/FreeLayer/LivesRow"]
+layout_mode = 2
+texture = ExtResource("34_vchkt")
+expand_mode = 2
+
+[node name="2" type="TextureRect" parent="HudCard/theme style/FreeLayer/LivesRow"]
+layout_mode = 2
+texture = ExtResource("35_txyw0")
+expand_mode = 2
+
+[node name="5" type="TextureRect" parent="HudCard/theme style/FreeLayer/LivesRow"]
+layout_mode = 2
+texture = ExtResource("36_vc5cj")
+expand_mode = 2
+
+[node name="Lives" type="HBoxContainer" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 139.0
+offset_top = 79.0
+offset_right = 235.0
+offset_bottom = 102.0
+theme_override_constants/separation = 0
+
+[node name="1" type="TextureRect" parent="HudCard/theme style/FreeLayer/Lives"]
+layout_mode = 2
+texture = ExtResource("30_2cjbq")
+expand_mode = 2
+
+[node name="2" type="TextureRect" parent="HudCard/theme style/FreeLayer/Lives"]
+layout_mode = 2
+texture = ExtResource("32_cjqg0")
+expand_mode = 2
+
+[node name="3" type="TextureRect" parent="HudCard/theme style/FreeLayer/Lives"]
+layout_mode = 2
+texture = ExtResource("34_txyw0")
+expand_mode = 2
+
+[node name="MULT" type="HBoxContainer" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 139.0
+offset_top = 99.0
+offset_right = 276.0
+offset_bottom = 121.0
+theme_override_constants/separation = 0
+
+[node name="1" type="TextureRect" parent="HudCard/theme style/FreeLayer/MULT"]
+layout_mode = 2
+texture = ExtResource("37_nvyfr")
+expand_mode = 2
+
+[node name="2" type="TextureRect" parent="HudCard/theme style/FreeLayer/MULT"]
+layout_mode = 2
+texture = ExtResource("38_ty1g6")
+expand_mode = 2
+
+[node name="3" type="TextureRect" parent="HudCard/theme style/FreeLayer/MULT"]
+layout_mode = 2
+texture = ExtResource("38_ty1g6")
+expand_mode = 2
+
+[node name="4" type="TextureRect" parent="HudCard/theme style/FreeLayer/MULT"]
+layout_mode = 2
+texture = ExtResource("38_ty1g6")
+expand_mode = 2
+
+[node name="5" type="TextureRect" parent="HudCard/theme style/FreeLayer/MULT"]
+layout_mode = 2
+texture = ExtResource("39_j2jfr")
+expand_mode = 2
+
+[node name="MultE" type="HBoxContainer" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 139.0
+offset_top = 99.0
+offset_right = 324.0
+offset_bottom = 121.0
+theme_override_constants/separation = 0
+
+[node name="1" type="TextureRect" parent="HudCard/theme style/FreeLayer/MultE"]
+layout_mode = 2
+texture = ExtResource("30_2cjbq")
+expand_mode = 2
+
+[node name="2" type="TextureRect" parent="HudCard/theme style/FreeLayer/MultE"]
+layout_mode = 2
+texture = ExtResource("32_cjqg0")
+expand_mode = 2
+
+[node name="3" type="TextureRect" parent="HudCard/theme style/FreeLayer/MultE"]
+layout_mode = 2
+texture = ExtResource("32_cjqg0")
+expand_mode = 2
+
+[node name="4" type="TextureRect" parent="HudCard/theme style/FreeLayer/MultE"]
+layout_mode = 2
+texture = ExtResource("32_cjqg0")
+expand_mode = 2
+
+[node name="5" type="TextureRect" parent="HudCard/theme style/FreeLayer/MultE"]
+layout_mode = 2
+texture = ExtResource("34_txyw0")
+expand_mode = 2
+
+[node name="TimerLabel" type="Label" parent="HudCard/theme style/FreeLayer"]
+layout_mode = 0
+offset_left = 311.0
+offset_top = 35.0
+offset_right = 413.0
+offset_bottom = 51.0
+text = "Time : mm:ss"
+label_settings = SubResource("LabelSettings_pibwh")
+horizontal_alignment = 1
+
+[node name="GameOverLabel" type="Panel" parent="HudCard"]
+process_mode = 3
+z_index = 1000
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_a8y0u")
+
+[node name="Center" type="CenterContainer" parent="HudCard/GameOverLabel"]
+process_mode = 3
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -207.0
+offset_top = -89.0
+offset_right = 207.0
+offset_bottom = 89.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="root" type="VBoxContainer" parent="HudCard/GameOverLabel/Center"]
+process_mode = 3
+z_index = 1000
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="HudCard/GameOverLabel/Center/root"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 1
+text = "GAME OVER"
+label_settings = SubResource("LabelSettings_jkv2x")
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="HudCard/GameOverLabel/Center/root"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Press Enter to retry"
+label_settings = SubResource("LabelSettings_jbj1t")
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="HudCard/GameOverLabel/Center/root"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Retry" type="Button" parent="HudCard/GameOverLabel/Center/root/Buttons"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Retry"
+
+[node name="Quit" type="Button" parent="HudCard/GameOverLabel/Center/root/Buttons"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Quit"
+icon_alignment = 1
+
+[node name="Next" type="Button" parent="HudCard/GameOverLabel/Center/root/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme_override_fonts/font = ExtResource("10_choun")
+theme_override_font_sizes/font_size = 40
+text = "Next"
+icon_alignment = 1

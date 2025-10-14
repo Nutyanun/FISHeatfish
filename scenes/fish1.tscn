@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://c6scf1upnwqly"]
 
 [ext_resource type="Script" uid="uid://dk50rkr56pbfv" path="res://scripts/Fish.cs" id="1_ngq1a"]
-[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://SpearFishing Assets Pack/Sprites/JellyFish - 32x16/JellyFish.png" id="3_ngq1a"]
+[ext_resource type="Texture2D" uid="uid://dx7xcglry28o1" path="res://JellyFish - 32x16/JellyFish.png" id="3_ngq1a"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_w4qb2"]
 atlas = ExtResource("3_ngq1a")
@@ -42,7 +42,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8srm5"]
 size = Vector2(109.625, 75.25)
 
-[node name="Fish1" type="CharacterBody2D"]
+[node name="Fish1" type="CharacterBody2D" groups=["fish"]]
 collision_layer = 2
 script = ExtResource("1_ngq1a")
 Speed = 100.0

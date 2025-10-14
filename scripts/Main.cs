@@ -1,37 +1,36 @@
 using Godot;
-
+using System;
+// ==== เพิ่มบรรทัดนี้ ====
+using HUD = HudCard;   // ให้ชื่อ HUD ในไฟล์นี้ หมายถึงคลาส HudCard
+// ========================
 public partial class Main : Node
 {
-	private T FindNodeSmart<T>(string unique, string a, string b) where T : Node =>
-		GetNodeOrNull<T>(unique) ?? GetNodeOrNull<T>(a) ?? GetNodeOrNull<T>(b);
+	[Export] public NodePath ScoreManagerPath { get; set; } = "ScoreManager";
+	[Export] public NodePath HudPath { get; set; } = "HudCard";   // ตั้งชื่อให้ตรงกับโหนดจริง
+
+	private ScoreManager _sm;
+	private HUD _hud;  // ใช้ชื่อ HUD ได้ตามเดิม เพราะเราทำ alias ไว้แล้ว
 
 	public override void _Ready()
 	{
-		GetTree().Paused = false;
+		_sm = GetNodeOrNull<ScoreManager>(ScoreManagerPath)
+			  ?? GetNodeOrNull<ScoreManager>("%ScoreManager");
 
-		var hud = FindNodeSmart<Hud>("%HUD", "/root/Main/HUD", "/root/HUD");
-		var sm  = FindNodeSmart<ScoreManager>("%ScoreManager", "/root/Main/ScoreManager", "/root/ScoreManager");
+		_hud = GetNodeOrNull<HUD>(HudPath)
+			  ?? GetNodeOrNull<HUD>("%HudCard")
+			  ?? GetNodeOrNull<HUD>("%HUD"); // เผื่อคุณตั้งเป็น #HUD
 
-		if (hud == null) { GD.PushError("[Main] HUD not found"); return; }
-		if (sm  == null) { GD.PushError("[Main] ScoreManager not found"); return; }
+		if (_hud == null)
+		{
+			GD.PushError("[Main] HUD (HudCard) not found. ตั้ง HudPath ให้ตรง หรือทำโหนดเป็น #HudCard/#HUD");
+			return;
+		}
+		if (_sm == null)
+		{
+			GD.PushError("[Main] ScoreManager not found. ตั้ง ScoreManagerPath หรือทำเป็น #ScoreManager");
+			return;
+		}
 
-		// ตั้งค่าเริ่มต้นบน HUD
-		hud.HideOverlay();
-		hud.UpdateScore(sm.Score, sm.TargetScore);
-		hud.UpdateLives(sm.Lives);
-		hud.UpdateLevel(sm.Level);
-		hud.UpdateTotalScore(sm.TotalScore, sm.HighScore);   // <-- เรียกเมธอดตรง ๆ
-
-		// ต่อสัญญาณ
-		sm.ScoreChanged       += hud.UpdateScore;
-		sm.TotalScoreChanged  += hud.UpdateTotalScore;
-		sm.LivesChanged       += hud.UpdateLives;
-		sm.LevelChanged       += hud.UpdateLevel;
-		sm.MultiplierChanged  += hud.UpdateMultiplier;
-		sm.TimeLeftChanged    += hud.UpdateTimer;
-		sm.LevelCleared       += hud.ShowLevelClear;
-		sm.GameOver           += hud.ShowGameOver;
-
-		GD.Print("[Main] signals wired");
+		// ไม่ต้อง connect อะไรเพิ่ม HudCard เชื่อมกับ ScoreManager เองแล้ว
 	}
 }
