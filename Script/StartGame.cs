@@ -119,6 +119,9 @@ public partial class StartGame : Node2D          // ซีนหน้าเร�
 
 	private void OnStartPressed()                                          // callback เมื่อกดปุ่มเริ่มเกม
 	{
+		GameProgress.Save();
+		GD.Print($"[StartGame] 💾 Saved progress before switching scene (Level={GameProgress.CurrentLevelIndex})");
+		
 		if (ResourceLoader.Exists(PLAY_SCENE))                             // ตรวจว่ามีไฟล์ซีนจริง
 			GetTree().ChangeSceneToFile(PLAY_SCENE);                       // เปลี่ยนซีนไปยังฉากเล่นเกม
 		else

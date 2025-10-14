@@ -146,7 +146,31 @@ public static class LeaderboardStore               // คลาสสาธา�
 		var history = lvObj.ContainsKey("scores") ? (GArray)lvObj["scores"] : new GArray(); // ดึงอาร์เรย์ประวัติคะแนน (หรือสร้างใหม่)
 		history.Add(score);                                                           // เพิ่มคะแนนล่าสุดเข้า history
 		lvObj["scores"] = history;                                                    // เขียนกลับเข้าอ็อบเจ็กต์เลเวล
+		
+		// ✅ บันทึก current_level ของผู้เล่นให้ตรงกับเลเวลที่เล่นล่าสุด
+try
+{
+	int currentLevel = 1;
 
+	// ถ้ามีคีย์ current_level อยู่แล้ว ให้อ่านค่าเดิมมา
+	if (pObj.ContainsKey("current_level"))
+		currentLevel = (int)(long)pObj["current_level"];
+
+	// ถ้าเล่นถึงด่านใหม่ → ปรับ current_level ขึ้น
+	if (GameProgress.IsLevelCleared && levelIndex + 1 > currentLevel)
+	{
+		pObj["current_level"] = levelIndex ;
+		GD.Print($"[LeaderboardStore] 🟢 Updated {playerName} current_level = {levelIndex}");
+	}
+	else
+	{
+		GD.Print($"[LeaderboardStore] ℹ️ current_level unchanged ({currentLevel})");
+	}
+}
+catch (Exception ex)
+{
+	GD.PushWarning($"[LeaderboardStore] ⚠️ Failed to update current_level: {ex.Message}");
+}
 		SaveDoc(doc);                                                                 // บันทึกเอกสารทั้งหมดกลับลงไฟล์
 	}
 	

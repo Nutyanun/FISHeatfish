@@ -15,9 +15,10 @@ public partial class PlayerLogin : Node           // คลาสซิงเก
 	// ✅ เปลี่ยนให้ set ได้จากไฟล์อื่น (เพื่อแก้ Error CS0272)
 	public SaveData CurrentUser { get; set; }      // ผู้ใช้ที่ล็อกอินอยู่ปัจจุบัน
 	public string TodayKey { get; internal set; }   // คีย์วันที่วันนี้ (yyyy-MM-dd) ใช้จัดกลุ่ม high score รายวัน
-
+	
 	// อ่าน/เขียน “ข้อมูลผู้เล่นจริง” เฉพาะใน user:// เท่านั้น
-	private string SavePathUser = "user://players.json"; // path ไฟล์ข้อมูลรวม (players + leaderboards) ในโฟลเดอร์ user
+	private string SavePathUser = "user://players.json";  // path ไฟล์ข้อมูลรวม (players + leaderboards) ในโฟลเดอร์ user
+	private string DefaultPath = "res://SceneLogin/saveUserLogin/players.json";
 
 	public class SaveData                           // โครงสร้างข้อมูลผู้เล่น 1 คน
 	{
@@ -162,47 +163,78 @@ public partial class PlayerLogin : Node           // คลาสซิงเก
 		return true;                                                   // สมัครสำเร็จ
 	}
 
-	// ===== ล็อกอินผู้ใช้เดิม (ตรวจจากไฟล์ user://players.json) =====
-	public bool LoginExisting(string name, string password) // ล็อกอินด้วยชื่อ/รหัสจากไฟล์เดิม
-	{
-		var list = LoadPlayers();                                        // โหลดผู้เล่นทั้งหมด
-		var user = list.Find(p => p.PlayerName == name && p.Password == password); // หาเรคคอร์ดที่ตรงชื่อและรหัส
-		if (user == null) return false;                                  // ไม่พบ → ล็อกอินล้มเหลว
-
-		SetCurrentUserAndStampToday(user);                                // ตั้งผู้ใช้+คีย์วันที่
-		
-		// เพิ่ม : โหลดข้อมูล progress เดิมของผู้เล่น
-var doc = LeaderboardStore.LoadDoc();
-if (doc.ContainsKey("players"))
+// ===== ล็อกอินผู้ใช้เดิม (ตรวจจากไฟล์ user://players.json) =====
+public bool LoginExisting(string name, string password)
 {
+	var list = LoadPlayers();
+	var user = list.Find(p => p.PlayerName == name && p.Password == password);
+	if (user == null) return false;
+
+	SetCurrentUserAndStampToday(user);
+
+	var doc = LeaderboardStore.LoadDoc();
+	doc = LeaderboardStore.EnsureRoot(doc);
 	var players = (GDict)doc["players"];
-	if (players.ContainsKey(name))
+
+	// ถ้าไม่มี record ของผู้เล่นนี้ → สร้างใหม่
+	if (!players.ContainsKey(name))
 	{
-		var p = (GDict)players[name];
-
-		// ถ้ามี current_level → โหลดกลับ
-		if (p.ContainsKey("current_level"))
-			GameProgress.CurrentLevelIndex = (int)(long)p["current_level"];
-		else
-			GameProgress.CurrentLevelIndex = 1;
-
-		// โหลด high score รายเลเวลถ้ามี
-		if (p.ContainsKey("high_scores"))
-		{
-			var hs = (GDict)p["high_scores"];
-			foreach (var kv in hs)
-			{
-				int level = int.Parse(kv.Key.AsString());
-				int score = (int)(long)kv.Value;
-				GameProgress.LastHighScore = Math.Max(GameProgress.LastHighScore, score);
-			}
-		}
+		players[name] = new GDict {
+			{ "registered_at", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz") },
+			{ "levels", new GDict() },
+			{ "current_level", 1 }
+		};
+		GD.Print($"[LoginExisting] 🆕 Created new player record for {name}");
 	}
+
+	var p = (GDict)players[name];
+
+	// 🟢 ตรวจว่าผู้เล่นมีเลเวลถึงไหนในไฟล์ แล้วอัปเดต current_level ให้ตรง
+	if (p.ContainsKey("levels"))
+	{
+		var levels = (GDict)p["levels"];
+		int maxLv = 0;
+		foreach (var key in levels.Keys)
+		{
+			if (int.TryParse(key.AsString(), out int lv))
+				maxLv = Math.Max(maxLv, lv);  // ❗ ไม่บวก +1 แล้ว
+		}
+
+		int current = p.ContainsKey("current_level") ? (int)(long)p["current_level"] : 1;
+
+		// ✅ Debug Log
+		GD.Print($"[LoginExisting] 🔍 Loaded from file → current_level={current}, maxLvFound={maxLv}");
+		
+		// ถ้า current_level > maxLvFound → ลดลงให้ตรง
+		if ((int)(long)p["current_level"] > maxLv)
+		{
+		p["current_level"] = maxLv;
+		GD.Print($"[LoginExisting] 🔧 Fixed current_level (was higher than levels) → now {maxLv}");
+		}
+
+		if (maxLv > current)
+		{
+			p["current_level"] = maxLv;
+			GD.Print($"[LoginExisting] 🟢 Auto-recovered current_level set to {maxLv}");
+		}
+		else
+		{
+			GD.Print($"[LoginExisting] ℹ️ Keep current_level = {current}");
+		}
+
+		GameProgress.CurrentLevelIndex = (int)(long)p["current_level"];
+	}
+	else
+	{
+		GameProgress.CurrentLevelIndex = 1;
+		GD.Print($"[LoginExisting] ℹ️ No levels found → set current_level = 1");
+	}
+
+	LeaderboardStore.SaveDoc(doc);  // ✅ เซฟกลับ
+
+	CurrentPlayerName = name;
+	GD.Print($"[LoginExisting] 🔓 Loaded level {GameProgress.CurrentLevelIndex} for {name}");
+	return true;
 }
 
-// 🟢 เพิ่มตรงนี้เลย เพื่อให้ HUD อ่านชื่อผู้เล่นได้
-	CurrentPlayerName = name;
-
-		return true;                                                      // สำเร็จ
-	}
 }
