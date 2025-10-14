@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c63v4saogcfo7"]
+
+[ext_resource type="Script" uid="uid://codgc2jcgewty" path="res://scripts/CrystalPickup.cs" id="1_vipkx"]
+
+[node name="CrystalPickup" type="Area2D"]
+script = ExtResource("1_vipkx")

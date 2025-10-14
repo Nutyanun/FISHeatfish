@@ -238,7 +238,7 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2yir0"]
 size = Vector2(54.5, 55.5)
 
-[node name="Fish2" type="CharacterBody2D"]
+[node name="Fish2" type="CharacterBody2D" groups=["fish"]]
 collision_layer = 2
 script = ExtResource("1_gwup6")
 

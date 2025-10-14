@@ -1,0 +1,56 @@
+[gd_scene load_steps=9 format=3 uid="uid://cjrw5fglgbb5h"]
+
+[ext_resource type="Texture2D" uid="uid://c14mtqqdsk3ru" path="res://Crystal_Animation/Purple/purple_crystal_0000.png" id="1_7qefl"]
+[ext_resource type="Texture2D" uid="uid://8yb55ee4q05" path="res://Crystal_Animation/Purple/purple_crystal_0001.png" id="2_66vrs"]
+[ext_resource type="Texture2D" uid="uid://d0vd34es1yubg" path="res://Crystal_Animation/Purple/purple_crystal_0002.png" id="3_ufn88"]
+[ext_resource type="Texture2D" uid="uid://baura0s4gyms2" path="res://Crystal_Animation/Purple/purple_crystal_0003.png" id="4_ywpor"]
+[ext_resource type="Script" uid="uid://codgc2jcgewty" path="res://scripts/CrystalPickup.cs" id="5_66vrs"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_00uhq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_7qefl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_66vrs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ufn88")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ywpor")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_wjev8"]
+radius = 15.0
+height = 68.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ufn88"]
+
+[node name="Purple" type="CharacterBody2D" groups=["coins"]]
+collision_layer = 2
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(42, 42)
+sprite_frames = SubResource("SpriteFrames_00uhq")
+autoplay = "default"
+frame_progress = 0.24364498
+
+[node name="Hit" type="Area2D" parent="."]
+collision_layer = 2
+script = ExtResource("5_66vrs")
+Type = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hit"]
+position = Vector2(41, 45)
+shape = SubResource("CapsuleShape2D_wjev8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(41, 44)
+shape = SubResource("CircleShape2D_ufn88")
