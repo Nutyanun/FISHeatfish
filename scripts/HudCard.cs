@@ -1,3 +1,4 @@
+// res://scripts/HudCard.cs
 using Godot;
 using System;
 
@@ -9,7 +10,6 @@ public partial class HudCard : CanvasLayer
 
 	// === Navigation options ===
 	[Export] public bool RetryReloadsScene { get; set; } = true;
-	// วางแทนบรรทัดเดิม
 	[Export(PropertyHint.File, "*.tscn")] public string MenuScenePath { get; set; } = "";
 	[Export(PropertyHint.File, "*.tscn")] public string NextScenePath { get; set; } = "";
 	[Export] public bool QuitExitsGameIfNoMenu { get; set; } = true;
@@ -89,7 +89,7 @@ public partial class HudCard : CanvasLayer
 			_lifeEmpty[i]  = GetNodeOrNull<CanvasItem>(i < LifeEmptyPaths.Length  ? LifeEmptyPaths[i]  : default);
 		}
 
-		// ===== Overlay wiring (หาทั่วทั้ง overlay กันพลาด) =====
+		// ===== Overlay wiring =====
 		_overlay = GetNodeOrNull<Control>(OverlayPath) ?? GetNodeOrNull<Control>("%GameOverLabel");
 		if (_overlay != null)
 		{
@@ -140,54 +140,43 @@ public partial class HudCard : CanvasLayer
 		_sm.LevelCleared += OnLevelCleared;
 		_sm.GameOver += OnGameOver;
 
+		// ขอ sync ค่าเริ่มจาก ScoreManager (ต้องมีเมธอดนี้ใน ScoreManager)
 		_sm.SyncRequestFromHud();
-		
-		// === Show player name from PlayerLogin or GameProgress ===
-string playerName = "Guest";
 
-// ถ้ามี PlayerLogin.Instance ใช้งานอยู่
-if (PlayerLogin.Instance != null)
-	playerName = PlayerLogin.Instance.CurrentPlayerName;
-
-// ถ้า GameProgress มีข้อมูลชื่อ
-else if (!string.IsNullOrEmpty(PlayerLogin.Instance.CurrentPlayerName))
-	playerName = PlayerLogin.Instance.CurrentPlayerName;
-
-// อัปเดตชื่อใน Label
-if (_nameLabel != null)
-	_nameLabel.Text = playerName;
-else
-	GD.PushWarning("[HUD] NameLabel not found, cannot show player name.");
+		// === Show player name (ปลอดภัยเมื่อ PlayerLogin.Instance เป็น null) ===
+		string playerName = PlayerLogin.Instance?.CurrentPlayerName ?? "Guest";
+		if (_nameLabel != null) _nameLabel.Text = playerName;
+		else GD.PushWarning("[HUD] NameLabel not found, cannot show player name.");
 	}
 
 	public override void _UnhandledInput(InputEvent e)
-{
-	// ถ้า overlay ยังไม่ขึ้น → ไม่รับ input
-	if (_overlay == null || !_overlay.Visible)
-		return;
-
-	// ป้องกัน pause ซ้ำจากระบบอื่น (PauseUI)
-	GetViewport().SetInputAsHandled();  // บอกว่า input นี้ถูกจัดการแล้ว (จะไม่ส่งต่อให้ node อื่น)
-
-	// ตรวจปุ่ม Enter
-	if (e.IsActionPressed("ui_accept"))
 	{
-		if (_next != null && _next.Visible && !_next.Disabled)
+		// ถ้า overlay ยังไม่ขึ้น → ไม่รับ input
+		if (_overlay == null || !_overlay.Visible)
+			return;
+
+		// ป้องกัน pause ซ้ำจากระบบอื่น (PauseUI)
+		GetViewport().SetInputAsHandled();  // บอกว่า input นี้ถูกจัดการแล้ว (จะไม่ส่งต่อให้ node อื่น)
+
+		// ตรวจปุ่ม Enter
+		if (e.IsActionPressed("ui_accept"))
 		{
-			OnNextPressed();
+			if (_next != null && _next.Visible && !_next.Disabled)
+			{
+				OnNextPressed();
+			}
+			else if (_retry != null && _retry.Visible && !_retry.Disabled)
+			{
+				OnRetryPressed();
+			}
 		}
-		else if (_retry != null && _retry.Visible && !_retry.Disabled)
+
+		// ตรวจปุ่มออก
+		if (e.IsActionPressed("ui_cancel") || e.IsActionPressed("quit"))
 		{
-			OnRetryPressed();
+			OnQuitPressed();
 		}
 	}
-
-	// ตรวจปุ่มออก
-	if (e.IsActionPressed("ui_cancel") || e.IsActionPressed("quit"))
-	{
-		OnQuitPressed();
-	}
-}
 
 	// ===== Handlers =====
 	private void OnLevelChanged(int level)
@@ -313,90 +302,87 @@ else
 
 	// ===== Buttons =====
 	private async void OnRetryPressed()
-{
-	GD.Print("[HUD] Retry pressed");
+	{
+		GD.Print("[HUD] Retry pressed");
 
-	// ✅ ปลด pause ก่อน reload (สำคัญมาก!)
-	GetTree().Paused = false;
+		// ✅ ปลด pause ก่อน reload (สำคัญมาก!)
+		GetTree().Paused = false;
 
-	// ✅ ถ้ามี overlay ก็ซ่อน
-	HideOverlay();
+		// ✅ ถ้ามี overlay ก็ซ่อน
+		HideOverlay();
 
-	// ✅ รอให้ process frame นึง เพื่อให้ tree resume แล้วค่อย reload
-	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		// ✅ รอให้ process frame นึง เพื่อให้ tree resume แล้วค่อย reload
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
-	GetTree().ReloadCurrentScene();
-}
-
+		GetTree().ReloadCurrentScene();
+	}
 
 	private async void OnNextPressed()
-{
-	GD.Print("[HUD] Next pressed");
+	{
+		GD.Print("[HUD] Next pressed");
 
-	GetTree().Paused = false;
-	HideOverlay();
-	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-	GetTree().ChangeSceneToFile("res://scenescore/score.tscn");
-}
-
+		GetTree().Paused = false;
+		HideOverlay();
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		GetTree().ChangeSceneToFile("res://scenescore/score.tscn");
+	}
 
 	private void OnQuitPressed()
-{
-	GD.Print("[HUD] Quit pressed");
-
-	if (!string.IsNullOrEmpty(MenuScenePath))
 	{
-		// ถ้าตั้งหน้าเมนูไว้ ให้กลับไปเมนูแทนการออก
-		GetTree().Paused = false;
-		GetTree().ChangeSceneToFile(MenuScenePath);
-		return;
-	}
+		GD.Print("[HUD] Quit pressed");
 
-	if (QuitExitsGameIfNoMenu)
-	{
-		QuitApp();   // ออกจากเกมแบบกันพลาด/ข้ามแพลตฟอร์ม
-	}
-	else
-	{
-		HideOverlay(); // ไม่ออกก็ซ่อนโอเวอร์เลย์
-	}
-}
-
-// --- helper: ออกจากเกมแบบครอบคลุม ---
-private void QuitApp()
-{
-	// บางแพลตฟอร์ม/บางจังหวะสั่ง Quit ตรง ๆ อาจไม่ทำงาน ให้ลองทั้งทันทีและแบบ deferred
-	GetTree().Paused = false;
-
-	// เคสเว็บ (HTML5) ส่วนใหญ่ "ออก" จะทำอะไรไม่ได้ ให้ลองกลับหน้าเมนูถ้ามี
-	if (OS.HasFeature("web"))
-	{
-		GD.Print("[HUD] Quit on web: fallback to hide or go menu if set.");
 		if (!string.IsNullOrEmpty(MenuScenePath))
 		{
+			// ถ้าตั้งหน้าเมนูไว้ ให้กลับไปเมนูแทนการออก
+			GetTree().Paused = false;
 			GetTree().ChangeSceneToFile(MenuScenePath);
+			return;
+		}
+
+		if (QuitExitsGameIfNoMenu)
+		{
+			QuitApp();   // ออกจากเกมแบบกันพลาด/ข้ามแพลตฟอร์ม
 		}
 		else
 		{
-			// บนเว็บไม่มีการปิดหน้าต่างจากเกมได้ ปิดโอเวอร์เลย์แทน
-			HideOverlay();
+			HideOverlay(); // ไม่ออกก็ซ่อนโอเวอร์เลย์
 		}
-		return;
 	}
 
-	// ลองแบบปกติ
-	GetTree().Quit();
-
-	// เผื่อสั่งในสัญญาณปุ่มแล้วไม่ปิด ให้ deferred อีกครั้ง
-	Callable.From(() => GetTree().Quit()).CallDeferred();
-
-	// เผื่อกรณีขี้เกียจจริง ๆ: ส่ง notification ปิดหน้าต่าง (desktop)
-	if (!OS.HasFeature("web"))
+	// --- helper: ออกจากเกมแบบครอบคลุม ---
+	private void QuitApp()
 	{
-		GetTree().Root.PropagateNotification((int)Node.NotificationWMCloseRequest);
-	}
-}
+		// บางแพลตฟอร์ม/บางจังหวะสั่ง Quit ตรง ๆ อาจไม่ทำงาน ให้ลองทั้งทันทีและแบบ deferred
+		GetTree().Paused = false;
 
+		// เคสเว็บ (HTML5) ส่วนใหญ่ "ออก" จะทำอะไรไม่ได้ ให้ลองกลับหน้าเมนูถ้ามี
+		if (OS.HasFeature("web"))
+		{
+			GD.Print("[HUD] Quit on web: fallback to hide or go menu if set.");
+			if (!string.IsNullOrEmpty(MenuScenePath))
+			{
+				GetTree().ChangeSceneToFile(MenuScenePath);
+			}
+			else
+			{
+				// บนเว็บไม่มีการปิดหน้าต่างจากเกมได้ ปิดโอเวอร์เลย์แทน
+				HideOverlay();
+			}
+			return;
+		}
+
+		// ลองแบบปกติ
+		GetTree().Quit();
+
+		// เผื่อสั่งในสัญญาณปุ่มแล้วไม่ปิด ให้ deferred อีกครั้ง
+		Callable.From(() => GetTree().Quit()).CallDeferred();
+
+		// เผื่อกรณีขี้เกียจจริง ๆ: ส่ง notification ปิดหน้าต่าง (desktop)
+		if (!OS.HasFeature("web"))
+		{
+			GetTree().Root.PropagateNotification((int)Node.NotificationWMCloseRequest);
+		}
+	}
 
 	private void OnResetHighPressed()
 	{

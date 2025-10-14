@@ -1,8 +1,7 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-
-public enum CrystalType { Red, Blue, Green, Pink, Purple }
+using System.Collections.Generic; // <- ใช้ Dictionary/List
+using Game;                       // <- enum กลาง: CrystalType
 
 public partial class SkillManager : Node
 {
@@ -35,16 +34,25 @@ public partial class SkillManager : Node
 	// ให้คริสตัลเรียกตัวนี้
 	public void Apply(CrystalType t, float durationSeconds)
 	{
-		// 🔴 Red: หักเวลา 10 วินาที "ทันที" (ไม่ต้องมีสถานะค้าง)
+		// 🔴 Red: หักเวลา 10 วินาที "ทันที"
 		if (t == CrystalType.Red)
 		{
-			ChangeTime(-10.0);                 // ปรับตัวเลขได้ตามต้องการ
+			ChangeTime(-10.0);
 			OnSkillStarted?.Invoke(t, 0f);
 			OnSkillEnded?.Invoke(t);
 			return;
 		}
 
-		// สีอื่น ๆ ทำงานตามปกติ (Blue = TimeFreeze, Green/Pink/Purple ตามเดิม)
+		// 🟣 Purple: เพิ่มตัวคูณทันที +1 และรีเซ็ตหน้าต่างคอมโบ (20 วิ) — ไม่มีสถานะค้าง
+		if (t == CrystalType.Purple)
+		{
+			IncreaseMultiplierImmediate();
+			OnSkillStarted?.Invoke(t, 0f);
+			OnSkillEnded?.Invoke(t);
+			return;
+		}
+
+		// สีอื่น ๆ ทำงานตามปกติ (Blue/Green/Pink เป็นสถานะชั่วคราว)
 		ulong now = Time.GetTicksMsec();
 		ulong endAt = now + (ulong)Math.Round(durationSeconds * 1000.0);
 
@@ -63,7 +71,7 @@ public partial class SkillManager : Node
 			case CrystalType.Blue:   _player?.SetTimeFreeze(false);          break;
 			case CrystalType.Green:  _player?.RemoveThornIfAny();            break;
 			case CrystalType.Pink:   _player?.SetMagnet(false, 0f, 0f);      break;
-			case CrystalType.Purple: _player?.SetPhase(false);               break;
+			case CrystalType.Purple: /* ทันที ไม่มีสถานะค้าง */              break;
 		}
 		OnSkillEnded?.Invoke(t);
 	}
@@ -82,7 +90,7 @@ public partial class SkillManager : Node
 			case CrystalType.Blue:   _player?.SetTimeFreeze(true, 0.35f);     break;
 			case CrystalType.Green:  _player?.GiveThornShield(1);             break;
 			case CrystalType.Pink:   _player?.SetMagnet(true, 260f, 0.15f);   break;
-			case CrystalType.Purple: _player?.SetPhase(true);                 break;
+			case CrystalType.Purple: /* ทันที ไม่มีสถานะค้าง */               break;
 		}
 	}
 
@@ -110,5 +118,23 @@ public partial class SkillManager : Node
 		if (sm.HasMethod("SubtractTime"))            { sm.Call("SubtractTime", Math.Abs(seconds)); return; }
 
 		GD.PushWarning("[SkillManager] No time API (AddTime/ReduceTime) on ScoreManager.");
+	}
+
+	// ===== เพิ่มคูณทันทีจากคริสตัลม่วง =====
+	private void IncreaseMultiplierImmediate(int amount = 1)
+	{
+		// หา ScoreManager ให้ได้ตัวจริง (Node) แล้วเรียกเมธอดเฉพาะ
+		ScoreManager sm =
+			GetTree().CurrentScene?.FindChild("ScoreManager", true, false) as ScoreManager ??
+			GetTree().Root?.FindChild("ScoreManager", true, false) as ScoreManager ??
+			_player?.GetNodeOrNull<ScoreManager>("%ScoreManager");
+
+		if (sm == null)
+		{
+			GD.PushWarning("[SkillManager] IncreaseMultiplierImmediate: ScoreManager not found.");
+			return;
+		}
+
+		sm.AddMultiplierFromCrystal(amount);
 	}
 }

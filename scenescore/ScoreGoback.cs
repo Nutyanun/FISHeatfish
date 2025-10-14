@@ -14,7 +14,7 @@ public partial class ScoreGoback : TextureButton
 
 	public override void _Pressed()
 	{
-	if (GameProgress.CurrentPlayingLevel == GameProgress.CurrentLevelIndex + 1)
+	if (GameProgress.CurrentPlayingLevel == GameProgress.CurrentLevelIndex +1)
 		{
 		GameProgress.Advance();
 		GD.Print("Advance to level: " + GameProgress.CurrentLevelIndex);

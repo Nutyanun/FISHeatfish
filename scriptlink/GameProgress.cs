@@ -11,6 +11,9 @@ public partial class GameProgress : Node
 	public static int LastBonusScore { get; set; } = 0;
 	public static int LastTotalScore { get; set; } = 0;
 	public static int LastHighScore { get; set; } = 0;
+	// 🟢 บอกว่าผู้เล่นผ่านด่านล่าสุดแล้วหรือยัง
+	public static bool IsLevelCleared { get; set; } = false;
+
 
 	private static readonly string SavePath = "user://savegame.json";
 	

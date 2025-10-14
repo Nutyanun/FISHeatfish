@@ -5,6 +5,15 @@ using GDict = Godot.Collections.Dictionary;
 
 public partial class ScoreManager : Node2D
 {
+	public static ScoreManager Instance { get; private set; }
+
+public override void _EnterTree()
+{
+	// จะถูกเรียกก่อน _Ready() เสมอ → เหมาะสำหรับ Autoload
+	Instance = this;
+	GD.Print("[ScoreManager] Autoload instance ready.");
+}
+
 	// ===== Signals =====
 	[Signal] public delegate void ScoreChangedEventHandler(int levelScore, int target);
 	[Signal] public delegate void TotalScoreChangedEventHandler(int totalScore, int highScore);
@@ -15,361 +24,290 @@ public partial class ScoreManager : Node2D
 	[Signal] public delegate void LevelClearedEventHandler(int finalScore, int level);
 	[Signal] public delegate void GameOverEventHandler(int finalScore, int level);
 
-	// ===== Bonus-related Signals =====
 	[Signal] public delegate void BonusScoreChangedEventHandler(int totalBonus);
 	[Signal] public delegate void BonusPhaseStartedEventHandler();
 	[Signal] public delegate void BonusPhaseEndedEventHandler(int totalBonus);
 
 	// ===== Config =====
-	[Export] public int BaseTargetScore { get; set; } = 300;
-	[Export] public int TargetGrowthPerLevel { get; set; } = 100;
-
-	[Export] public int BaseTimeSeconds { get; set; } = 150;
-	[Export] public int TimeGrowthPerLevel { get; set; } = 30;
-
-	[Export] public int StartingLives { get; set; } = 3;
-
-	// ===== Bonus =====
-	[Export] public NodePath BonusSpawnerPath { get; set; } = "../BonusCoinSpawner";
-	[Export] public float BonusTriggerSeconds { get; set; } = 20f;
-	[Export] public int BonusStartLevel { get; set; } = 2;
-
-	private BonusCoinSpawner _bonus;
-	private bool _bonusStarted = false;
-	private bool _bonusRunning = false;
-	private int _bonusScore = 0;
-
-	// ===== Multiplier =====
-	[Export] public int MaxMult { get; set; } = 5;
-	[Export] public int NeedFishForNextMult { get; set; } = 10;
-	[Export] public float MultWindowSeconds { get; set; } = 20f;
-
-	private int _fishInWindow = 0;
-	private float _windowLeft = 0f;
-	private int _mult = 1;
+	[Export] public int  BaseTargetScore { get; set; } = 300;
+	[Export] public int  TargetIncrement { get; set; } = 100;
+	[Export] public int  StartLives      { get; set; } = 3;
+	[Export] public bool InfiniteLives   { get; set; } = false;
 
 	// ===== State =====
 	public int Level { get; private set; } = 1;
-	public int Lives { get; private set; } = 3;
-	public int LevelScore { get; private set; } = 0;
-	public int TotalScore { get; private set; } = 0;
-	public int HighScore { get; private set; } = 0;
+	public int TotalScore { get; private set; }
+	public int LevelScore { get; private set; }
+	public int TargetScore { get; private set; }
+
+	public float TimeLeftSec { get; private set; } = 120f;
+	[Export] public bool CountDown = true;
+
+	private int _mult = 1;
+	private int _fishInWindow = 0;
+	private int _needFish = 3;
+	private float _windowLeft = 0f;
+
+	private int _lives;
+	private int _highScore = 0;
+
+	private CrystalSpawner _crystal;
+
+	private bool _isRunning = true;
+	public  bool IsGameOver { get; private set; }
+
+	// ✅ ใช้คู่กับ GameProgress เพื่อไม่ให้นับด่านเกิน
+	public  bool IsLevelCleared { get; private set; }
+
+	// Bonus (เก็บตัวเลขไว้ให้ HUD)
+	private int  _bonusScore = 0;
+	private bool _bonusEnabledThisLevel = false;
+
+	private const string SAVE_FILE = "user://save.dat";
+
+	// ===== กติกาด่าน =====
+	private readonly struct LevelRule
+	{
+		public readonly int Seconds;
+		public readonly bool BonusOn;
+		public readonly CrystalType[] CrystalColors;
+		public readonly float CrystalIntervalSec;
+		public readonly int   CrystalMaxOnScreen;
+
+		public LevelRule(int seconds, bool bonusOn, CrystalType[] colors, float intervalSec, int maxOnScreen)
+		{
+			Seconds = seconds;
+			BonusOn = bonusOn;
+			CrystalColors = colors;
+			CrystalIntervalSec = intervalSec;
+			CrystalMaxOnScreen = maxOnScreen;
+		}
+	}
+
+	private static readonly CrystalType[] NONE = Array.Empty<CrystalType>();
+
+	private readonly LevelRule[] _rules =
+	{
+		new LevelRule(120, false, NONE, 45f, 1),
+		new LevelRule(150, true,  NONE, 45f, 1),
+		new LevelRule(180, true,  NONE, 45f, 1),
+
+		new LevelRule(180, true,  new[]{ CrystalType.Purple, CrystalType.Blue }, 45f, 2),
+		new LevelRule(180, true,  new[]{ CrystalType.Purple, CrystalType.Blue, CrystalType.Green }, 45f, 3),
+
+		new LevelRule(180, true,  new[]{ CrystalType.Red, CrystalType.Blue, CrystalType.Green, CrystalType.Pink, CrystalType.Purple }, 45f, 5),
+		new LevelRule(180, true,  new[]{ CrystalType.Red, CrystalType.Blue, CrystalType.Green, CrystalType.Pink, CrystalType.Purple }, 45f, 5),
+	};
 	
-	// ====== สถานะเกม ======
-public bool IsLevelCleared { get; private set; } = false;
-public bool IsGameOver { get; private set; } = false;
 
-	private int _targetScore;
-	private float _timeLeft;
-	private bool _isRunning = false;
-	private bool _isLevelCleared = false;
-	private bool _isGameOver = false;
-
-	// ===== Save paths =====
-	private const string SAVE_PATH = "user://save_highscore.dat";
-
+	// ===== INITIALIZE =====
 	public override void _Ready()
 	{
 		LoadHighScore();
+		Level = (GameProgress.CurrentPlayingLevel > 0) ? GameProgress.CurrentPlayingLevel : 1;
 
-		if (GameProgress.CurrentPlayingLevel > 0)
-			Level = GameProgress.CurrentPlayingLevel;
+		_crystal = GetNodeOrNull<CrystalSpawner>("%CrystalSpawner") ?? GetNodeOrNull<CrystalSpawner>("CrystalSpawner");
 
-		Lives = StartingLives;
+		_lives = InfiniteLives ? int.MaxValue / 2 : StartLives;
+		EmitSignal(SignalName.LivesChanged, _lives);
+
 		StartLevel(Level);
-
-		// connect BonusSpawner
-		if (!BonusSpawnerPath.IsEmpty)
-		{
-			_bonus = GetNodeOrNull<BonusCoinSpawner>(BonusSpawnerPath);
-			if (_bonus != null)
-			{
-				_bonus.BonusStarted += OnBonusStarted;
-				_bonus.BonusEnded += OnBonusEnded;
-				_bonus.BonusTick += OnBonusTick;
-			}
-		}
-
-		GD.Print($"[ScoreManager] Ready → Level {Level}");
 	}
 
-	// ===== Start Level =====
-	private void StartLevel(int lvl)
+	private LevelRule GetRule(int lv)
 	{
-		GameProgress.ResetFishCount();
-		Level = Mathf.Max(1, lvl);
-		Lives = StartingLives;
+		if (lv <= 0) lv = 1;
+		if (lv > _rules.Length) lv = _rules.Length;
+		return _rules[lv - 1];
+	}
 
-		_targetScore = BaseTargetScore + (Level - 1) * TargetGrowthPerLevel;
-		_timeLeft = BaseTimeSeconds + (Level - 1) * TimeGrowthPerLevel;
+	private void StartLevel(int nextLevel)
+	{
+		Level = Math.Max(1, nextLevel);
+		var rule = GetRule(Level);
 
-		LevelScore = 0;
+		TimeLeftSec = rule.Seconds;
+		TargetScore = BaseTargetScore + (Level - 1) * TargetIncrement;
+		LevelScore  = 0;
+
+		EmitSignal(SignalName.TimeLeftChanged, TimeLeftSec);
+		EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
+
 		_bonusScore = 0;
-		_bonusStarted = false;
-		_bonusRunning = false;
+		_bonusEnabledThisLevel = rule.BonusOn;
 
-		_mult = 1;
-		_fishInWindow = 0;
-		_windowLeft = MultWindowSeconds;
+		_mult = 1; _fishInWindow = 0; _windowLeft = 0f;
 
-		_isLevelCleared = false;
-		_isGameOver = false;
+		IsLevelCleared = false;
+		IsGameOver = false;
+		GameProgress.IsLevelCleared = false;  // 🟢 รีเซ็ตทุกครั้งที่เริ่มด่าน
 		_isRunning = true;
 
-		HighScore = LoadHighScoreForLevel(Level);
+		_crystal?.ApplyRule(rule.CrystalColors, rule.CrystalIntervalSec, rule.CrystalMaxOnScreen);
 
 		EmitSignal(SignalName.LevelChanged, Level);
-		EmitSignal(SignalName.ScoreChanged, LevelScore, _targetScore);
-		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
-		EmitSignal(SignalName.LivesChanged, Lives);
-		EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, NeedFishForNextMult, _windowLeft);
-		EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
 	}
 
-	// ===== Process =====
+	// ===== UPDATE LOOP =====
 	public override void _Process(double delta)
 	{
-		if (!_isRunning || _isGameOver) return;
+		if (!_isRunning || IsGameOver || IsLevelCleared) return;
+		float dt = (float)delta;
 
-		// --- multiplier timer ---
-		_windowLeft -= (float)delta;
-		if (_windowLeft <= 0f)
+		if (CountDown)
 		{
-			_windowLeft = MultWindowSeconds;
-			_fishInWindow = 0;
-			EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, NeedFishForNextMult, _windowLeft);
+			TimeLeftSec -= dt;
+			if (TimeLeftSec < 0f) TimeLeftSec = 0f;
+		}
+		else
+		{
+			TimeLeftSec += dt;
 		}
 
-		// --- time countdown ---
-		_timeLeft = Mathf.Max(0, _timeLeft - (float)delta);
-		EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
+		EmitSignal(SignalName.TimeLeftChanged, TimeLeftSec);
 
-		// --- trigger bonus phase ---
-		if (!_bonusStarted && Level >= BonusStartLevel && _timeLeft <= BonusTriggerSeconds)
-			StartBonusRainForRemainingTime();
-
-		// --- time up ---
-		if (_timeLeft <= 0f && !_isLevelCleared)
+		if (CountDown && TimeLeftSec <= 0f)
 		{
-			if (_bonusRunning) return;
-			if (LevelScore >= _targetScore)
-				FinishCurrentLevel();
+			if (LevelScore >= TargetScore)
+				OnLevelCleared();
 			else
-				FailByTimeUp();
+				OnGameOver();
+		}
+
+		if (_windowLeft > 0f)
+		{
+			_windowLeft -= dt;
+			if (_windowLeft <= 0f)
+			{
+				_mult = 1; _fishInWindow = 0; _windowLeft = 0f;
+				EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, _needFish, _windowLeft);
+			}
 		}
 	}
 
-	// ===== Gameplay =====
-	public void AddScore(int basePoints, string fishType = "fish1")
+	// ===== SCORE SYSTEM =====
+	public void AddScore(int baseScore)
 	{
-		if (_isGameOver) return;
+		if (IsGameOver || IsLevelCleared) return;
+		int add = Math.Max(0, baseScore) * Math.Max(1, _mult);
+		LevelScore += add;
+		TotalScore += add;
 
-		_fishInWindow++;
-		if (_fishInWindow >= NeedFishForNextMult)
+		if (TotalScore > _highScore)
 		{
-			_mult = Mathf.Min(_mult + 1, MaxMult);
-			_fishInWindow = 0;
-		}
-		_windowLeft = MultWindowSeconds;
-
-		int gained = basePoints * _mult;
-		LevelScore += gained;
-		TotalScore += gained;
-
-		if (TotalScore > HighScore)
-		{
-			HighScore = TotalScore;
+			_highScore = TotalScore;
 			SaveHighScore();
 		}
 
-		EmitSignal(SignalName.ScoreChanged, LevelScore, _targetScore);
-		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
-		EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, NeedFishForNextMult, _windowLeft);
+		EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
+		EmitSignal(SignalName.TotalScoreChanged, TotalScore, _highScore);
 
-		GD.Print($"[ScoreManager] +{gained} (x{_mult}) from {fishType}");
-	}
-
-	public void LoseLife(int amount = 1)
-	{
-		if (_isGameOver) return;
-		Lives = Mathf.Max(0, Lives - amount);
-		EmitSignal(SignalName.LivesChanged, Lives);
-
-		if (Lives == 0) DoGameOver();
-	}
-
-	// ===== Bonus =====
-	private void StartBonusRainForRemainingTime()
-	{
-		if (_bonus == null) return;
-		_bonusStarted = true;
-		_bonusRunning = true;
-		_bonusScore = 0;
-
-		EmitSignal(SignalName.BonusScoreChanged, _bonusScore);
-		EmitSignal(SignalName.BonusPhaseStarted);
-
-		float duration = Mathf.Max(0f, _timeLeft);
-		_bonus.Start(duration);
-		GD.Print($"[ScoreManager] BONUS started for {duration:0.##}s");
-	}
-
-	private void OnBonusTick(int value, int runningTotal)
-	{
-		_bonusScore = runningTotal;
-		EmitSignal(SignalName.BonusScoreChanged, _bonusScore);
-		EmitSignal(SignalName.TotalScoreChanged, LevelScore + _bonusScore, HighScore);
-	}
-
-	private void OnBonusEnded(int totalBonus)
-	{
-		_bonusScore = totalBonus;
-		_bonusRunning = false;
-		EmitSignal(SignalName.BonusScoreChanged, _bonusScore);
-		TotalScore += _bonusScore;
-		if (TotalScore > HighScore) { HighScore = TotalScore; SaveHighScore(); }
-		EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
-		EmitSignal(SignalName.BonusPhaseEnded, _bonusScore);
-		if (_timeLeft <= 0f && !_isLevelCleared && LevelScore >= _targetScore)
-			FinishCurrentLevel();
-	}
-
-	private void OnBonusStarted() => GD.Print("[ScoreManager] Bonus phase started");
-
-	// ===== Level End =====
-private void FinishCurrentLevel()
-{
-	if (_isLevelCleared) return;
-	_isLevelCleared = true;
-	_isRunning = false;
-
-	// ✅ เซฟ HighScore ต่อเลเวล
-	SaveHighScoreForLevel(Level, Math.Max(LoadHighScoreForLevel(Level), LevelScore));
-
-	// ✅ อัปเดตค่าใน GameProgress สำหรับไปหน้า ScoreScene
-	GameProgress.LastLevelScore = LevelScore;
-	GameProgress.LastBonusScore = _bonusScore;
-	GameProgress.LastTotalScore = LevelScore + _bonusScore;
-	GameProgress.LastHighScore = HighScore;
-
-	// ====== บันทึก progress ต่อชื่อผู้เล่น ======
-	var pl = PlayerLogin.Instance;
-	if (pl?.CurrentUser != null)
-	{
-		string name = pl.CurrentUser.PlayerName;
-
-		// โหลด doc หลังจากแน่ใจว่ามี player แล้ว
-		var doc = LeaderboardStore.LoadDoc();
-		doc = LeaderboardStore.EnsureRoot(doc);
-		var players = (GDict)doc["players"];
-
-		if (players.ContainsKey(name))
+		_fishInWindow++;
+		_windowLeft = Mathf.Max(_windowLeft, 3.5f);
+		if (_fishInWindow >= _needFish && _mult < 5)
 		{
-			var p = (GDict)players[name];
-
-			// อัปเดตด่านล่าสุดที่เล่นถึง
-			p["current_level"] = Level;
-
-			// บันทึก high score ต่อเลเวล
-			if (!p.ContainsKey("high_scores"))
-				p["high_scores"] = new GDict();
-
-			var hs = (GDict)p["high_scores"];
-			if (!hs.ContainsKey(Level.ToString()) || (int)(long)hs[Level.ToString()] < LevelScore)
-				hs[Level.ToString()] = LevelScore;
-
-			// ✅ เซฟไฟล์กลับ
-			LeaderboardStore.SaveDoc(doc);
-			GD.Print($"[ScoreManager] Saved progress for {name}: Level={Level}, High={LevelScore}");
+			_mult++;
+			_fishInWindow = 0;
+			EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, _needFish, _windowLeft);
 		}
 	}
+	public void AddScore(int baseScore, object _unused) => AddScore(baseScore);
 
-	// ✅ ส่งสัญญาณกลับ HUD / Game
+	// ===== LIVES =====
+	public void LoseLife(int n = 1)
+	{
+		if (InfiniteLives || IsGameOver || IsLevelCleared) return;
+		_lives -= Math.Max(1, n);
+		if (_lives < 0) _lives = 0;
+		EmitSignal(SignalName.LivesChanged, _lives);
+		if (_lives <= 0) OnGameOver();
+	}
+
+	// ===== CLEAR / GAMEOVER =====
+	private void OnLevelCleared()
+{
+	if (IsLevelCleared || IsGameOver) return;
+	IsLevelCleared = true;
+	GameProgress.IsLevelCleared = true;  // ✅ ผ่านด่าน
+
+	// 🟢 เพิ่มส่วนนี้ ↓↓↓
+	GameProgress.LastLevelScore = LevelScore;
+	GameProgress.LastBonusScore = _bonusScore;
+	GameProgress.LastTotalScore = GetTotalWithBonus();
+	GameProgress.LastHighScore = LoadHighScoreForLevel(Level);
+	GameProgress.Save();
+
+	_isRunning = false;
+
+	GD.Print($"[ScoreManager] 🎉 Level {Level} cleared!");
 	EmitSignal(SignalName.LevelCleared, LevelScore, Level);
 }
 
-
-	private void FailByTimeUp()
+	private void OnGameOver()
 	{
-		_isGameOver = true;
+		if (IsGameOver || IsLevelCleared) return;
+		IsGameOver = true;
+		GameProgress.IsLevelCleared = false;  // ❌ แพ้ = ไม่ผ่าน
 		_isRunning = false;
-		SaveHighScore();
-		GD.Print($"[ScoreManager] Time up | Score={LevelScore}/{_targetScore} → GAME OVER");
+
+		GD.Print($"[ScoreManager] 💀 Game Over at Level {Level}");
 		EmitSignal(SignalName.GameOver, LevelScore, Level);
 	}
 
-	private void DoGameOver()
+	public void SetRunning(bool run)
 	{
-		if (_isGameOver) return;
-		_isGameOver = true;
-		_isRunning = false;
-		SaveHighScore();
-		EmitSignal(SignalName.GameOver, LevelScore, Level);
+		_isRunning = run && !IsGameOver && !IsLevelCleared;
 	}
 
-	// ===== Save / Load =====
-	public void SaveHighScore()
+	public void GoToNextLevel() => StartLevel(Level + 1);
+
+	// ===== SAVE / LOAD =====
+	private void LoadHighScore()
 	{
-		using var f = FileAccess.Open(SAVE_PATH, FileAccess.ModeFlags.Write);
-		f.Store32((uint)HighScore);
+		if (!FileAccess.FileExists(SAVE_FILE))
+		{
+			_highScore = 0;
+			return;
+		}
+		using var f = FileAccess.Open(SAVE_FILE, FileAccess.ModeFlags.Read);
+		if (f == null) { _highScore = 0; return; }
+		_highScore = (int)f.Get32();
 	}
 
-	public void LoadHighScore()
+	private void SaveHighScore()
 	{
-		if (!FileAccess.FileExists(SAVE_PATH)) { HighScore = 0; return; }
-		using var f = FileAccess.Open(SAVE_PATH, FileAccess.ModeFlags.Read);
-		HighScore = (int)f.Get32();
+		using var f = FileAccess.Open(SAVE_FILE, FileAccess.ModeFlags.Write);
+		f.Store32((uint)_highScore);
 	}
 
-	private string GetHighScorePath(int levelIndex) => $"user://highscore_level{levelIndex}.dat";
-
-	public int LoadHighScoreForLevel(int levelIndex)
-	{
-		var path = GetHighScorePath(levelIndex);
-		if (!FileAccess.FileExists(path)) return 0;
-		using var f = FileAccess.Open(path, FileAccess.ModeFlags.Read);
-		return (int)f.Get32();
-	}
-
-	public void SaveHighScoreForLevel(int levelIndex, int score)
-	{
-		using var f = FileAccess.Open(GetHighScorePath(levelIndex), FileAccess.ModeFlags.Write);
-		f.Store32((uint)score);
-	}
-
+	// ===== GETTERS =====
+	public float GetTimeLeft() => TimeLeftSec;
 	public int GetBonusScore() => _bonusScore;
-	public int GetTotalWithBonus() => LevelScore + _bonusScore;
-	
-	// ===== Compatibility / HUD Sync =====
-public void SyncRequestFromHud()
-{
-	// ส่งสถานะทั้งหมดกลับ HUD ทันที (เหมือนตอนเริ่มเกม)
-	EmitSignal(SignalName.LevelChanged, Level);
-	EmitSignal(SignalName.ScoreChanged, LevelScore, _targetScore);
-	EmitSignal(SignalName.TotalScoreChanged, TotalScore, HighScore);
-	EmitSignal(SignalName.LivesChanged, Lives);
-	EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, NeedFishForNextMult, _windowLeft);
-	EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
+	public int GetTotalWithBonus() => TotalScore + _bonusScore;
+	public int LoadHighScoreForLevel(int _level) => _highScore;
 
-	// สัญญาณโบนัส (ถ้ามี)
-	EmitSignal(SignalName.BonusScoreChanged, _bonusScore);
-}
+	public void SyncRequestFromHud()
+	{
+		EmitSignal(SignalName.TimeLeftChanged, TimeLeftSec);
+		EmitSignal(SignalName.ScoreChanged, LevelScore, TargetScore);
+		EmitSignal(SignalName.TotalScoreChanged, TotalScore, _highScore);
+		EmitSignal(SignalName.LivesChanged, _lives);
+		EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, _needFish, _windowLeft);
+		EmitSignal(SignalName.LevelChanged, Level);
+	}
 
-// ===== Time control for SkillManager =====
-public void AddTime(double seconds)
-{
-	// เพิ่มเวลาที่เหลือในด่าน
-	_timeLeft += (float)seconds;
-	GD.Print($"[ScoreManager] AddTime +{seconds:F1}s → {_timeLeft:F1}s");
-	EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
-}
-
-public void ReduceTime(double seconds)
-{
-	// ลดเวลา แต่ไม่ให้ติดลบ
-	_timeLeft = Mathf.Max(0, _timeLeft - (float)seconds);
-	GD.Print($"[ScoreManager] ReduceTime -{seconds:F1}s → {_timeLeft:F1}s");
-	EmitSignal(SignalName.TimeLeftChanged, _timeLeft);
-}
-
+	// ===== MULTIPLIER =====
+	public void AddMultiplierFromCrystal(int add = 1)
+	{
+		int before = _mult;
+		_mult = Math.Clamp(_mult + Math.Max(1, add), 1, 9);
+		if (_mult != before)
+			EmitSignal(SignalName.MultiplierChanged, _mult, _fishInWindow, _needFish, _windowLeft);
+	}
+	public void AddMultiplierFromCrystal(CrystalType crystal)
+	{
+		int delta = (crystal == CrystalType.Pink) ? 2 : 1;
+		AddMultiplierFromCrystal(delta);
+	}
+	public void AddMultiplierFromCrystal(object _) => AddMultiplierFromCrystal(1);
 }

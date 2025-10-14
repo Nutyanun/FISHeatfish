@@ -14,6 +14,7 @@ public partial class ScoreScene : Node2D             // ซีนสรุปค
 
 	public override void _Ready()                         // เรียกเมื่อซีนพร้อมใช้งาน
 	{
+		GD.Print($"[ScoreScene] Read from GameProgress → Score={GameProgress.LastLevelScore}, Bonus={GameProgress.LastBonusScore}, Total={GameProgress.LastTotalScore}, High={GameProgress.LastHighScore}");
 		int levelIndex = GameProgress.CurrentPlayingLevel; // ด่านที่เพิ่งเล่นจบ (index)
 		int score = GameProgress.LastLevelScore;           // คะแนนหลักของด่าน
 		int bonus = GameProgress.LastBonusScore;           // คะแนนโบนัส

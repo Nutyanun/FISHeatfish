@@ -1,17 +1,36 @@
 using Godot;
+using System;
+using Game;
 
 public partial class CrystalPickup : Area2D
 {
-	[Export] public CrystalType Type = CrystalType.Blue;
+	// ใช้ string สำหรับ Export (เลือกจาก dropdown ใน Inspector)
+	[Export(PropertyHint.Enum, "Red,Blue,Green,Pink,Purple")]
+	private string _typeName = "Blue";
+
+	// ใช้ภายในเป็น enum (ไม่ export)
+	public CrystalType Type { get; private set; } = CrystalType.Blue;
+
 	[Export] public float Duration = 6f;
 
-	// เปิดไว้: เดาสีจากชื่อโหนด/ซีนอัตโนมัติถ้าลืมตั้ง Type ใน Inspector
-	// จะ "ไม่ทับ" ค่า Type ที่ตั้งไว้ ยกเว้นกรณี Type ยังเป็น Blue แต่ชื่อบอกว่าเป็นสีอื่น
+	// เปิดไว้: เดาสีจากชื่อโหนด/ซีนอัตโนมัติ
 	[Export] public bool AutoDetectFromName = true;
 
 	public override void _Ready()
 	{
-		if (AutoDetectFromName) TryAutoDetectType();
+		// แปลง string → enum (จาก Inspector)
+		try
+		{
+			Type = Enum.Parse<CrystalType>(_typeName, true);
+		}
+		catch
+		{
+			Type = CrystalType.Blue; // fallback
+			GD.PushWarning($"[CrystalPickup] Unknown type name: {_typeName}, fallback to Blue");
+		}
+
+		if (AutoDetectFromName)
+			TryAutoDetectType();
 	}
 
 	public void CollectBy(Player p)
@@ -26,37 +45,35 @@ public partial class CrystalPickup : Area2D
 
 		if (sm == null)
 		{
-			GD.PushError("[CrystalPickup] No SkillManager found. Put a node named 'SkillManager' with SkillManager.cs (preferably under Player).");
+			GD.PushError("[CrystalPickup] No SkillManager found. Please add a node named 'SkillManager' with SkillManager.cs (under Player).");
 			return;
 		}
 
 		sm.Apply(Type, Duration);
 
-		// ลบทั้งชิ้น (สคริปต์มักติดที่ Hit ซึ่งเป็นลูกของราก)
+		// ลบตัวเองออกจากฉาก
 		(GetParent() ?? this).QueueFree();
 	}
 
 	private void TryAutoDetectType()
-{
-	// Name เป็น StringName -> แปลงเป็น string ก่อนค่อย ToLowerInvariant()
-	StringName sn = GetParent()?.Name ?? Name;
-	string n = sn.ToString().ToLowerInvariant();
+	{
+		StringName sn = GetParent()?.Name ?? Name;
+		string n = sn.ToString().ToLowerInvariant();
 
-	// ถ้าตั้ง Type เองไว้แล้ว (ไม่ใช่ Blue ค่าเริ่ม) ไม่ทับ
-	if (Type != CrystalType.Blue)
-		return;
+		// ถ้า Type ตั้งเองแล้ว (ไม่ใช่ Blue เริ่มต้น) → ไม่ทับ
+		if (Type != CrystalType.Blue)
+			return;
 
-	// ถ้าชื่อบอกว่า blue อยู่แล้ว ก็ปล่อยไว้
-	if (n.Contains("blue"))
-		return;
+		// ถ้าชื่อบอกว่า blue → ปล่อยไว้
+		if (n.Contains("blue"))
+			return;
 
-	// เดาสีจากชื่อ
-	if (n.Contains("red"))                 Type = CrystalType.Red;
-	else if (n.Contains("green"))          Type = CrystalType.Green;
-	else if (n.Contains("pink"))           Type = CrystalType.Pink;
-	else if (n.Contains("purple"))         Type = CrystalType.Purple;
+		// เดาสีจากชื่อ
+		if (n.Contains("red"))       Type = CrystalType.Red;
+		else if (n.Contains("green")) Type = CrystalType.Green;
+		else if (n.Contains("pink"))  Type = CrystalType.Pink;
+		else if (n.Contains("purple"))Type = CrystalType.Purple;
 
-	GD.Print($"[CrystalPickup] AutoDetect Type => {Type} (from name: {n})");
-}
-
+		GD.Print($"[CrystalPickup] AutoDetect Type => {Type} (from name: {n})");
+	}
 }

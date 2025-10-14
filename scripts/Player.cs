@@ -47,13 +47,15 @@ public partial class Player : CharacterBody2D
 	// ===========================================
 	// 🟦 ส่วน Helper: หา Node อื่น และ Resolve Object
 	// ===========================================
-	private ScoreManager GetSM()
-	{
-		return
-			GetNodeOrNull<ScoreManager>("%ScoreManager") ??
-			GetNodeOrNull<ScoreManager>("/root/Main/ScoreManager") ??
-			GetNodeOrNull<ScoreManager>("/root/ScoreManager");
-	}
+	private ScoreManager _smCache;
+
+private ScoreManager GetSM()
+{
+	if (ScoreManager.Instance == null)
+		GD.PushWarning("[Player] ⚠️ ScoreManager.Instance is null!");
+	return ScoreManager.Instance;
+}
+
 
 	private Fish ResolveFish(Node n)
 	{
@@ -242,6 +244,8 @@ public partial class Player : CharacterBody2D
 
 		if (_anim != null && _anim.SpriteFrames?.HasAnimation(SwimAnimation) == true)
 			_anim.Play(SwimAnimation);
+		
+		GD.Print($"[Player] Bite triggered → ScoreManager found? {GetSM() != null}");
 	}
 
 	private void CheckDeathOnTouch(Fish fish)

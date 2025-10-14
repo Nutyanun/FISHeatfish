@@ -5,6 +5,23 @@ public partial class CheckpointManager : Node2D
 {
 	public override void _Ready()
 	{
+		// ✅ โหลด progress จาก players.json ของผู้เล่นที่ล็อกอินล่าสุด
+var login = PlayerLogin.Instance;
+if (login?.CurrentUser != null)
+{
+	var name = login.CurrentUser.PlayerName;
+	var doc = LeaderboardStore.LoadDoc();
+	if (doc.ContainsKey("players"))
+	{
+		var players = (Godot.Collections.Dictionary)doc["players"];
+		if (players.ContainsKey(name))
+		{
+			var p = (Godot.Collections.Dictionary)players[name];
+			if (p.ContainsKey("current_level"))
+				GameProgress.CurrentLevelIndex = (int)(long)p["current_level"];
+		}
+	}
+}
 		GameProgress.Load();   // โหลดข้อมูลความคืบหน้าของผู้เล่น (เช่นถึงด่านไหนแล้ว)
 		UpdateLevelVisual();   // อัปเดตรูปภาพหรือสีของด่านตามข้อมูลที่โหลดมา
 	}
