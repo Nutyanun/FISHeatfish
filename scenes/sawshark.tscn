@@ -1,0 +1,149 @@
+[gd_scene load_steps=21 format=3 uid="uid://38btfv40udct"]
+
+[ext_resource type="Script" uid="uid://dk50rkr56pbfv" path="res://scripts/Fish.cs" id="1_wx37g"]
+[ext_resource type="Texture2D" uid="uid://bdkrdjynxumhg" path="res://SawShark - 48x32/SawShark.png" id="2_yohga"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_awvvo"]
+atlas = ExtResource("2_yohga")
+region = Rect2(0, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t1tqh"]
+atlas = ExtResource("2_yohga")
+region = Rect2(48, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2c71k"]
+atlas = ExtResource("2_yohga")
+region = Rect2(96, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hi8xr"]
+atlas = ExtResource("2_yohga")
+region = Rect2(144, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rxhll"]
+atlas = ExtResource("2_yohga")
+region = Rect2(192, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qx30y"]
+atlas = ExtResource("2_yohga")
+region = Rect2(240, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f3qqo"]
+atlas = ExtResource("2_yohga")
+region = Rect2(288, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c1ho1"]
+atlas = ExtResource("2_yohga")
+region = Rect2(336, 0, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a5uxc"]
+atlas = ExtResource("2_yohga")
+region = Rect2(336, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bmq23"]
+atlas = ExtResource("2_yohga")
+region = Rect2(288, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r3gok"]
+atlas = ExtResource("2_yohga")
+region = Rect2(240, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gyf47"]
+atlas = ExtResource("2_yohga")
+region = Rect2(192, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3eii4"]
+atlas = ExtResource("2_yohga")
+region = Rect2(144, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q0m5d"]
+atlas = ExtResource("2_yohga")
+region = Rect2(96, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g5y4e"]
+atlas = ExtResource("2_yohga")
+region = Rect2(48, 32, 48, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xfk1s"]
+atlas = ExtResource("2_yohga")
+region = Rect2(0, 32, 48, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ebkgy"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_awvvo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t1tqh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2c71k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hi8xr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rxhll")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qx30y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f3qqo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c1ho1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a5uxc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bmq23")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r3gok")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gyf47")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3eii4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q0m5d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g5y4e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xfk1s")
+}],
+"loop": true,
+"name": &"SawShark",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r2p7n"]
+size = Vector2(211.5, 107)
+
+[node name="SawShark" type="CharacterBody2D" groups=["fish"]]
+collision_layer = 8
+collision_mask = 129
+motion_mode = 1
+script = ExtResource("1_wx37g")
+Speed = 100.0
+FishType = "SawShark"
+Points = 500
+RequiredScore = 700
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(142, 121)
+scale = Vector2(4.5, 4.5)
+sprite_frames = SubResource("SpriteFrames_ebkgy")
+animation = &"SawShark"
+autoplay = "SawShark"
+frame_progress = 0.67629945
+
+[node name="CollisionShape2D_pink" type="CollisionShape2D" parent="."]
+position = Vector2(144.25, 118.5)
+shape = SubResource("RectangleShape2D_r2p7n")

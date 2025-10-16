@@ -239,8 +239,11 @@ animations = [{
 size = Vector2(54.5, 55.5)
 
 [node name="Fish2" type="CharacterBody2D" groups=["fish"]]
-collision_layer = 2
+collision_layer = 8
+collision_mask = 129
+motion_mode = 1
 script = ExtResource("1_gwup6")
+FishType = "fish2"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(120, 108)

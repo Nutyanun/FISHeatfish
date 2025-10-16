@@ -308,12 +308,32 @@ public partial class Hud : CanvasLayer
 	}
 
 	// ===== Level clear / game over flow =====
-	private void OnLevelCleared(int finalScore, int level)
+	private async void OnLevelCleared(int finalScore, int level)
+{
+	GD.Print($"[HUD] Level {level} cleared (score={finalScore}).");
+	HideOverlay();
+	GetTree().Paused = false;
+
+	// ✅ รอ 1 frame ให้ ScoreManager ประมวลผลคะแนนล่าสุดเสร็จก่อน
+	await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+	var sm = GetNodeOrNull<ScoreManager>("%ScoreManager") ?? GetNodeOrNull<ScoreManager>("ScoreManager");
+	if (sm != null)
 	{
-		GD.Print($"[HUD] Level {level} cleared (score={finalScore}).");
-		HideOverlay();
-		GetTree().Paused = false;
+		GameProgress.CurrentPlayingLevel = sm.Level;
+		GameProgress.LastLevelScore = sm.LevelScore;
+		GameProgress.LastBonusScore = sm.GetBonusScore();
+		GameProgress.LastTotalScore = sm.GetTotalWithBonus();
+		GameProgress.LastHighScore = sm.LoadHighScoreForLevel(sm.Level);
+
+		GD.Print($"[HUD] ✅ Saved progress after frame: Level={sm.Level}, Score={sm.LevelScore}, Bonus={GameProgress.LastBonusScore}, Total={GameProgress.LastTotalScore}, High={GameProgress.LastHighScore}");
 	}
+	else
+	{
+		GD.PushWarning("[HUD] ScoreManager not found during level clear.");
+	}
+}
+
 
 	public void ShowLevelClear(int level, int finalScore)
 	{

@@ -1,6 +1,17 @@
 using Godot;
-using Game;
+using Game; // ✅ ถ้ามี namespace Game จริง ๆ ในโปรเจกต์
 
+namespace Game
+{
+	public enum CrystalType
+	{
+		Blue = 0,
+		Red = 1,
+		Green = 2,
+		Pink = 3,
+		Purple = 4,
+	}
+	
 public partial class Bg : ParallaxBackground 
 {
 	[Export] public Vector2 Speed = new(-120f, 0f); // ความเร็วเลื่อนฉาก
@@ -15,4 +26,5 @@ public partial class Bg : ParallaxBackground
 	{
 		ScrollOffset += Speed * (float)delta;
 	}
+}
 }

@@ -1,257 +1,327 @@
 using Godot;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using Game; // ⬅️ ใช้ enum Global: Game.CrystalType
 
 public partial class CrystalSpawner : Node2D
 {
-	[Export] public float   IntervalSec = 45f;
-	[Export] public int     MaxOnScreen = 2;
-	[Export] public bool    UsePickupsGroup = true;
+	[Export] public NodePath SpawnRootPath { get; set; } = "..";
+	[Export] public float IntervalSec { get; set; } = 60f;
+	[Export] public bool UseRandomInterval { get; set; } = false;
+	[Export] public float RandomJitter { get; set; } = 0.25f;
+	[Export] public int MaxOnScreen { get; set; } = 5;
+	[Export] public float FallSpeed { get; set; } = 70f;
+	[Export] public float MinVisibleSec { get; set; } = 2.5f;
 
-	[Export] public bool    UseRandomInterval = false;
-	[Export] public Vector2 RandomIntervalRange = new Vector2(50f, 70f);
+	[Export] public bool SpawnImmediatelyOnStart { get; set; } = true;
+	[Export] public bool LogDebug { get; set; } = true;
 
-	// ซีนคริสตัลแต่ละสี
-	[Export] public PackedScene RedScene;
-	[Export] public PackedScene BlueScene;
-	[Export] public PackedScene GreenScene;
-	[Export] public PackedScene PinkScene;
-	[Export] public PackedScene PurpleScene;
+	[Export] public PackedScene PurpleScene { get; set; }
+	[Export] public PackedScene BlueScene   { get; set; }
+	[Export] public PackedScene GreenScene  { get; set; }
+	[Export] public PackedScene RedScene    { get; set; }
+	[Export] public PackedScene PinkScene   { get; set; }
 
-	// เงื่อนไข: 20 วิท้าย (ด่าน >= 4) บังคับมีชมพู 1 ชิ้น
-	[Export] public bool  SpawnOnePinkInLastSeconds = true;
-	[Export] public float LastSeconds = 20f;
+	private Node2D _spawnRoot;
+	private float _timer;
+	private float _nextInterval;
 
-	private bool   _finalPinkSpawned = false;
-	private double _accum;
-	private Timer  _timer;
+	private readonly HashSet<CrystalType> _allowed = new();
+	private readonly List<CrystalType> _allowedWithScene = new();
+	private bool _finalPinkSpawned = false;
 
-	// สีที่อนุญาตในด่านนี้ (null = ใช้ทุกสีที่มีซีน)
-	private HashSet<CrystalType> _allowed = null;
+	public void ApplyRule(CrystalType[] colors, float intervalSec, int maxOnScreen)
+	{
+		_allowed.Clear();
+		if (colors != null && colors.Length > 0)
+			_allowed.UnionWith(colors);
+
+		IntervalSec = Math.Max(0.1f, intervalSec);
+		MaxOnScreen = Math.Max(0, maxOnScreen);
+
+		RefreshAllowedWithScene();
+		ResetPinkForced();
+
+		_timer = 0f;
+		_nextInterval = IntervalWithJitter();
+
+		if (LogDebug) GD.Print($"[CrystalSpawner] ApplyRule OK colors={_allowedWithScene.Count} interval={IntervalSec}s max={MaxOnScreen}");
+	}
+
+	public void ResetPinkForced() => _finalPinkSpawned = false;
+
+	public void ForcePinkOnceInLastWindow()
+	{
+		if (_finalPinkSpawned || PinkScene == null) return;
+		if (!PinkExistsOnScreen())
+			SpawnSpecific(PinkScene, force: true);
+		_finalPinkSpawned = true;
+		if (LogDebug) GD.Print("[CrystalSpawner] Force pink in last 20s.");
+	}
 
 	public override void _Ready()
 	{
-		GD.Seed(Time.GetTicksUsec());
-		_timer = new Timer { WaitTime = Math.Max(0.05f, IntervalSec), OneShot = false, Autostart = true };
-		AddChild(_timer);
-		_timer.Timeout += OnTimeout;
+		_spawnRoot = GetNodeOrNull<Node2D>(SpawnRootPath) ?? GetParent() as Node2D ?? this;
+		_timer = 0f;
+		_nextInterval = IntervalWithJitter();
+		
+		if (SpawnImmediatelyOnStart && _allowedWithScene.Count > 0)
+			TrySpawnOnceNow();
 	}
 
 	public override void _Process(double delta)
+{
+	if (!IsInsideTree()) return;
+	if (_spawnRoot == null) return;
+	if (!GodotObject.IsInstanceValid(_spawnRoot)) return;
+	if (_spawnRoot.IsQueuedForDeletion() || !_spawnRoot.IsInsideTree()) return;
+	// กันเคสซีน/รากโดนลบระหว่างเฟรม
+	if (!IsInsideTree()) return;
+	if (_spawnRoot == null || !GodotObject.IsInstanceValid(_spawnRoot) || !_spawnRoot.IsInsideTree())
+		return;
+
+	if (_allowedWithScene.Count == 0) return;
+
+	_timer += (float)delta;
+	if (_timer < _nextInterval) return;
+
+	_timer -= _nextInterval;
+	_nextInterval = IntervalWithJitter();
+
+	int onScreen = CountCrystalsOnScreen();
+	int room = (MaxOnScreen <= 0) ? 0 : Math.Max(0, MaxOnScreen - onScreen);
+	if (room <= 0) return;                      // ← ไม่มีที่ว่าง/ปิดไว้ → ไม่สปอว์น
+	int toSpawn = 1 + (int)(GD.Randi() % (uint)room);
+
+
+	for (int i = 0; i < toSpawn; i++)
 	{
-		if (!SpawnOnePinkInLastSeconds || _finalPinkSpawned || PinkScene == null) return;
-
-		_accum += delta;
-		if (_accum < 0.25) return;
-		_accum = 0;
-
-		if (TryGetTimeLeftSeconds(out var left) && left <= LastSeconds)
-		{
-			// ถ้าด่านนี้ไม่ได้เปิด Pink ปกติ ให้ยกเว้นเฉพาะด่าน >= 4
-			if (_allowed != null && !_allowed.Contains(CrystalType.Pink))
-			{
-				if (!TryGetLevel(out int lv) || lv < 4) return;
-			}
-
-			if (!PinkExistsOnScreen())
-			{
-				SpawnSpecific(PinkScene);
-				_finalPinkSpawned = true;
-			}
-		}
+		var color = PickAllowedColorWithScene();
+		var scene = SceneOf(color);
+		if (scene != null) SpawnSpecific(scene);
 	}
 
-	private void OnTimeout()
-	{
-		string groupName = UsePickupsGroup ? "pickups" : "coins";
-		int alive = GetTree().GetNodesInGroup(groupName).Count;
+	if (LogDebug) GD.Print($"[CrystalSpawner] Spawn batch={toSpawn} onScreen={CountCrystalsOnScreen()}");
+}
 
-		// เต็มเพดานแล้ว ข้ามรอบนี้
-		if (alive >= MaxOnScreen)
-		{
-			if (UseRandomInterval) ResetTimerRandomInterval();
+	private void TrySpawnOnceNow()
+	{
+		if (_allowedWithScene.Count == 0) return;
+		var color = PickAllowedColorWithScene();
+		var scene = SceneOf(color);
+		if (scene != null) { SpawnSpecific(scene, force: true); if (LogDebug) GD.Print("[CrystalSpawner] SpawnImmediatelyOnStart"); }
+	}
+
+	private float IntervalWithJitter()
+	{
+		if (!UseRandomInterval || RandomJitter <= 0f) return IntervalSec;
+		float j = Mathf.Clamp(RandomJitter, 0f, 0.9f);
+		float low = IntervalSec * (1f - j);
+		float high = IntervalSec * (1f + j);
+		return (float)GD.RandRange(low, high);
+	}
+
+	private void RefreshAllowedWithScene()
+	{
+		_allowedWithScene.Clear();
+		foreach (var c in _allowed)
+			if (SceneOf(c) != null)
+				_allowedWithScene.Add(c);
+	}
+
+	private CrystalType PickAllowedColorWithScene()
+	{
+		int n = _allowedWithScene.Count;
+		int idx = (int)(GD.Randi() % (uint)Math.Max(1, n));
+		return (n == 0) ? CrystalType.Purple : _allowedWithScene[idx];
+	}
+
+	private PackedScene SceneOf(CrystalType c) => c switch
+	{
+		CrystalType.Purple => PurpleScene,
+		CrystalType.Blue   => BlueScene,
+		CrystalType.Green  => GreenScene,
+		CrystalType.Red    => RedScene,
+		CrystalType.Pink   => PinkScene,
+		_ => null
+	};
+
+	private void SpawnSpecific(PackedScene ps, bool force = false)
+	{
+		if (ps == null || _spawnRoot == null) return;
+		if (!GodotObject.IsInstanceValid(_spawnRoot) || _spawnRoot.IsQueuedForDeletion() || !_spawnRoot.IsInsideTree())
 			return;
-		}
+			
+		if (ps == null || _spawnRoot == null) return;
 
-		int allowedCount = GetAllowedColorCount();
-		if (allowedCount <= 0)
-		{
-			if (UseRandomInterval) ResetTimerRandomInterval();
+		if (!force && MaxOnScreen > 0 && CountCrystalsOnScreen() >= MaxOnScreen)
 			return;
+
+		var n = ps.Instantiate<Node2D>();
+		if (n == null) return;
+
+		Rect2 vp = GetViewportRect();
+		float x = (float)GD.RandRange(vp.Position.X + 32f, vp.End.X - 32f);
+		float y = vp.Position.Y + 2f;
+		n.GlobalPosition = new Vector2(x, y);
+
+		n.AddToGroup("Crystal");                  // ✅ สำคัญ: เพื่อให้ Player สแกนเจอ
+		if (ps == PinkScene) n.SetMeta("crystal_color", "pink");
+
+		_spawnRoot.AddChild(n);
+
+		StartFall(n);
+
+		if (LogDebug) GD.Print($"[CrystalSpawner] +1 {ps.ResourcePath}");
+	}
+
+	private void StartFall(Node2D n)
+	{
+		if (n == null) return;
+		FallDriver driver = new FallDriver(n, FallSpeed, MinVisibleSec);
+		n.AddChild(driver);
+	}
+
+	private int CountCrystalsOnScreen()
+{
+	if (_spawnRoot == null ||
+		!GodotObject.IsInstanceValid(_spawnRoot) ||
+		_spawnRoot.IsQueuedForDeletion() ||
+		!_spawnRoot.IsInsideTree())
+		return 0;
+
+	try
+	{
+		int count = 0;
+
+		foreach (Node child in _spawnRoot.GetChildren())
+		{
+			if (child == null) continue;
+			if (!GodotObject.IsInstanceValid(child)) continue;
+			if (child.IsQueuedForDeletion() || !child.IsInsideTree()) continue;
+
+			// นับเฉพาะ "รากคริสตัล" เท่านั้น
+			if (!child.IsInGroup("Crystal")) continue;
+
+			count++;
 		}
 
-		// สุ่มจำนวนในรอบนี้ = 1..N แต่ไม่เกินช่องว่างบนจอ
-		int want    = 1 + (int)(GD.Randi() % (uint)allowedCount);
-		int room    = Math.Max(0, MaxOnScreen - alive);
-		int toSpawn = Math.Min(want, room);
-
-		SpawnBatch(toSpawn);
-
-		if (UseRandomInterval) ResetTimerRandomInterval();
+		return count; // ✅ ต้องมี return ก่อนออกจาก try
 	}
-
-	private void ResetTimerRandomInterval()
+	catch (ObjectDisposedException)
 	{
-		float min = Mathf.Min(RandomIntervalRange.X, RandomIntervalRange.Y);
-		float max = Mathf.Max(RandomIntervalRange.X, RandomIntervalRange.Y);
-		_timer.WaitTime = (float)GD.RandRange(min, max);
-		_timer.Start();
-	}
-
-	// ===== รับกติกาจาก ScoreManager =====
-	public void ApplyRule(CrystalType[] colors, float intervalSec, int maxOnScreen)
-	{
-		_allowed = (colors == null || colors.Length == 0)
-			? new HashSet<CrystalType>()          // ไม่อนุญาตสีใดเลย = ไม่สปอว์น
-			: new HashSet<CrystalType>(colors);   // ใช้ชุดสีที่อนุญาต
-
-		IntervalSec = Math.Max(0.05f, intervalSec);
-		MaxOnScreen = Math.Max(0, maxOnScreen);
-		_finalPinkSpawned = false;
-
-		if (_timer != null) { _timer.WaitTime = IntervalSec; _timer.Start(); }
-	}
-
-	// สปอว์นเป็น “ชุด” ตามจำนวนที่กำหนด
-	private void SpawnBatch(int count)
-	{
-		if (count <= 0) return;
-
-		var pairs = new List<(CrystalType type, PackedScene scene)>
-		{
-			(CrystalType.Red,    RedScene),
-			(CrystalType.Blue,   BlueScene),
-			(CrystalType.Green,  GreenScene),
-			(CrystalType.Pink,   PinkScene),
-			(CrystalType.Purple, PurpleScene)
-		};
-
-		bool allowAll = (_allowed == null);
-
-		var pool = pairs
-			.Where(p => p.scene != null && (allowAll || (_allowed.Count > 0 && _allowed.Contains(p.type))))
-			.Select(p => p.scene)
-			.ToArray();
-
-		if ((!allowAll && _allowed.Count == 0) || pool.Length == 0) return;
-
-		for (int i = 0; i < count; i++)
-		{
-			var scene = pool[GD.Randi() % (uint)pool.Length];
-			SpawnSpecific(scene);
-		}
-	}
-
-	private int GetAllowedColorCount()
-	{
-		if (_allowed != null) return _allowed.Count;
-
-		// ถ้าไม่ได้รับ rule → fallback = จำนวน scene ที่ตั้งค่าไว้จริง
-		int c = 0;
-		if (RedScene    != null) c++;
-		if (BlueScene   != null) c++;
-		if (GreenScene  != null) c++;
-		if (PinkScene   != null) c++;
-		if (PurpleScene != null) c++;
-		return c;
-	}
-
-	private void SpawnSpecific(PackedScene scene)
-	{
-		if (scene == null) return;
-
-		var node = scene.Instantiate<Node2D>();
-		AddChild(node);
-
-		// วางแบบสุ่มแกน X เหนือขอบบนเล็กน้อย
-		var vp = GetViewportRect();
-		float x = (float)GD.RandRange(vp.Position.X + 32, vp.End.X - 32);
-		float y = vp.Position.Y - 48;
-		node.GlobalPosition = new Vector2(x, y);
-
-		AddFallController(node);
-	}
-
-	private void AddFallController(Node2D node)
-	{
-		var fall = new FallController
-		{
-			StartSpeed      = 90f,
-			TargetSpeed     = 160f,
-			EaseTime        = 8f,
-			OffscreenMargin = 64f
-		};
-		node.AddChild(fall);
-	}
-
-	private bool TryGetLevel(out int level)
-	{
-		level = 0;
-		var sm = FindScoreManager() as ScoreManager;
-		if (sm == null) return false;
-		level = sm.Level; return true;
-	}
-
-	private bool PinkExistsOnScreen()
-	{
-		string groupName = UsePickupsGroup ? "pickups" : "coins";
-		foreach (var obj in GetTree().GetNodesInGroup(groupName))
-		{
-			if (obj is Node n)
-			{
-				var cp = n as CrystalPickup
-					?? n.GetNodeOrNull<CrystalPickup>("Hit")
-					?? n.FindChild("Hit", true, false) as CrystalPickup;
-
-				if (cp != null && cp.Type == CrystalType.Pink) return true;
-
-				// กรณีไม่มีสคริปต์ระบุชนิด ดูจากชื่อโหนดแทน
-				var nm = n.Name.ToString().ToLower();
-				if (nm.Contains("pink") || nm.Contains("yellow")) return true;
-			}
-		}
-		return false;
-	}
-
-	private bool TryGetTimeLeftSeconds(out double secs)
-	{
-		secs = 0;
-		var sm = FindScoreManager() as ScoreManager;
-		if (sm == null) return false;
-		secs = sm.GetTimeLeft(); return true;
-	}
-
-	private Node FindScoreManager()
-	{
-		return GetTree().CurrentScene?.FindChild("ScoreManager", true, false)
-			?? GetTree().Root?.FindChild("ScoreManager", true, false);
+		return 0;     // ✅ ต้องมี catch/finally ปิด try
 	}
 }
 
-// ตัวควบคุมการตกอย่างง่าย
-public partial class FallController : Node
+
+	private bool PinkExistsOnScreen()
 {
-	[Export] public float StartSpeed = 90f;
-	[Export] public float TargetSpeed = 160f;
-	[Export] public float EaseTime = 8f;
-	[Export] public float OffscreenMargin = 64f;
+	if (_spawnRoot == null ||
+		!GodotObject.IsInstanceValid(_spawnRoot) ||
+		_spawnRoot.IsQueuedForDeletion() ||
+		!_spawnRoot.IsInsideTree())
+		return false;
 
-	private float _t;
-
-	public override void _Process(double delta)
+	try
 	{
-		if (GetParent() is not Node2D n2d) return;
+		foreach (Node child in _spawnRoot.GetChildren())
+		{
+			if (child is not Node2D n2d) continue;
+			if (!GodotObject.IsInstanceValid(n2d)) continue;
+			if (n2d.IsQueuedForDeletion() || !n2d.IsInsideTree()) continue;
 
-		_t += (float)delta;
-		float k = Mathf.Clamp(_t / Mathf.Max(EaseTime, 0.0001f), 0f, 1f);
-		float speed = Mathf.Lerp(StartSpeed, TargetSpeed, k);
+			Variant meta = n2d.GetMeta("crystal_color");
+				string s = null;
+			// Godot 4: ตรวจชนิดแล้วค่อยดึงออกมาเป็น string
+			if (meta.VariantType == Variant.Type.String || meta.VariantType == Variant.Type.StringName)
+				s = meta.AsString();
 
-		n2d.GlobalPosition += new Vector2(0, speed * (float)delta);
-
-		var vp = n2d.GetViewportRect();
-		if (n2d.GlobalPosition.Y > vp.End.Y + OffscreenMargin)
-			n2d.QueueFree();
+			if (s == "pink" && IsInsideViewport(n2d.GlobalPosition))
+   				 return true;
+ 				
+		}
 	}
+	catch (ObjectDisposedException)
+	{
+		return false;
+	}
+	return false;
+}
+
+
+	private bool IsInsideViewport(Vector2 g)
+	{
+		Rect2 vp = GetViewportRect();
+		return g.X >= vp.Position.X && g.X <= vp.End.X && g.Y >= vp.Position.Y && g.Y <= vp.End.Y;
+	}
+
+	private List<CrystalType> AvailableColors()
+	{
+		var list = new List<CrystalType>(5);
+		if (PurpleScene != null) list.Add(CrystalType.Purple);
+		if (BlueScene   != null) list.Add(CrystalType.Blue);
+		if (GreenScene  != null) list.Add(CrystalType.Green);
+		if (RedScene    != null) list.Add(CrystalType.Red);
+		if (PinkScene   != null) list.Add(CrystalType.Pink);
+		return list;
+	}
+
+	private void EnsureAllowedFallback()
+	{
+		if (_allowedWithScene.Count > 0) return;
+		var avail = AvailableColors();
+		if (avail.Count > 0)
+		{
+			_allowed.Clear();
+			foreach (var c in avail) _allowed.Add(c);
+			_allowedWithScene.Clear();
+			_allowedWithScene.AddRange(avail);
+			GD.PushWarning("[CrystalSpawner] Allowed empty → fallback to all available PackedScenes.");
+		}
+	}
+
+	private sealed partial class FallDriver : Node
+	{
+		private readonly Node2D _host;
+		private readonly float _fallSpeed;
+		private readonly float _minVisible;
+		private float _t;
+		private float _life;
+
+		public FallDriver(Node2D host, float fallSpeed, float minVisible)
+		{
+			_host = host;
+			_fallSpeed = Math.Max(20f, fallSpeed);
+			_minVisible = Math.Max(0.2f, minVisible);
+			ProcessMode = ProcessModeEnum.Always;
+		}
+
+		public override void _Process(double delta)
+		{
+			if (!IsInstanceValid(_host)) { QueueFree(); return; }
+
+			_life += (float)delta;
+			_t += (float)delta;
+			float drift = Mathf.Sin(_t * 2.2f) * 18f;
+
+			_host.GlobalPosition += new Vector2(drift, _fallSpeed) * (float)delta;
+
+			var vp = _host.GetViewportRect();
+			bool passedBottom = _host.GlobalPosition.Y > vp.End.Y + 80f;
+			if ((_life >= _minVisible && passedBottom) || _life > 12f)
+			{
+				Node root = _host;
+				while (root != null && !root.IsInGroup("Crystal")) root = root.GetParent();
+				(root ?? (Node)_host).QueueFree();
+				QueueFree();
+			}
+		}
+	}
+	public override void _ExitTree()
+{
+	// ซีน/รากกำลังถูกทำลาย: หยุด Process และตัด reference
+	SetProcess(false);
+	_spawnRoot = null;
+}
+
 }

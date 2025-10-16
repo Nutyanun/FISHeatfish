@@ -1,0 +1,149 @@
+[gd_scene load_steps=21 format=3 uid="uid://dj338qxpc0ior"]
+
+[ext_resource type="Script" uid="uid://dk50rkr56pbfv" path="res://scripts/Fish.cs" id="1_bry5d"]
+[ext_resource type="Texture2D" uid="uid://c02qjivtfqao6" path="res://Seaangler - 32x32/SeaAngler.png" id="2_v5ceu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e7ygo"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_44xi5"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iqquc"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wm7ya"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qgqgm"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b0ed2"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lhgc3"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_106qv"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dq5md"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(224, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ffoq"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(192, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h47a7"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(160, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r6b4e"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(128, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m02qr"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(96, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5rvmg"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tifcr"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xpwwy"]
+atlas = ExtResource("2_v5ceu")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_roddo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e7ygo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_44xi5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iqquc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wm7ya")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qgqgm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b0ed2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lhgc3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_106qv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dq5md")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ffoq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h47a7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r6b4e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m02qr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5rvmg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tifcr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xpwwy")
+}],
+"loop": true,
+"name": &"Seaangler",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8srm5"]
+size = Vector2(151, 116)
+
+[node name="Seaangler" type="CharacterBody2D" groups=["fish"]]
+collision_layer = 8
+collision_mask = 129
+motion_mode = 1
+script = ExtResource("1_bry5d")
+Speed = 100.0
+FishType = "Seaangler"
+Points = 1000
+RequiredScore = 1200
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(142, 121)
+scale = Vector2(4.5, 4.5)
+sprite_frames = SubResource("SpriteFrames_roddo")
+animation = &"Seaangler"
+autoplay = "Seaangler"
+frame_progress = 0.65299314
+
+[node name="CollisionShape2D_pink" type="CollisionShape2D" parent="."]
+position = Vector2(142.5, 120)
+shape = SubResource("RectangleShape2D_8srm5")

@@ -1,7 +1,7 @@
 [gd_scene load_steps=21 format=3 uid="uid://cckise0dr8nnj"]
 
 [ext_resource type="Script" uid="uid://dk50rkr56pbfv" path="res://scripts/Fish.cs" id="1_v5iaq"]
-[ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://SpearFishing Assets Pack/Sprites/Shark - 32x32/Shark.png" id="2_po4rd"]
+[ext_resource type="Texture2D" uid="uid://cmeofbo3pe5ot" path="res://Shark - 32x32/Shark.png" id="2_po4rd"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_inbs7"]
 atlas = ExtResource("2_po4rd")
@@ -126,12 +126,15 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2ogw6"]
 size = Vector2(213, 143.5)
 
-[node name="Shark" type="CharacterBody2D"]
-collision_layer = 2
+[node name="Shark" type="CharacterBody2D" groups=["fish"]]
+collision_layer = 8
+collision_mask = 129
+motion_mode = 1
 script = ExtResource("1_v5iaq")
 Speed = 110.0
-Points = 15
-RequiredScore = 30
+FishType = "Shark"
+Points = 100
+RequiredScore = 150
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(304, 217)

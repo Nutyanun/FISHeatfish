@@ -63,6 +63,12 @@ public partial class HudCard : CanvasLayer
 	[Export] public float ScoreFlashSeconds { get; set; } = 0.35f;
 	private Color _scoreNormalColor = Colors.White;
 	private bool _flashedThisLevel = false;
+	
+	// ===== Crystal HUD =====
+	[Export] public NodePath CrystalIconPath  { get; set; } = "FreeLayer/Crystal/Icon";   // แก้ path ให้ตรงของคุณ
+	[Export] public NodePath CrystalCountPath { get; set; } = "FreeLayer/Crystal/Count";  // แก้ path ให้ตรงของคุณ
+	private TextureRect _crystalIcon;
+	private Label _crystalCountLabel;
 
 	public override void _Ready()
 	{
@@ -142,12 +148,21 @@ public partial class HudCard : CanvasLayer
 
 		// ขอ sync ค่าเริ่มจาก ScoreManager (ต้องมีเมธอดนี้ใน ScoreManager)
 		_sm.SyncRequestFromHud();
+		// ==== Crystal HUD wiring ====
+		_crystalIcon       = GetNodeOrNull<TextureRect>(CrystalIconPath);
+		_crystalCountLabel = GetNodeOrNull<Label>(CrystalCountPath);
+
+	if (_crystalCountLabel != null)
+{
+		_crystalCountLabel.Text = "x0";
+		_crystalCountLabel.Position += new Vector2(0, -10); // ยกขึ้น 10 px
+}
 
 		// === Show player name (ปลอดภัยเมื่อ PlayerLogin.Instance เป็น null) ===
 		string playerName = PlayerLogin.Instance?.CurrentPlayerName ?? "Guest";
 		if (_nameLabel != null) _nameLabel.Text = playerName;
-		else GD.PushWarning("[HUD] NameLabel not found, cannot show player name.");
-	}
+		else GD.PushWarning("[HUD] NameLabel not found, cannot show player name."); 
+		}
 
 	public override void _UnhandledInput(InputEvent e)
 	{
@@ -396,5 +411,10 @@ public partial class HudCard : CanvasLayer
 		_scoreLabel.Modulate = ScoreFlashColor;
 		await ToSignal(GetTree().CreateTimer(ScoreFlashSeconds), "timeout");
 		_scoreLabel.Modulate = _scoreNormalColor;
+	}
+
+public override void _ExitTree()
+	{
+		if (_sm != null);
 	}
 }

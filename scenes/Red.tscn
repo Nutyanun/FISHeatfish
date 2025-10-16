@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cjc11il5f206n"]
+[gd_scene load_steps=8 format=3 uid="uid://cjc11il5f206n"]
 
 [ext_resource type="Texture2D" uid="uid://db8u8xit6lvcj" path="res://Crystal_Animation/Red/red_crystal_0000.png" id="1_xr8cw"]
 [ext_resource type="Texture2D" uid="uid://dw6xgvn0is1gt" path="res://Crystal_Animation/Red/red_crystal_0001.png" id="2_mvvxh"]
@@ -30,10 +30,13 @@ animations = [{
 radius = 15.0
 height = 68.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_xr8cw"]
-
-[node name="Red" type="CharacterBody2D" groups=["coins"]]
-collision_layer = 2
+[node name="Red" type="CharacterBody2D" groups=["Crystal"]]
+disable_mode = 2
+collision_layer = 32
+collision_mask = 3
+script = ExtResource("5_mvvxh")
+Type = 2
+RedAction = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(42, 42)
@@ -41,16 +44,6 @@ sprite_frames = SubResource("SpriteFrames_oko1w")
 autoplay = "default"
 frame_progress = 0.8135627
 
-[node name="Hit" type="Area2D" parent="."]
-collision_layer = 2
-script = ExtResource("5_mvvxh")
-Type = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hit"]
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
 position = Vector2(41, 45)
 shape = SubResource("CapsuleShape2D_wjev8")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2(41, 45)
-shape = SubResource("CircleShape2D_xr8cw")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://fw7v7jnwb250"]
+[gd_scene load_steps=55 format=3 uid="uid://fw7v7jnwb250"]
 
 [ext_resource type="Script" uid="uid://csw63ayyu5njt" path="res://scripts/Main.cs" id="1_choun"]
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_o5qli"]
@@ -7,14 +7,17 @@
 [ext_resource type="PackedScene" uid="uid://cckise0dr8nnj" path="res://scenes/shark.tscn" id="5_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://cjlwti2qyeaf6" path="res://scenes/Player.tscn" id="5_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://b1dnh1txquryq" path="res://scenes/fish3.tscn" id="5_yc10j"]
+[ext_resource type="PackedScene" uid="uid://38btfv40udct" path="res://scenes/sawshark.tscn" id="7_5he1u"]
+[ext_resource type="PackedScene" uid="uid://dj338qxpc0ior" path="res://scenes/seaangler.tscn" id="8_5poiv"]
 [ext_resource type="PackedScene" uid="uid://c7u54uhfrpmcj" path="res://scenes/bg.tscn" id="8_tipki"]
+[ext_resource type="PackedScene" uid="uid://ddn6i0hjj4eik" path="res://scenes/SkillManager.tscn" id="10_chjal"]
 [ext_resource type="FontFile" uid="uid://bc6cd5qpcylc6" path="res://BoldPixels/BoldPixels.otf" id="10_choun"]
 [ext_resource type="Script" uid="uid://dst8ehoc1274i" path="res://scripts/ScoreManager.cs" id="10_ya4ey"]
 [ext_resource type="Script" uid="uid://clrin8jr56gc8" path="res://scripts/PauseUi.cs" id="12_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://cx3n4x5aoio30" path="res://Buttons/f/freeversion (4).png" id="13_trceg"]
 [ext_resource type="Texture2D" uid="uid://4i33vkcyt3x7" path="res://Buttons/f/freeversion (2).png" id="14_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://dkyhsjc5vdmjs" path="res://Buttons/f/freeversion (3).png" id="16_dp3eg"]
-[ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/bonuscoinspawner.tscn" id="17_muem4"]
+[ext_resource type="PackedScene" uid="uid://bexeiavjwvaiq" path="res://scenes/BonusCoinSpawner.tscn" id="17_muem4"]
 [ext_resource type="PackedScene" uid="uid://bnaarab6ni7wp" path="res://scenes/coin_1.tscn" id="18_gqmmt"]
 [ext_resource type="PackedScene" uid="uid://dne2gy0sbgtd8" path="res://scenes/coin_3.tscn" id="20_jscy8"]
 [ext_resource type="Script" uid="uid://bc6pacbt80rvq" path="res://scripts/CrystalSpawner.cs" id="22_jscy8"]
@@ -38,6 +41,11 @@
 [ext_resource type="Texture2D" uid="uid://6ek5dpvfxs4k" path="res://3 Progress Bars/4.png" id="37_nvyfr"]
 [ext_resource type="Texture2D" uid="uid://cnchphv1yxruo" path="res://3 Progress Bars/5.png" id="38_ty1g6"]
 [ext_resource type="Texture2D" uid="uid://cg71x4auhkydp" path="res://3 Progress Bars/6.png" id="39_j2jfr"]
+[ext_resource type="PackedScene" uid="uid://cltv8fo36wy83" path="res://scenes/CrystalRoot.tscn" id="41_5poiv"]
+[ext_resource type="Script" uid="uid://jpxn333o5edd" path="res://scripts/CrystalDirector.cs" id="42_2cjbq"]
+[ext_resource type="Script" uid="uid://dnm4r0kt7muhb" path="res://scripts/CrystalHud.cs" id="44_cjqg0"]
+[ext_resource type="PackedScene" uid="uid://c63v4saogcfo7" path="res://scenes/Crystalpickup.tscn" id="45_vchkt"]
+[ext_resource type="Script" uid="uid://ow5jyj5knuuh" path="res://scripts/PickupEnforcer.cs" id="46_txyw0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_bu4jf"]
 font = ExtResource("10_choun")
@@ -67,19 +75,24 @@ font_size = 75
 font = ExtResource("10_choun")
 font_size = 45
 
+[sub_resource type="LabelSettings" id="LabelSettings_txyw0"]
+font = ExtResource("10_choun")
+font_size = 18
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_choun")
 
 [node name="FishSpawner" type="Node2D" parent="."]
 position = Vector2(-1, 9)
 script = ExtResource("1_o5qli")
-FishScenes = Array[PackedScene]([ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_yc10j"), ExtResource("5_o6xl0")])
-Weights = PackedFloat32Array(3, 6, 4, 1)
-MaxFish = 150
+FishScenes = Array[PackedScene]([ExtResource("3_tbgi4"), ExtResource("4_tefeu"), ExtResource("5_yc10j"), ExtResource("5_o6xl0"), ExtResource("7_5he1u"), ExtResource("8_5poiv")])
+Weights = PackedFloat32Array(5, 20, 10, 2, 0.5, 1)
+SpawnInterval = 1.2
 ScoreManagerPath = NodePath("../ScoreManager")
 
 [node name="Player" parent="." instance=ExtResource("5_tbgi4")]
 position = Vector2(489, 263)
+HurtTriggerDistance = 80.0
 
 [node name="BG" parent="." instance=ExtResource("8_tipki")]
 
@@ -87,6 +100,7 @@ position = Vector2(489, 263)
 unique_name_in_owner = true
 position = Vector2(-1, 0)
 script = ExtResource("10_ya4ey")
+CrystalSpawnerPath = NodePath("../CrystalSpawner")
 
 [node name="PauseUI" type="CanvasLayer" parent="."]
 process_mode = 3
@@ -147,17 +161,21 @@ icon = ExtResource("16_dp3eg")
 flat = true
 
 [node name="BonusCoinSpawner" parent="." instance=ExtResource("17_muem4")]
+unique_name_in_owner = true
 BronzeScene = ExtResource("20_jscy8")
 GoldScene = ExtResource("18_gqmmt")
 
 [node name="CrystalSpawner" type="Node2D" parent="."]
-unique_name_in_owner = true
 script = ExtResource("22_jscy8")
-RedScene = ExtResource("23_2wyq8")
+SpawnRootPath = NodePath("../CrystalRoot")
+FallSpeed = 60.0
+MinVisibleSec = 4.0
+SpawnImmediatelyOnStart = false
+PurpleScene = ExtResource("26_yq6so")
 BlueScene = ExtResource("24_vxglm")
 GreenScene = ExtResource("25_2f3dj")
+RedScene = ExtResource("23_2wyq8")
 PinkScene = ExtResource("26_vxglm")
-PurpleScene = ExtResource("26_yq6so")
 
 [node name="HudCard" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
@@ -463,3 +481,48 @@ theme_override_fonts/font = ExtResource("10_choun")
 theme_override_font_sizes/font_size = 40
 text = "Next"
 icon_alignment = 1
+
+[node name="CrystalRoot" parent="." instance=ExtResource("41_5poiv")]
+
+[node name="CrystalDirector" type="Node2D" parent="."]
+script = ExtResource("42_2cjbq")
+ScoreManagerPath = NodePath("../ScoreManager")
+SpawnerPath = NodePath("../CrystalSpawner")
+
+[node name="BuffHUD" type="CanvasLayer" parent="."]
+
+[node name="CrystalHud" type="Control" parent="BuffHUD" node_paths=PackedStringArray("CrystalCountLabel")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("44_cjqg0")
+IconsContainerPath = NodePath("../HBox")
+BlueScene = ExtResource("24_vxglm")
+GreenScene = ExtResource("25_2f3dj")
+PinkScene = ExtResource("26_vxglm")
+RedScene = ExtResource("23_2wyq8")
+PurpleScene = ExtResource("26_yq6so")
+IconSize = Vector2i(50, 50)
+CrystalCountLabel = NodePath("../HBox/CrystalCountLabel")
+
+[node name="HBox" type="HBoxContainer" parent="BuffHUD"]
+offset_left = 297.0
+offset_top = 48.0
+offset_right = 494.0
+offset_bottom = 97.0
+theme_override_constants/separation = 3
+
+[node name="CrystalCountLabel" type="Label" parent="BuffHUD/HBox"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_txyw0")
+
+[node name="CrystalPickup" parent="." instance=ExtResource("45_vchkt")]
+
+[node name="SkillManager" parent="." instance=ExtResource("10_chjal")]
+unique_name_in_owner = true
+position = Vector2(489, 263)
+PlayerPath = NodePath("../Player")
+BlueSpeedMultiplier = 50.0
+
+[node name="PickupEnforcer" type="Node2D" parent="."]
+visible = false
+script = ExtResource("46_txyw0")

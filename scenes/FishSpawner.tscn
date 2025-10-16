@@ -1,13 +1,14 @@
-[gd_scene load_steps=6 format=3 uid="uid://bqldmt0e8x2yc"]
+[gd_scene load_steps=7 format=3 uid="uid://bqldmt0e8x2yc"]
 
 [ext_resource type="Script" uid="uid://c3triknx3ak8u" path="res://scripts/FishSpawner.cs" id="1_isa6r"]
-[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish3.tscn" id="2_vblnl"]
-[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish3.tscn" id="3_br7ep"]
+[ext_resource type="PackedScene" uid="uid://c6scf1upnwqly" path="res://scenes/fish1.tscn" id="3_br7ep"]
 [ext_resource type="PackedScene" uid="uid://65d7a5r4eqfe" path="res://scenes/fish2.tscn" id="4_ox20s"]
 [ext_resource type="PackedScene" uid="uid://cckise0dr8nnj" path="res://scenes/shark.tscn" id="5_br7ep"]
+[ext_resource type="PackedScene" uid="uid://38btfv40udct" path="res://scenes/sawshark.tscn" id="5_ox20s"]
+[ext_resource type="PackedScene" uid="uid://dj338qxpc0ior" path="res://scenes/seaangler.tscn" id="6_s1gs0"]
 
 [node name="FishSpawner" type="Node2D"]
 script = ExtResource("1_isa6r")
-FishScenes = Array[PackedScene]([ExtResource("2_vblnl"), ExtResource("3_br7ep"), ExtResource("4_ox20s"), ExtResource("5_br7ep")])
-Weights = PackedFloat32Array(4, 10, 4.5, 3)
-MaxFish = 55
+FishScenes = Array[PackedScene]([ExtResource("3_br7ep"), ExtResource("3_br7ep"), ExtResource("4_ox20s"), ExtResource("5_br7ep"), ExtResource("5_ox20s"), ExtResource("6_s1gs0")])
+Weights = PackedFloat32Array(4, 6, 5, 3, 0.5, 2)
+MaxFish = 200

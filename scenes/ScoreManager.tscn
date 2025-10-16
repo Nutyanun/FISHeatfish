@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbqecn3lxxw0v"]
+
+[ext_resource type="Script" uid="uid://dst8ehoc1274i" path="res://scripts/ScoreManager.cs" id="1_gtaeq"]
+
+[node name="ScoreManager" type="Node2D"]
+unique_name_in_owner = true
+position = Vector2(-1, 0)
+script = ExtResource("1_gtaeq")
