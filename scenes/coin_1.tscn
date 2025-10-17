@@ -50,8 +50,9 @@ animations = [{
 radius = 20.0
 height = 42.0
 
-[node name="coin1" type="CharacterBody2D"]
-collision_layer = 2
+[node name="coin1" type="CharacterBody2D" groups=["coins"]]
+collision_layer = 64
+collision_mask = 2
 script = ExtResource("1_kq0cd")
 Type = 2
 
@@ -63,8 +64,9 @@ animation = &"1"
 autoplay = "1"
 frame_progress = 0.41668236
 
-[node name="Hitbox" type="Area2D" parent="."]
-collision_layer = 2
+[node name="Hitbox" type="Area2D" parent="." groups=["coins"]]
+collision_layer = 64
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 position = Vector2(49, 48)

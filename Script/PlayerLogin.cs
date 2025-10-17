@@ -1,240 +1,356 @@
-using Godot;                                      // ใช้ API ของ Godot (Node, GD, ProjectSettings ฯลฯ)
-using System;                                     // .NET base (DateTime, Exception)
-using System.Collections.Generic;                 // List<T>
-using System.IO;                                  // File, File.Exists, File.ReadAllText
-using System.Text.Json;                           // System.Text.Json สำหรับ parse JSON (สคีมาใหม่/เก่า)
-// ใช้ GDict สำหรับทำงานกับ LeaderboardStore (Godot.Dictionary)
-using GDict = Godot.Collections.Dictionary;       // alias ให้พิมพ์สั้นขึ้น
+using Godot;                       
+using System;                      
+using System.Collections.Generic;  // ใช้โครงสร้างข้อมูลพวก List<T>, Dictionary<T> ฯลฯ
+using System.IO;  // ใช้จัดการไฟล์ เช่น File.ReadAllText(), File.Exists()
+using System.Text.Json; // ใช้สำหรับอ่าน/เขียน JSON (serialize / deserialize)
+using GDict = Godot.Collections.Dictionary; // ตั้งชื่อสั้นให้ Godot.Collections.Dictionary เป็น GDict
 
-public partial class PlayerLogin : Node           // คลาสซิงเกิลตัน (Autoload) เก็บสถานะผู้เล่น/ล็อกอิน
+//
+//// PlayerLogin (Autoload/Singleton)  คลาสนี้ตั้งเป็นซิงเกิลตัน ใช้ได้ข้ามซีน
+//// - ถือสถานะผู้เล่นปัจจุบัน เช่น CurrentUser, CurrentPlayerName, TodayKey  ข้อมูลล็อกอิน
+////- จัดการไฟล์ players.json (อ่าน/เขียน บันทึกชื่อ/รหัส/เลเวล) ที่เก็บข้อมูลผู้เล่น
+//// - สมัคร / ล็อกอิน / mirror ไป res:// เพื่อดีบักใน Editor  สำหรับตอนพัฒนาเกม
+//// ควรตั้งเป็น Autoload ใน Project Settings → Autoload  เพื่อให้คงค่าไว้ทุกซีน
+//
+public partial class PlayerLogin : Node   // สร้างคลาส PlayerLogin สืบทอดจาก Node (Godot)
 {
-	public static PlayerLogin Instance { get; private set; } // ตัวชี้ global ของซิงเกิลตัน
-	
-	public string CurrentPlayerName { get; private set; } = "Guest";
+	// Single Instance 
+	public static PlayerLogin Instance { get; private set; } // อินสแตนซ์แบบโกลบอล ใช้เรียกได้จากทุกที่
 
-	// ✅ เปลี่ยนให้ set ได้จากไฟล์อื่น (เพื่อแก้ Error CS0272)
-	public SaveData CurrentUser { get; set; }      // ผู้ใช้ที่ล็อกอินอยู่ปัจจุบัน
-	public string TodayKey { get; internal set; }   // คีย์วันที่วันนี้ (yyyy-MM-dd) ใช้จัดกลุ่ม high score รายวัน
-	
-	// อ่าน/เขียน “ข้อมูลผู้เล่นจริง” เฉพาะใน user:// เท่านั้น
-	private string SavePathUser = "user://players.json";  // path ไฟล์ข้อมูลรวม (players + leaderboards) ในโฟลเดอร์ user
-	private string DefaultPath = "res://SceneLogin/saveUserLogin/players.json";
+	// Public State
+	public string CurrentPlayerName { get; private set; } = "Guest"; // ชื่อผู้เล่นปัจจุบัน เริ่มต้นเป็น Guest
+	public SaveData CurrentUser { get; set; }  // เก็บข้อมูลผู้ใช้ปัจจุบันในรูปแบบอ็อบเจ็กต์ SaveData
+	public string TodayKey { get; internal set; }  // เก็บวันที่ปัจจุบัน เช่น "2025-10-15"
 
-	public class SaveData                           // โครงสร้างข้อมูลผู้เล่น 1 คน
+	// Storage Paths
+	private string SavePathUser = "user://players.json"; // ไฟล์ข้อมูลผู้เล่นจริง (เขียนใน user data)
+	private string DefaultPath = "res://SceneLogin/saveUserLogin/players.json"; // ไฟล์ต้นแบบสำหรับเริ่มต้น (อยู่ในโปรเจกต์)
+
+	/// <summary> 
+	/// โครงสร้างข้อมูลของผู้เล่น 1 คน (ใช้สำหรับ serialize / deserialize)
+	/// </summary>
+	public class SaveData // ประกาศคลาสภายในชื่อ SaveData
 	{
-		public string PlayerName { get; set; }      // ชื่อผู้เล่น
-		public string Password   { get; set; }      // รหัสผ่าน (หมายเหตุ: โปรดแฮชจริงจังในโปรดักชัน)
-		public string CreatedAt  { get; set; }      // เวลาสมัคร/ถูกสร้าง (ISO 8601)
+		public string PlayerName { get; set; } // ชื่อผู้เล่น (ใช้เป็นคีย์)
+		public string Password   { get; set; } // รหัสผ่านของผู้เล่น
+		public string CreatedAt  { get; set; } // วันที่สมัคร (ในรูปแบบ ISO)
 	}
 
-	private string MakeTodayKeyLocal() => DateTime.Now.ToString("yyyy-MM-dd"); // คืนวันที่ท้องถิ่นรูปแบบ yyyy-MM-dd
+	// ฟังก์ชันสร้างข้อความวันที่วันนี้ เช่น "2025-10-15"
+	private string MakeTodayKeyLocal() => DateTime.Now.ToString("yyyy-MM-dd"); // ใช้ DateTime.Now แปลงเป็น string รูปแบบ yyyy-MM-dd
 
-	public void StampTodayKey()                     // อัปเดต TodayKey ให้เป็นวันนี้ (ท้องถิ่น)
+	// ฟังก์ชันอัปเดต TodayKey ให้เป็นวันที่ปัจจุบัน
+	public void StampTodayKey()
 	{
-		TodayKey = MakeTodayKeyLocal();             // เซ็ตคีย์
-		GD.Print($"🗓️ TodayKey set to {TodayKey}"); // log เพื่อดีบัก
+		TodayKey = MakeTodayKeyLocal();  // เรียก MakeTodayKeyLocal() แล้วเก็บใน TodayKey
+		GD.Print($"🗓️ TodayKey set to {TodayKey}");// พิมพ์ข้อความบอกใน Output
 	}
 
-	public void SetCurrentUserAndStampToday(SaveData user) // ตั้งผู้ใช้ปัจจุบัน + ประทับ TodayKey
+	// ฟังก์ชันตั้งค่าผู้เล่นปัจจุบัน + อัปเดตวันที่
+	public void SetCurrentUserAndStampToday(SaveData user)
 	{
-		CurrentUser = user;                         // เซ็ตผู้ใช้
-		StampTodayKey();                            // อัปเดตคีย์วันที่
-		GD.Print($"🔑 Login as {CurrentUser?.PlayerName ?? "(null)"} ; TodayKey={TodayKey}"); // log
+		CurrentUser = user;// เก็บข้อมูลผู้เล่นปัจจุบัน
+		StampTodayKey();   // อัปเดตวันที่วันนี้
+		GD.Print($"🔑 Login as {CurrentUser?.PlayerName ?? "(null)"} ; TodayKey={TodayKey}"); // แสดงชื่อผู้เล่นและวันที่ใน Output
 	}
 
-	public override void _Ready()                   // เรียกเมื่อโหนดพร้อมใช้งาน
+	// ฟังก์ชัน Godot เรียกอัตโนมัติเมื่อ Node พร้อมใช้งาน (เช่น ตอนเปิดซีน)
+	public override void _Ready()
 	{
-		Instance = this;                            // ตั้งซิงเกิลตัน
-		TodayKey = MakeTodayKeyLocal();             // ค่าตั้งต้นของ TodayKey
-		GD.Print("🟢 PlayerLogin ready at " + ProjectSettings.GlobalizePath(SavePathUser)); // พิมพ์ path จริงบนดิสก์
-		GD.Print($"🗓️ Initial TodayKey = {TodayKey}"); // พิมพ์คีย์วันที่เริ่มต้น
-	}
+		Instance = this;    // ตั้งค่า Instance ให้ชี้มาที่อ็อบเจ็กต์นี้ (Autoload)
+		TodayKey = MakeTodayKeyLocal(); // ตั้งวันที่ปัจจุบันให้ TodayKey
 
-	// ===== Loader: รองรับสคีมาเก่า [] และสคีมาใหม่ { "players": { ... } } ; อ่านเฉพาะ user:// =====
-	public List<SaveData> LoadPlayers()             // อ่านรายชื่อผู้เล่นทั้งหมดจากไฟล์ user://players.json
+		// แสดงข้อความว่าพร้อมแล้ว และแปลง path user:// เป็น path จริงของระบบ
+		GD.Print("🟢 PlayerLogin ready at " + ProjectSettings.GlobalizePath(SavePathUser));
+
+		// แสดงค่า TodayKey ที่ตั้งไว้ตอนเริ่มต้น
+		GD.Print($"🗓️ Initial TodayKey = {TodayKey}");
+
+		// ตรวจว่ามีไฟล์ players.json ใน user:// แล้วยัง
+		if (!Godot.FileAccess.FileExists(SavePathUser))
+		{
+			// ถ้าไม่มีไฟล์ user:// แต่มีไฟล์ต้นฉบับใน res://
+			if (Godot.FileAccess.FileExists(DefaultPath))
+			{
+				using var src = Godot.FileAccess.Open(DefaultPath, Godot.FileAccess.ModeFlags.Read); // เปิดไฟล์ต้นฉบับแบบอ่าน
+				using var dst = Godot.FileAccess.Open(SavePathUser, Godot.FileAccess.ModeFlags.Write); // เปิดไฟล์ปลายทางแบบเขียน
+				dst.StoreString(src.GetAsText());             // อ่านเนื้อหาจากต้นฉบับแล้วเขียนลงปลายทาง
+				GD.Print($"📦 Copied default players.json to {SavePathUser}"); // แจ้งว่าก๊อปไฟล์เสร็จ
+			}
+			else
+			{
+				// ถ้าไม่มีไฟล์ต้นแบบเลย → แจ้ง error
+				GD.PushError("❌ Default player file not found at " + DefaultPath);
+			}
+		}
+	}
+	// ฟังก์ชันคัดลอก (mirror) ไฟล์จาก user:// → res://
+	// ใช้เฉพาะตอนดีบักใน Editor เพราะ res:// เขียนได้เฉพาะในโหมดพัฒนา
+	private void MirrorToRes()
 	{
 		try
 		{
-			string pathUser = ProjectSettings.GlobalizePath(SavePathUser); // แปลง user:// → path จริงของระบบไฟล์
-			if (!File.Exists(pathUser)) return new List<SaveData>();       // ถ้าไฟล์ไม่มี → คืนลิสต์ว่าง
+			string userPath = ProjectSettings.GlobalizePath(SavePathUser); // แปลง path เสมือน user:// → path จริงบนเครื่อง
+			string resPath  = ProjectSettings.GlobalizePath(DefaultPath);  // แปลง path เสมือน res:// → path จริงบนเครื่อง
 
-			string json = File.ReadAllText(pathUser);                      // อ่านทั้งหมดเป็นสตริง
-			if (string.IsNullOrWhiteSpace(json)) return new List<SaveData>(); // ถ้าว่าง → คืนลิสต์ว่าง
-
-			// ตรวจอักษรตัวแรกเพื่อแยก schema
-			char first = '\0';                                             // ตัวแปรเก็บอักขระตัวแรกที่ไม่ใช่ white space
-			foreach (var ch in json) { if (!char.IsWhiteSpace(ch)) { first = ch; break; } }
-
-			// สคีมาเก่า: เป็นลิสต์ SaveData ตรง ๆ
-			if (first == '[')                                              // ถ้าขึ้นต้นด้วย '[' แปลว่าเป็น array
+			if (System.IO.File.Exists(userPath)) // ถ้ามีไฟล์ใน user:// จริง
 			{
-				return JsonSerializer.Deserialize<List<SaveData>>(json)    // แปลงเป็น List<SaveData>
-					   ?? new List<SaveData>();                            // ถ้า null → คืนลิสต์ว่าง
+				System.IO.File.Copy(userPath, resPath, true); // คัดลอกไฟล์ไปยัง res:// ทับของเดิม (true = overwrite)
+				GD.Print("🔁 Mirrored user://players.json → res://players.json"); // แจ้งว่าคัดลอกสำเร็จ
+			}
+			else
+			{
+				GD.PushWarning("⚠️ No user file found to mirror!"); // ถ้าไม่มีไฟล์ user://  เตือน
+			}
+		}
+		catch (Exception ex)
+		{
+			GD.PushWarning($"⚠️ Mirror failed: {ex.Message}");// ถ้ามีข้อผิดพลาด แสดงข้อความเตือน
+		}
+	}
+
+	// โหลดผู้เล่นทั้งหมดจากไฟล์ user://players.json
+	// รองรับทั้งรูปแบบเก่า (array) และใหม่ (object { players: {...} })
+	public List<SaveData> LoadPlayers()
+	{
+		try
+		{
+			string pathUser = ProjectSettings.GlobalizePath(SavePathUser); // แปลง path user:// เป็น path จริงในเครื่อง
+
+			if (!File.Exists(pathUser))   // ถ้าไม่มีไฟล์ user://players.json
+				return new List<SaveData>(); // คืนลิสต์ว่างทันที
+
+			string json = File.ReadAllText(pathUser);// อ่านเนื้อหาทั้งไฟล์เป็น string
+
+			if (string.IsNullOrWhiteSpace(json)) // ถ้าไฟล์ว่างหรือเป็นช่องว่าง
+				return new List<SaveData>(); // คืนลิสต์ว่าง
+
+			char first = '\0';  // ตัวแปรเก็บอักษรตัวแรกของไฟล์ (ใช้ตรวจรูปแบบ)
+			foreach (var ch in json)  // วนอ่านอักษรในไฟล์ทีละตัว
+			{
+				if (!char.IsWhiteSpace(ch)) { first = ch; break; } // ถ้าไม่ใช่ช่องว่าง → เก็บตัวแรกแล้วหยุด
 			}
 
-			// สคีมาใหม่: เป็น object ที่มี "players"
-			using var doc = JsonDocument.Parse(json);                       // parse เป็น JsonDocument
-			var root = doc.RootElement;                                     // เข้าถึง root
-			if (root.ValueKind != JsonValueKind.Object) return new List<SaveData>(); // ไม่ใช่ object → คืนว่าง
-			if (!root.TryGetProperty("players", out var playersElem) ||     // ต้องมีคีย์ "players"
-				playersElem.ValueKind != JsonValueKind.Object)
-				return new List<SaveData>();                                // ไม่มี → คืนว่าง
-
-			var list = new List<SaveData>();                                // เตรียมลิสต์ผลลัพธ์
-			foreach (var prop in playersElem.EnumerateObject())             // วนทีละผู้เล่น (key = ชื่อ)
+			if (first == '[')   // ถ้าขึ้นต้นด้วย [ → เป็น array schema เก่า
 			{
-				var name = prop.Name;                                       // ชื่อผู้เล่นจากชื่อพร็อพเพอร์ตี
-				var pObj = prop.Value;                                      // ค่าของ object ผู้เล่น
+				return JsonSerializer.Deserialize<List<SaveData>>(json) // แปลง JSON เป็น List<SaveData>
+				?? new List<SaveData>(); // ถ้า null → คืนลิสต์ว่าง
+			}
 
-				string pwd = "";                                            // รหัสผ่าน (เริ่มค่าว่าง)
-				string reg = "";                                            // เวลาสมัคร
+			using var doc = JsonDocument.Parse(json);   // แปลง JSON เป็น DOM object
+			var root = doc.RootElement;   // ดึง root ของเอกสาร
 
-				if (pObj.ValueKind == JsonValueKind.Object)                 // ถ้าโครงสร้างถูกต้อง
+			if (root.ValueKind != JsonValueKind.Object) // ถ้า root ไม่ใช่ object
+				return new List<SaveData>();  // คืนลิสต์ว่าง
+
+			if (!root.TryGetProperty("players", out var playersElem)   // ถ้าไม่มี key "players"
+				|| playersElem.ValueKind != JsonValueKind.Object) // หรือไม่ใช่ object
+				return new List<SaveData>();  // คืนลิสต์ว่าง
+
+			var list = new List<SaveData>();  // เตรียมลิสต์เก็บข้อมูลผู้เล่น
+
+			foreach (var prop in playersElem.EnumerateObject())  // วนลูปผู้เล่นทุกคน
+			{
+				var name = prop.Name; // ชื่อผู้เล่น (key)
+				var pObj = prop.Value;   // object ของผู้เล่น
+				string pwd = "";   // รหัสผ่าน (ดีฟอลต์ค่าว่าง)
+				string reg = "";   // วันที่สมัคร (ดีฟอลต์ค่าว่าง)
+
+				if (pObj.ValueKind == JsonValueKind.Object)  // ถ้า pObj เป็น object
 				{
-					if (pObj.TryGetProperty("password", out var pwdElem) && // มี password?
-						pwdElem.ValueKind == JsonValueKind.String)
-						pwd = pwdElem.GetString() ?? "";                     // อ่าน password
+					if (pObj.TryGetProperty("password", out var pwdElem)  // ถ้ามีฟิลด์ "password"
+						&& pwdElem.ValueKind == JsonValueKind.String) // และเป็น string
+						pwd = pwdElem.GetString() ?? "";  // ดึงค่า string ออกมา
 
-					// รองรับทั้ง registered_at และ CreatedAt
-					if (pObj.TryGetProperty("registered_at", out var regElem) && // โครงสร้างใหม่
-						regElem.ValueKind == JsonValueKind.String)
-						reg = regElem.GetString() ?? "";
-					else if (pObj.TryGetProperty("CreatedAt", out var reg2Elem) && // บางไฟล์เก่าใช้ CreatedAt
-							 reg2Elem.ValueKind == JsonValueKind.String)
+					if (pObj.TryGetProperty("registered_at", out var regElem) // ถ้ามีฟิลด์ registered_at
+						&& regElem.ValueKind == JsonValueKind.String)
+						reg = regElem.GetString() ?? "";   // ดึงวันที่
+					else if (pObj.TryGetProperty("CreatedAt", out var reg2Elem) // หรือใช้ฟิลด์เก่า CreatedAt
+						&& reg2Elem.ValueKind == JsonValueKind.String)
 						reg = reg2Elem.GetString() ?? "";
 				}
 
-				if (string.IsNullOrEmpty(reg))                               // ถ้าไม่พบเวลา
-					reg = DateTime.UtcNow.ToString("o");                     // ใช้เวลาปัจจุบันแบบ ISO (UTC)
+				if (string.IsNullOrEmpty(reg))  // ถ้าไม่มีเวลาเลย
+					reg = DateTime.UtcNow.ToString("o"); // ใส่เวลาปัจจุบัน (UTC ISO format)
 
-				list.Add(new SaveData {                                      // เพิ่มลงผลลัพธ์
-					PlayerName = name,
-					Password   = pwd,
-					CreatedAt  = reg
-				});
+				list.Add(new SaveData { PlayerName = name, Password = pwd, CreatedAt = reg }); // เพิ่มเข้าในลิสต์
 			}
 
-			return list;                                                     // คืนลิสต์ผู้เล่นทั้งหมด
+			return list;  // คืนค่าลิสต์ผู้เล่นทั้งหมด
 		}
-		catch (Exception ex)                                                 // จัดการความผิดพลาดการอ่าน/parse
+		catch (Exception ex)
 		{
-			GD.PushError("❌ Failed to parse JSON: " + ex.Message);          // log error
-			return new List<SaveData>();                                     // คืนว่างเพื่อให้โปรแกรมไปต่อได้
+			GD.PushError("❌ Failed to parse JSON: " + ex.Message);  // ถ้ามี error ในการอ่าน JSON
+			return new List<SaveData>();   // คืนลิสต์ว่าง
 		}
 	}
 
-	// ===== สมัครผู้เล่นใหม่ (บันทึกลงเอกสารรวมผ่าน LeaderboardStore; ไม่ยุ่งกับ res://) =====
-	public bool SavePlayer(string name, string password) // สมัครผู้ใช้ใหม่ และบันทึกลง players.json (สคีมาใหม่)
+	// ฟังก์ชันสมัครผู้เล่นใหม่ (เพิ่ม record ลง user://players.json)
+	public bool SavePlayer(string name, string password)
 	{
-		var doc = LeaderboardStore.LoadDoc();                  // โหลดเอกสารรวม (Dictionary) จากไฟล์
-		doc = LeaderboardStore.EnsureRoot(doc);                // ensure ให้มีคีย์พื้นฐาน "players", "leaderboards"
+		var doc = LeaderboardStore.LoadDoc();   // โหลดไฟล์ JSON ทั้งหมดมาเป็น GDict
+		doc = LeaderboardStore.EnsureRoot(doc);  // ตรวจว่ามี root object "players" และ "leaderboards"
+		var players = (GDict)doc["players"];   // ดึง object "players" ออกมา
 
-		var players = (GDict)doc["players"];                   // อ้างถึงโหนด players
-		if (players.ContainsKey(name))                         // ถ้าชื่อซ้ำ
+		if (players.ContainsKey(name))  // ถ้ามีชื่อผู้เล่นนี้อยู่แล้ว
 		{
-			GD.Print("🚫 Duplicate name: " + name);            // log และ
-			return false;                                      // ไม่อนุญาตให้สมัคร
+			GD.Print("🚫 Duplicate name: " + name);  // แจ้งชื่อซ้ำ
+			return false;  // สมัครไม่สำเร็จ
 		}
 
-		var nowIso = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz"); // เวลาเขตท้องถิ่นพร้อม timezone
-		players[name] = new GDict {                                   // สร้างเรคคอร์ดผู้เล่นใหม่
-			{ "password",      password },                             // เก็บรหัส (plain-text ตามเวอร์ชันนี้)
-			{ "registered_at", nowIso },                               // เวลาเริ่มต้นใช้งาน
-			{ "levels",        new GDict() },                           // ที่ว่างไว้เก็บความคืบหน้าด่าน
-			{ "current_level", 1 },              // เพิ่ม: เริ่มต้นที่ด่าน 1
-			{ "high_scores",   new GDict() }     // เพิ่ม: เก็บ high score รายเลเวล
-			
+		var nowIso = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz");// เวลาปัจจุบัน (ISO + timezone)
+
+		players[name] = new GDict {   // เพิ่มข้อมูลผู้เล่นใหม่เข้า Dictionary
+			{ "password",      password }, // รหัสผ่าน
+			{ "registered_at", nowIso   }, // วันที่สมัคร
+			{ "levels",        new GDict() },    // object ว่างสำหรับบันทึก level ในอนาคต
+			{ "current_level", 1 },  // เริ่มที่เลเวล 1
+			{ "high_scores",   new GDict() }   // object ว่างสำหรับสกอร์สูงสุด
 		};
 
-		// เซฟกลับเอกสารรวม (ตำแหน่งไฟล์ถูกกำหนดใน LeaderboardStore เอง)
-		LeaderboardStore.SaveDoc(doc);                                 // เขียนลงไฟล์ user://players.json
+		LeaderboardStore.SaveDoc(doc);   // บันทึกเอกสารกลับไป user://players.json
+		MirrorToRes();   // mirror ไป res:// เพื่อดีบัก
+		GD.Print("✅ Saved new user (new schema only): " + name);   // แจ้งว่าบันทึกผู้ใช้ใหม่สำเร็จ
 
-		GD.Print("✅ Saved new user (new schema only): " + name);      // log ว่าสมัครสำเร็จ
+		try
+		{
+			var plain = ConvertToPlainDict(doc);    // แปลงจาก GDict → Dictionary ปกติ (.NET)
+			string json = JsonSerializer.Serialize(plain, new JsonSerializerOptions { WriteIndented = true }); // แปลงเป็น JSON พร้อมจัดบรรทัดสวย
+			string realPath = ProjectSettings.GlobalizePath(DefaultPath);  // แปลง path res:// เป็น path จริง
+			System.IO.File.WriteAllText(realPath, json);  // เขียนไฟล์ players.json ลง res://
+			GD.Print($"✅ Saved players.json to RES (real path): {realPath}"); // แจ้งว่าเขียนสำเร็จ
+		}
+		catch (Exception ex)
+		{
+			GD.PushWarning($"⚠️ Could not write back to res:// → {ex.Message}"); // ถ้าเขียนไม่ได้ → เตือน
+		}
 
-		SetCurrentUserAndStampToday(new SaveData {                      // ตั้ง CurrentUser และ TodayKey ทันที
-			PlayerName = name,
-			Password   = password,
-			CreatedAt  = nowIso
+		SetCurrentUserAndStampToday(new SaveData {   // ตั้งค่าผู้ใช้ปัจจุบันในหน่วยความจำ
+			PlayerName = name,   // ชื่อผู้เล่น
+			Password   = password,  // รหัสผ่าน
+			CreatedAt  = nowIso  // วันที่สมัคร
 		});
-		
-		// 🟢 เพิ่มบรรทัดนี้ (ตั้งชื่อให้ HUD ใช้)
-		CurrentPlayerName = name;
 
-		return true;                                                   // สมัครสำเร็จ
+		CurrentPlayerName = name;  // เก็บชื่อไว้ให้ UI หรือ HUD ใช้
+		return true;  // คืนค่า true แสดงว่าสมัครสำเร็จ
 	}
-
-// ===== ล็อกอินผู้ใช้เดิม (ตรวจจากไฟล์ user://players.json) =====
-public bool LoginExisting(string name, string password)
-{
-	var list = LoadPlayers();
-	var user = list.Find(p => p.PlayerName == name && p.Password == password);
-	if (user == null) return false;
-
-	SetCurrentUserAndStampToday(user);
-
-	var doc = LeaderboardStore.LoadDoc();
-	doc = LeaderboardStore.EnsureRoot(doc);
-	var players = (GDict)doc["players"];
-
-	// ถ้าไม่มี record ของผู้เล่นนี้ → สร้างใหม่
-	if (!players.ContainsKey(name))
+	// ฟังก์ชันล็อกอินผู้ใช้เดิมจากไฟล์ user://players.json
+	// ถ้ามีข้อมูล → ตั้งค่าผู้เล่นปัจจุบัน + sync ความคืบหน้าจากไฟล์
+	public bool LoginExisting(string name, string password)
 	{
-		players[name] = new GDict {
-			{ "registered_at", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz") },
-			{ "levels", new GDict() },
-			{ "current_level", 1 }
-		};
-		GD.Print($"[LoginExisting] 🆕 Created new player record for {name}");
-	}
+		var list = LoadPlayers(); // โหลดผู้เล่นทั้งหมดจากไฟล์ JSON
+		var user = list.Find(p => p.PlayerName == name && p.Password == password); // ค้นผู้เล่นที่ชื่อและรหัสตรงกัน
+		if (user == null) return false; // ถ้าไม่เจอ → คืนค่า false (ล็อกอินไม่สำเร็จ)
 
-	var p = (GDict)players[name];
+		SetCurrentUserAndStampToday(user);  // ตั้งผู้เล่นปัจจุบันและอัปเดตวันที่วันนี้
 
-	// 🟢 ตรวจว่าผู้เล่นมีเลเวลถึงไหนในไฟล์ แล้วอัปเดต current_level ให้ตรง
-	if (p.ContainsKey("levels"))
-	{
-		var levels = (GDict)p["levels"];
-		int maxLv = 0;
-		foreach (var key in levels.Keys)
+		var doc = LeaderboardStore.LoadDoc();   // โหลดเอกสาร JSON รวม (Godot.Dictionary)
+		doc = LeaderboardStore.EnsureRoot(doc); // ตรวจให้แน่ใจว่ามีโครงสร้าง root "players"/"leaderboards"
+		var players = (GDict)doc["players"]; // ดึง object ของ players ออกมา
+
+		if (!players.ContainsKey(name))  // ถ้าไม่มีชื่อผู้เล่นใน schema ใหม่
 		{
-			if (int.TryParse(key.AsString(), out int lv))
-				maxLv = Math.Max(maxLv, lv);  // ❗ ไม่บวก +1 แล้ว
+			players[name] = new GDict {   // สร้าง record ใหม่ให้ผู้เล่นนี้
+				{ "registered_at", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:sszzz") }, // เวลาเวลาปัจจุบัน
+				{ "levels",        new GDict() }, // object ว่างเก็บข้อมูล level
+				{ "current_level", 1 }  // เริ่มต้นที่ level 1
+			};
+			GD.Print($"[LoginExisting] 🆕 Created new player record for {name}"); // แสดงว่าเพิ่งสร้าง record ใหม่
 		}
 
-		int current = p.ContainsKey("current_level") ? (int)(long)p["current_level"] : 1;
+		var p = (GDict)players[name];  // ดึงข้อมูลผู้เล่นออกมาเก็บในตัวแปร p
 
-		// ✅ Debug Log
-		GD.Print($"[LoginExisting] 🔍 Loaded from file → current_level={current}, maxLvFound={maxLv}");
-		
-		// ถ้า current_level > maxLvFound → ลดลงให้ตรง
-		if ((int)(long)p["current_level"] > maxLv)
+		if (p.ContainsKey("levels")) // ถ้ามี key "levels" (เคยเล่นแล้ว)
 		{
-		p["current_level"] = maxLv;
-		GD.Print($"[LoginExisting] 🔧 Fixed current_level (was higher than levels) → now {maxLv}");
-		}
+			var levels = (GDict)p["levels"]; // ดึงข้อมูลระดับ (levels)
+			int maxLv = 0; // ตัวแปรเก็บ level สูงสุด
 
-		if (maxLv > current)
-		{
-			p["current_level"] = maxLv;
-			GD.Print($"[LoginExisting] 🟢 Auto-recovered current_level set to {maxLv}");
+			foreach (var key in levels.Keys) // วนทุก key (ชื่อ level เช่น "1", "2", "3")
+			{
+				if (int.TryParse(key.AsString(), out int lv)) // แปลงชื่อ key เป็นตัวเลข
+					maxLv = Math.Max(maxLv, lv);   // เก็บค่า level สูงสุดที่เจอ
+			}
+
+			int current = p.ContainsKey("current_level") // ถ้ามี key current_level
+				? (int)(long)p["current_level"]    // ดึงค่าปัจจุบันจาก dict
+				: 1;  // ถ้าไม่มีให้ค่าเริ่มต้น = 1
+
+			GD.Print($"[LoginExisting] 🔍 Loaded from file → current_level={current}, maxLvFound={maxLv}"); // แสดงผลดีบัก
+
+			if ((int)(long)p["current_level"] > maxLv)  // ถ้า current_level มากกว่า level สูงสุด
+			{
+				p["current_level"] = maxLv;  // ลดค่าให้เท่ากับ maxLv
+				GD.Print($"[LoginExisting] 🔧 Fixed current_level (was higher than levels) → now {maxLv}");
+			}
+
+			if (maxLv > current)  // ถ้า level ที่เล่นถึงจริงมากกว่าค่าที่เก็บไว้
+			{
+				p["current_level"] = maxLv; // อัปเดต current_level = maxLv
+				GD.Print($"[LoginExisting] 🟢 Auto-recovered current_level set to {maxLv}"); // แจ้งว่ากู้คืนค่า
+			}
+			else
+			{
+				GD.Print($"[LoginExisting] ℹ️ Keep current_level = {current}"); // ถ้าไม่ต้องแก้ → แจ้งว่าคงค่าเดิม
+			}
+
+			GameProgress.CurrentLevelIndex = (int)(long)p["current_level"]; // sync ค่ากับระบบความคืบหน้าในเกม
 		}
 		else
 		{
-			GD.Print($"[LoginExisting] ℹ️ Keep current_level = {current}");
+			GameProgress.CurrentLevelIndex = 1;// ถ้าไม่มีข้อมูล levels → เริ่มที่ level 1
+			GD.Print($"[LoginExisting] ℹ️ No levels found → set current_level = 1"); // แสดงข้อความแจ้ง
 		}
 
-		GameProgress.CurrentLevelIndex = (int)(long)p["current_level"];
+		LeaderboardStore.SaveDoc(doc); // เซฟเอกสารกลับลงไฟล์ user://players.json
+		MirrorToRes(); // mirror ไป res:// (เพื่อดีบัก)
+		CurrentPlayerName = name;    // ตั้งชื่อผู้เล่นปัจจุบันให้ใช้ใน HUD
+		GD.Print($"[LoginExisting] * Loaded level {GameProgress.CurrentLevelIndex} for {name}"); // แสดง log ดีบัก
+		return true;  // คืนค่า true แสดงว่าล็อกอินสำเร็จ
 	}
-	else
+
+	// Helpers: แปลงข้อมูลจาก Godot Variant → .NET ปกติ (serialize)
+
+	// ฟังก์ชันแปลงค่า Variant ของ Godot ให้กลายเป็น object ปกติใน .NET
+	// ใช้ก่อน serialize ด้วย System.Text.Json
+	private static object ConvertVariantToPlain(object value)
 	{
-		GameProgress.CurrentLevelIndex = 1;
-		GD.Print($"[LoginExisting] ℹ️ No levels found → set current_level = 1");
+		if (value is GDict gd)  // ถ้าเป็น Godot.Dictionary
+		{
+			var dict = new Dictionary<string, object>(); // สร้าง Dictionary ปกติ
+			foreach (var key in gd.Keys)  // วนทุก key ของ GDict
+			{
+				string keyStr = key.AsString(); // แปลง key ให้เป็น string
+				dict[keyStr] = ConvertVariantToPlain(gd[key]);  // แปลงค่าด้านใน (recursive)
+			}
+			return dict;  // คืน Dictionary ที่แปลงแล้ว
+		}
+		else if (value is Godot.Collections.Array arr) // ถ้าเป็น Array ของ Godot
+		{
+			var list = new List<object>(); // สร้าง List ปกติ
+			foreach (var item in arr)  // วนทุก element
+				list.Add(ConvertVariantToPlain(item));  // แปลงทีละตัว (recursive)
+			return list; // คืน List ที่แปลงแล้ว
+		}
+		else if (value is Variant var)   // ถ้าเป็น Variant (wrapper type ของ Godot)
+		{
+			return ConvertVariantToPlain(var.Obj);  // เรียกตัวจริงของ Variant.Obj มาแปลงต่อ
+		}
+		else
+		{
+			return value ?? "";   // ถ้าเป็นชนิดพื้นฐาน (int, string ฯลฯ) → คืนค่าเดิม
+		}
 	}
 
-	LeaderboardStore.SaveDoc(doc);  // ✅ เซฟกลับ
-
-	CurrentPlayerName = name;
-	GD.Print($"[LoginExisting] 🔓 Loaded level {GameProgress.CurrentLevelIndex} for {name}");
-	return true;
-}
-
+	// ฟังก์ชันแปลง GDict (รูท) → Dictionary ปกติ 
+	// ใช้เรียกก่อน serialize เป็น JSON สวย ๆ
+	private static Dictionary<string, object> ConvertToPlainDict(GDict gdict)
+	{
+		var result = new Dictionary<string, object>();  // สร้าง Dictionary เปล่า
+		foreach (var key in gdict.Keys) // วนทุกคีย์ใน GDict
+		{
+			string keyStr = key.AsString();   // แปลงคีย์เป็น string
+			result[keyStr] = ConvertVariantToPlain(gdict[key]); // แปลงค่าด้านในแต่ละอัน
+		}
+		return result; // คืน Dictionary ที่แปลงเสร็จ
+	}
 }

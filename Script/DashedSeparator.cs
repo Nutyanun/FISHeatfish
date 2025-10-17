@@ -1,4 +1,4 @@
-using Godot;    // ใช้ namespace ของ Godot เพื่อเข้าถึงคลาสต่าง ๆ เช่น Control, Color, Vector2, ฯลฯ
+using Godot;   
 using System;   // ใช้ namespace มาตรฐานของ .NET ที่มี MathF และอื่น ๆ
 
 // สร้างคลาสชื่อ DashedSeparator ซึ่งสืบทอดจาก Control
@@ -7,8 +7,8 @@ public partial class DashedSeparator : Control
 {
 	// [Export] ทำให้ปรับค่าได้ใน Inspector ของ Godot
 	[Export] public float Thickness { get; set; } = 2f; // ความหนาของเส้น
-	[Export] public float Dash { get; set; } = 10f;     // ความยาวของเส้นแต่ละช่วง
-	[Export] public float Gap { get; set; } = 6f;       // ระยะช่องว่างระหว่างเส้น
+	[Export] public float Dash { get; set; } = 10f;  // ความยาวของเส้นแต่ละช่วง
+	[Export] public float Gap { get; set; } = 6f;  // ระยะช่องว่างระหว่างเส้น
 	[Export] public Color LineColor { get; set; } = new Color(1, 1, 1, 0.22f); // สีของเส้น (ขาวโปร่ง 22%)
 
 	// เมธอดนี้จะถูกเรียกเมื่อ Node พร้อมใช้งาน (ตอนเริ่มต้น)
