@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1l1kk8c17fhp"
-path="res://.godot/imported/pearl.webp-d41b58da7dcad6940d38aa97c9eb15c8.ctex"
+uid="uid://b4ejn5fy2mkui"
+path="res://.godot/imported/star-Photoroom.png-c8d1447de66333d18985675ad110a77b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://scenecheckpoint/pearl.webp"
-dest_files=["res://.godot/imported/pearl.webp-d41b58da7dcad6940d38aa97c9eb15c8.ctex"]
+source_file="res://sceneexplaingame/star-Photoroom.png"
+dest_files=["res://.godot/imported/star-Photoroom.png-c8d1447de66333d18985675ad110a77b.ctex"]
 
 [params]
 

@@ -21,87 +21,93 @@ scale = Vector2(1.15826, 1.15461)
 texture = ExtResource("1_5uyae")
 
 [node name="level1" type="Sprite2D" parent="."]
-position = Vector2(156, 380)
+position = Vector2(287, 201)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 
 [node name="level2" type="Sprite2D" parent="."]
-position = Vector2(234, 428)
+position = Vector2(317, 361.99997)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 2
 
 [node name="level3" type="Sprite2D" parent="."]
-position = Vector2(307, 373)
+position = Vector2(451.00003, 472)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 3
 
 [node name="level4" type="Sprite2D" parent="."]
-position = Vector2(384, 421)
+position = Vector2(614.00006, 515)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 4
 
 [node name="level5" type="Sprite2D" parent="."]
-position = Vector2(443, 480)
+position = Vector2(770, 453)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 5
 
 [node name="level6" type="Sprite2D" parent="."]
-position = Vector2(528, 519)
+position = Vector2(773.00006, 305)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 6
 
 [node name="level7" type="Sprite2D" parent="."]
-position = Vector2(616, 487)
+position = Vector2(615.00006, 274)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 7
 
 [node name="level8" type="Sprite2D" parent="."]
-position = Vector2(717, 490)
+visible = false
+position = Vector2(741, 450)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 8
 
 [node name="level9" type="Sprite2D" parent="."]
-position = Vector2(740, 390)
+visible = false
+position = Vector2(752, 355)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 9
 
 [node name="level10" type="Sprite2D" parent="."]
-position = Vector2(670, 333)
+visible = false
+position = Vector2(673, 296)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 LevelNumber = 10
 
 [node name="level11" type="Sprite2D" parent="."]
-position = Vector2(582, 294)
+visible = false
+position = Vector2(602, 234)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 
 [node name="level12" type="Sprite2D" parent="."]
-position = Vector2(572, 204)
+visible = false
+position = Vector2(655, 146.99998)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
 script = ExtResource("4_sk1eg")
 
 [node name="level13" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(655, 143.999)
 scale = Vector2(0.136195, 0.147829)
 texture = ExtResource("2_ls46f")
@@ -113,12 +119,20 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
+[node name="ResetHighButton" type="Button" parent="Control"]
+layout_mode = 0
+offset_left = 40.0
+offset_top = -67.0
+offset_right = 180.0
+offset_bottom = -36.0
+text = "ResetHighButton"
+
 [node name="resetcheckpoint" type="Button" parent="Control"]
 layout_mode = 0
-offset_left = 28.0
-offset_top = 588.0
-offset_right = 233.0
-offset_bottom = 619.0
+offset_left = 17.0
+offset_top = 675.0
+offset_right = 222.0
+offset_bottom = 706.0
 theme = SubResource("Theme_oisqg")
 text = "Reset checkpoint"
 script = ExtResource("5_230tk")
