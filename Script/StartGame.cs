@@ -1,12 +1,12 @@
 using Godot;                                     
 using System;                                   
-using System.Globalization;                      // ใช้ CultureInfo / DateTimeStyles สำหรับ parse/format วันที่
+using System.Globalization; // ใช้ CultureInfo / DateTimeStyles สำหรับ parse/format วันที่
 
-public partial class StartGame : Node2D // ซีนหน้าเริ่มเกม/เมนูหลัก สืบทอดจาก Node2D
+// ซีนหน้าเริ่มเกม/เมนูหลัก สืบทอดจาก Node2D
+public partial class StartGame : Node2D 
 {
-	[Export] private NodePath PlayerInfoPath;// [Export] ให้ตั้ง path ของ Label แสดงข้อมูลผู้เล่นได้จาก Inspector
-
-	// ปุ่ม (ตั้งผ่าน Inspector ได้ หรือปล่อยให้หาโดยชื่อในซีน)
+	// [Export] ให้ตั้ง path ของ Label แสดงข้อมูลผู้เล่นได้จาก Inspector
+	[Export] private NodePath PlayerInfoPath;
 	[Export] private NodePath StartButtonPath;   // [Export] path ปุ่มเริ่มเล่น
 	[Export] private NodePath HighscoreButtonPath; // [Export] path ปุ่มไปหน้า High Score
 
@@ -20,7 +20,7 @@ public partial class StartGame : Node2D // ซีนหน้าเริ่ม�
 
 	public override void _Ready()  // เรียกเมื่อโหนดพร้อม 
 	{
-		// ----- หา Label แสดงชื่อ/วันที่สมัคร -----
+		//  หา Label แสดงชื่อ/วันที่สมัคร
 		_playerInfo = GetNodeOrNull<Label>(PlayerInfoPath) // พยายามดึงตาม path จาก Inspector ก่อน
 					  ?? GetNodeOrNull<Label>("CanvasLayer/PlayerInfo"); // ถ้าไม่ได้ ใช้ path สำรองในซีน
 
@@ -33,7 +33,7 @@ public partial class StartGame : Node2D // ซีนหน้าเริ่ม�
 			ShowUserInfo(); // ถ้าพบแล้ว แสดงข้อมูลผู้ใช้ทันที
 		}
 
-		// ----- หาและเชื่อมปุ่ม -----
+		//  หาและเชื่อมปุ่ม 
 		_startBtn = GetNodeOrNull<Button>(StartButtonPath) // หา StartButton ตาม Inspector
 					?? GetNodeOrNull<Button>("Sprite2D/StartButton");  // หรือ path สำรองในซีน
 		_highBtn  = GetNodeOrNull<Button>(HighscoreButtonPath) // หา HighscoreButton ตาม Inspector
@@ -45,8 +45,9 @@ public partial class StartGame : Node2D // ซีนหน้าเริ่ม�
 		if (_highBtn != null) _highBtn.Pressed += OnHighscorePressed; // ถ้าพบ: ผูกอีเวนต์กด → ไปหน้า High Score
 		else GD.PushError("HighscButton not found or not a Button.");  // ไม่พบ: แจ้งเตือน
 	}
-
-	private void ShowUserInfo()   // แสดงชื่อผู้เล่น + วันที่สมัครบน Label
+	
+	 // แสดงชื่อผู้เล่น + วันที่สมัครบน Label
+	private void ShowUserInfo()  
 	{
 		var pl = PlayerLogin.Instance;  // อ้างซิงเกิลตัน PlayerLogin (autoload)
 		if (pl == null || _playerInfo == null) return; // ถ้าไม่มีระบบหรือไม่มี Label ให้จบ
@@ -68,7 +69,7 @@ public partial class StartGame : Node2D // ซีนหน้าเริ่ม�
 		{
 			DateTime dt;   // ตัวแปรเก็บเวลาหลัง parse
 
-			// พยายาม parse ตามรูปแบบที่พบบ่อยก่อน (ISO 8601 ฯลฯ)
+			// พยายามแยกวิเคราะห์ตามรูปแบบที่พบบ่อยก่อน (ISO 8601 ฯลฯ)
 			string[] isoFormats = {
 				"yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'",
 				"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'",
@@ -121,7 +122,7 @@ public partial class StartGame : Node2D // ซีนหน้าเริ่ม�
 	private void OnStartPressed()  // callback เมื่อกดปุ่มเริ่มเกม
 	{
 		GameProgress.Save();
-		GD.Print($"[StartGame] 💾 Saved progress before switching scene (Level={GameProgress.CurrentLevelIndex})");
+		GD.Print($"[StartGame] * Saved progress before switching scene (Level={GameProgress.CurrentLevelIndex})");
 		
 		if (ResourceLoader.Exists(PLAY_SCENE))   // ตรวจว่ามีไฟล์ซีนจริง
 			GetTree().ChangeSceneToFile(PLAY_SCENE);  // เปลี่ยนซีนไปยังฉากเล่นเกม

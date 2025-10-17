@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 public partial class DownloadGame : Control
 {
-	private ProgressBar _bar;//ตัวแปร _bar เอาไว้เก็บ ProgressBar
-	private Label _status;//ตัวแปร _status เอาไว้เก็บ Label
+	private ProgressBar _bar; //ตัวแปร _bar เอาไว้เก็บ ProgressBar
+	private Label _status; //ตัวแปร _status เอาไว้เก็บ Label
 
 	//_Ready() ฟังก์ชันที่ Godot จะเรียกอัตโนมัติเมื่อ Node ถูกเพิ่มลงใน Scene Tree
 	public override void _Ready()

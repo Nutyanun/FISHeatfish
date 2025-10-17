@@ -5,19 +5,22 @@ using System.Collections.Generic;
 using GDict = Godot.Collections.Dictionary;  // ชื่อย่อให้ Godot.Collections.Dictionary (เป็น dynamic map ของ Godot)
 using GArray = Godot.Collections.Array;   // ชื่อย่อให้ Godot.Collections.Array (เป็น dynamic array ของ Godot)
 
-public static class LeaderboardStore // คลาสสาธารณะสำหรับจัดการข้อมูล Leaderboard และ Players (แบบ static utility)
+// คลาสสาธารณะสำหรับจัดการข้อมูล Leaderboard และ Players (แบบ static utility)
+public static class LeaderboardStore 
 {
-	public static string PlayersPath => "user://players.json"; // พาธไฟล์ข้อมูลในโฟลเดอร์ user:// (เขียนได้)
+	// พาธไฟล์ข้อมูลในโฟลเดอร์ user:// (เขียนได้)
+	public static string PlayersPath => "user://players.json";
 
 	//สร้างคีย์วันที่วันนี้รูปแบบ YYYY-MM-DD (ตามเวลาเครื่อง)
 	public static string MakeTodayKeyLocal() => DateTime.Now.ToString("yyyy-MM-dd"); // สร้างคีย์วันที่วันนี้รูปแบบ YYYY-MM-DD (ตามเวลาเครื่อง)
 	
-	 // รูปแบบวันที่เพื่อโชว์เป็นหัวข้อ (ไทย)
+	// รูปแบบวันที่เพื่อโชว์เป็นหัวข้อ (ไทย)
 	public static string FormatThaiDateForHeader(string yyyyMmDd)   
 	{
-		if (DateTime.TryParse(yyyyMmDd, out var d))   // พยายาม parse สตริงวันที่
+		// พยายามแยกวิเคราะห์ string วันที่
+		if (DateTime.TryParse(yyyyMmDd, out var d))  
 			return d.ToString("dd/MM/yyyy", new System.Globalization.CultureInfo("th-TH")); // ถ้าได้: แสดง dd/MM/yyyy ตามวัฒนธรรมไทย
-		return yyyyMmDd; // ถ้า parse ไม่ได้: คืนค่าเดิม
+		return yyyyMmDd; // ถ้าแยกวิเคราะห์ ไม่ได้: คืนค่าเดิม
 	}
 
 	// โหลดเอกสาร (players.json) เป็น Dictionary ของ Godot
@@ -25,7 +28,7 @@ public static class LeaderboardStore // คลาสสาธารณะสำ�
 	{
 		if (!FileAccess.FileExists(PlayersPath)) return new GDict();   // ถ้าไฟล์ยังไม่มี ให้คืน dict ว่าง
 		using var f = FileAccess.Open(PlayersPath, FileAccess.ModeFlags.Read);  // เปิดไฟล์ในโหมดอ่าน
-		var v = Json.ParseString(f.GetAsText());  // อ่านทั้งหมดเป็นสตริง แล้ว parse JSON เป็น Variant
+		var v = Json.ParseString(f.GetAsText());  // อ่านทั้งหมดเป็นstring แล้วแยกวิเคราะห์ JSON เป็นตัวแปร
 		return v.VariantType == Variant.Type.Dictionary ? (GDict)v : new GDict();  // ถ้าเป็น Dictionary ก็แคสต์คืน มิฉะนั้นคืน dict ว่าง
 	}
    // บันทึกเอกสารกลับลงไฟล์
@@ -61,7 +64,7 @@ public static class LeaderboardStore // คลาสสาธารณะสำ�
 	// เพิ่ม/อัปเดตสกอร์ลงลีดเดอร์บอร์ด
 	public static void UpsertScore(string dateKey, int levelIndex, string playerName, int score, int limitTop = 50) 
 	{
-		var doc = EnsureRoot(LoadDoc()); // โหลดไฟล์ แล้ว ensure โครงสร้างรูทครบ
+		var doc = EnsureRoot(LoadDoc()); // โหลดไฟล์ แล้ว ensure( ทำให้มั่นใจ)โครงสร้างรูทครบ
 
 		// 1) leaderboards
 		var dateNode = EnsureLeaderboardDate(doc, dateKey); // ensure โหนดวันที่ใน leaderboards
@@ -166,11 +169,14 @@ public static class LeaderboardStore // คลาสสาธารณะสำ�
 			}
 			else 
 			{
+				//ตรวจสอบว่าค่าของ current_level มีการเปลี่ยนแปลงหรือไม่
 				GD.Print($"[LeaderboardStore]  current_level unchanged ({currentLevel})"); 
 			}
 		}
 		catch (Exception ex) 
 		{
+			//ถ้ามีข้อผิดพลาดเกิดขึ้นภายในบล็อก try ด้านบน (เช่น doc เป็น null หรือ key ไม่มีอยู่)
+			// โปรแกรมจะไม่หยุดทำงาน แต่จะจับข้อผิดพลาดไว้ที่นี่
 			GD.PushWarning($"[LeaderboardStore] Failed to update current_level: {ex.Message}");
 		}
 		

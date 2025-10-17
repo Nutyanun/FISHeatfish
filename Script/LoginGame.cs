@@ -2,7 +2,8 @@ using Godot;  // อิมพอร์ต API ของ Godot (Control, LineEdit
 using System;  // ใช้ฟีเจอร์พื้นฐานของ .NET (DateTime, String, ฯลฯ)
 using System.Collections.Generic;  // ใช้คอลเลกชันมาตรฐาน เช่น List<T>
 
-public partial class LoginGame : Control // คลาส LoginGame เป็นคอนโทรล (หน้าล็อกอิน)
+// คลาส LoginGame เป็นคอนโทรล (หน้าล็อกอิน)
+public partial class LoginGame : Control 
 {
 	// ตั้งผ่าน Inspector ได้ (เผื่อ path ในฉากเปลี่ยน)
 	[Export] private NodePath NameInputPath; // path ของ LineEdit ช่องชื่อผู้เล่น
@@ -16,9 +17,11 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 	private Button _submitButton;   // ตัวแปรอ้างอิงปุ่มยืนยัน
 
 	// อักขระพิเศษที่อนุญาตในรหัสผ่าน
-	private const string AllowedSpecials = @"!@#$%^&*()-_=+[]{};:'"",.<>/?\|`~"; // ชุดตัวพิเศษที่อนุญาต (verbatim string)
-
-	public override void _Ready() // เรียกเมื่อโหนดพร้อมใช้งาน
+	// ชุดตัวพิเศษที่อนุญาต (verbatim string)
+	private const string AllowedSpecials = @"!@#$%^&*()-_=+[]{};:'"",.<>/?\|`~"; 
+	
+	// เรียกเมื่อโหนดพร้อมใช้งาน
+	public override void _Ready() 
 	{
 		_nameInput     = GetNodeOrNull<LineEdit>(NameInputPath)  // ลองดึงตาม path จาก Inspector
 					  ?? GetNodeOrNull<LineEdit>("CenterContainer/VBoxContainer/NameInput"); // ถ้าไม่ได้ ใช้ path สำรองในซีน
@@ -40,7 +43,7 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 		if (_errorLabel != null) _errorLabel.Visible = false;// ซ่อน error ตอนเริ่ม
 		if (_submitButton != null) _submitButton.Pressed += OnSubmit;// ผูกอีเวนต์กดปุ่ม → OnSubmit()
 
-		if (_passwordInput != null) _passwordInput.Secret = true;  // ตั้งให้ช่องรหัสซ่อนตัวอักษร (●●●)
+		if (_passwordInput != null) _passwordInput.Secret = true;  // ตั้งให้ช่องรหัสซ่อนตัวอักษร 
 
 		//  กด Enter ในช่องกรอกให้ส่งฟอร์ม (LineEdit → TextSubmitted)
 		if (_nameInput != null)     _nameInput.TextSubmitted     += _ => OnSubmit();
@@ -50,10 +53,13 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 	// กด Enter ที่ไหนในหน้าก็ส่งฟอร์ม (ใช้ action ui_accept)
 	public override void _UnhandledInput(InputEvent @event)
 	{
+		//จะถูกเรียกอัตโนมัติเมื่อมี "อินพุต" เช่น กดปุ่ม คีย์บอร์ด หรือคลิก
 		if (@event.IsActionPressed("ui_accept"))
 		{
 			AcceptEvent(); // กัน event วิ่งต่อ
 			// เงื่อนไขเล็กน้อยเพื่อความปลอดภัย
+			// IsInstanceValid(this): ตรวจว่า Node นี้ยังอยู่ใน Scene ปัจจุบัน (ไม่ถูกลบ)
+			// _nameInput และ _passwordInput ไม่เป็น null (ถูกเชื่อมกับ Node จริง)
 			if (IsInstanceValid(this) && _nameInput != null && _passwordInput != null)
 			{
 				OnSubmit();
@@ -64,20 +70,24 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 	// เรียกเมื่อผู้ใช้กดปุ่ม Submit/Enter
 	private void OnSubmit()  
 	{
-		if (_nameInput == null || _passwordInput == null || _errorLabel == null) // ป้องกันกรณี node ไม่พร้อม
+		// ป้องกันกรณี node ไม่พร้อม
+		if (_nameInput == null || _passwordInput == null || _errorLabel == null) 
 		{
-			GD.PushError("UI nodes missing, cannot submit."); // log แล้วหยุด
+			// log แล้วหยุด
+			GD.PushError("UI nodes missing, cannot submit."); 
 			return;
 		}
 
 		// 1) ตรวจชื่อ User
-		string name = (_nameInput.Text ?? "").Trim();  // ดึงข้อความชื่อ (กัน null) และตัดช่องว่างหัวท้าย
+		// ดึงข้อความชื่อ (กัน null) และตัดช่องว่างหัวท้าย
+		string name = (_nameInput.Text ?? "").Trim();  
 		if (name.Length == 0)  // ถ้าไม่กรอก
 		{
-			ShowError("กรุณากรอกชื่ออย่างน้อย 1 ตัวอักษร");  // แจ้งผู้ใช้
-			return;  // จบ flow
+			ShowError("กรุณากรอกชื่ออย่างน้อย 1 ตัวอักษร");  
+			return; 
 		}
-		string badName = GetInvalidNameChars(name);  // ตรวจหาตัวอักษรที่ไม่อนุญาตในชื่อ
+		// ตรวจหาตัวอักษรที่ไม่อนุญาตในชื่อ
+		string badName = GetInvalidNameChars(name);  
 		if (!string.IsNullOrEmpty(badName))  // ถ้าพบ
 		{
 			ShowError($"ไม่สามารถใช้ชื่อนี้ได้ เพราะมีตัวอักษรพิเศษ: {badName}"); // โชว์ตัวที่ผิด
@@ -85,11 +95,12 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 		}
 
 		// 2) ตรวจ Password
-		string password = (_passwordInput.Text ?? "").Trim(); // ดึงรหัสผ่าน (กัน null) และ Trim
+		// ดึงรหัสผ่าน (กัน null) และ Trim
+		string password = (_passwordInput.Text ?? "").Trim(); 
 		string pwdErr = ValidatePassword(password);// ตรวจรูปแบบ/ความยาว/ชุดตัวอักษร
 		if (pwdErr != null) // ถ้าไม่ผ่าน
 		{
-			ShowError(pwdErr);  // แสดงข้อความผิดพลาด
+			ShowError(pwdErr);  
 			return;
 		}
 
@@ -98,13 +109,14 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 				 ?? GetNodeOrNull<PlayerLogin>("/root/PlayerLogin");  // หรือดึงจาก Autoload path
 		if (saver == null)   // ถ้าไม่เจอระบบ
 		{
-			ShowError("ระบบ PlayerLogin (Autoload) ไม่ได้เปิดใช้งาน"); // บอกผู้ใช้
+			ShowError("ระบบ PlayerLogin (Autoload) ไม่ได้เปิดใช้งาน"); 
 			GD.PushError("Missing /root/PlayerLogin. Add Autoload."); // log สำหรับ dev
 			return;
 		}
 
 		// 4) ลองล็อกอินผู้ใช้เดิมก่อน
-		if (saver.LoginExisting(name, password)) // ถ้าพบผู้ใช้เดิมและรหัสถูก
+		// ถ้าพบผู้ใช้เดิมและรหัสถูก
+		if (saver.LoginExisting(name, password)) 
 		{
 			HideError(); // ซ่อน error
 			GD.Print($"* Login OK: {saver.CurrentUser?.PlayerName}"); // log ดีบัก
@@ -115,7 +127,7 @@ public partial class LoginGame : Control // คลาส LoginGame เป็น�
 		// 5) ถ้าไม่พบ ก็สมัครใหม่
 		if (!saver.SavePlayer(name, password))  // สมัครใหม่ 
 		{
-			ShowError("ชื่อนี้ถูกใช้แล้ว กรุณาลองชื่ออื่น");  // แจ้งผู้ใช้
+			ShowError("ชื่อนี้ถูกใช้แล้ว กรุณาลองชื่ออื่น"); 
 			return;
 		}
 		// เพิ่ม : ถ้าเป็นชื่อใหม่ → เริ่มจากศูนย์

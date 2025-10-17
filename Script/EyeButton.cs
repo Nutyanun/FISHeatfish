@@ -17,10 +17,11 @@ public partial class EyeButton : TextureButton
 	// เรียกเมื่อ Node พร้อมใช้งาน (หลังโหลดเข้าฉาก)
 	public override void _Ready()                  
 	{
-		_line = GetNodeOrNull<LineEdit>(PasswordLineEditPath); // พยายามดึง LineEdit ตาม path ที่ตั้งไว้ใน Inspector
+		// พยายามดึง LineEdit ตาม path ที่ตั้งไว้ใน Inspector
+		_line = GetNodeOrNull<LineEdit>(PasswordLineEditPath); 
 		if (_line == null)   // ถ้าไม่พบ
 		{
-			GD.PushError("[EyeButton] Assign PasswordLineEditPath to a LineEdit."); // แจ้งเตือน dev
+			GD.PushError("[EyeButton] Assign PasswordLineEditPath to a LineEdit."); 
 			return;  // หยุดไม่ทำงานต่อ
 		}
 
@@ -40,8 +41,9 @@ public partial class EyeButton : TextureButton
 
 		_hidden = StartClosed; // ตั้งสถานะเริ่มต้นให้ตรงกับค่าที่ Export
 		Apply();   // เรียกใช้ Apply() เพื่ออัปเดตค่าจริง (Secret, ความจาง ฯลฯ)
-
-		Pressed += OnPressed; // ผูกสัญญาณกดปุ่ม (Pressed) → เรียกฟังก์ชัน OnPressed
+		
+		// ผูกสัญญาณกดปุ่ม (Pressed) → เรียกฟังก์ชัน OnPressed
+		Pressed += OnPressed; 
 	}
 	// เรียกเมื่อผู้ใช้ "คลิกปุ่มตา"
 	private void OnPressed()   

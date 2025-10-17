@@ -5,13 +5,11 @@ using System.IO;  // ใช้จัดการไฟล์ เช่น File.R
 using System.Text.Json; // ใช้สำหรับอ่าน/เขียน JSON (serialize / deserialize)
 using GDict = Godot.Collections.Dictionary; // ตั้งชื่อสั้นให้ Godot.Collections.Dictionary เป็น GDict
 
-//
-//// PlayerLogin (Autoload/Singleton)  คลาสนี้ตั้งเป็นซิงเกิลตัน ใช้ได้ข้ามซีน
-//// - ถือสถานะผู้เล่นปัจจุบัน เช่น CurrentUser, CurrentPlayerName, TodayKey  ข้อมูลล็อกอิน
-////- จัดการไฟล์ players.json (อ่าน/เขียน บันทึกชื่อ/รหัส/เลเวล) ที่เก็บข้อมูลผู้เล่น
-//// - สมัคร / ล็อกอิน / mirror ไป res:// เพื่อดีบักใน Editor  สำหรับตอนพัฒนาเกม
-//// ควรตั้งเป็น Autoload ใน Project Settings → Autoload  เพื่อให้คงค่าไว้ทุกซีน
-//
+// PlayerLogin (Autoload/Singleton)  ตั้งเป็นซิงเกิลตัน ใช้ได้ข้ามซีน
+// - ถือสถานะผู้เล่นปัจจุบัน เช่น CurrentUser, CurrentPlayerName, TodayKey  ข้อมูลล็อกอิน
+//- จัดการไฟล์ players.json (อ่าน/เขียน บันทึกชื่อ/รหัส/เลเวล) ที่เก็บข้อมูลผู้เล่น
+// - สมัคร / ล็อกอิน / mirror ไป res:// เพื่อดีบักใน Editor  สำหรับตอนพัฒนาเกม
+// ควรตั้งเป็น Autoload ใน Project Settings → Autoload  เพื่อให้คงค่าไว้ทุกซีน
 public partial class PlayerLogin : Node   // สร้างคลาส PlayerLogin สืบทอดจาก Node (Godot)
 {
 	// Single Instance 
@@ -26,9 +24,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 	private string SavePathUser = "user://players.json"; // ไฟล์ข้อมูลผู้เล่นจริง (เขียนใน user data)
 	private string DefaultPath = "res://SceneLogin/saveUserLogin/players.json"; // ไฟล์ต้นแบบสำหรับเริ่มต้น (อยู่ในโปรเจกต์)
 
-	/// <summary> 
-	/// โครงสร้างข้อมูลของผู้เล่น 1 คน (ใช้สำหรับ serialize / deserialize)
-	/// </summary>
+	// โครงสร้างข้อมูลของผู้เล่น 1 คน (ใช้สำหรับ serialize / deserialize)
 	public class SaveData // ประกาศคลาสภายในชื่อ SaveData
 	{
 		public string PlayerName { get; set; } // ชื่อผู้เล่น (ใช้เป็นคีย์)
@@ -36,14 +32,14 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 		public string CreatedAt  { get; set; } // วันที่สมัคร (ในรูปแบบ ISO)
 	}
 
-	// ฟังก์ชันสร้างข้อความวันที่วันนี้ เช่น "2025-10-15"
+	// ฟังก์ชันสร้างข้อความวันที่วันนี้  "2025-10-15"
 	private string MakeTodayKeyLocal() => DateTime.Now.ToString("yyyy-MM-dd"); // ใช้ DateTime.Now แปลงเป็น string รูปแบบ yyyy-MM-dd
 
 	// ฟังก์ชันอัปเดต TodayKey ให้เป็นวันที่ปัจจุบัน
 	public void StampTodayKey()
 	{
 		TodayKey = MakeTodayKeyLocal();  // เรียก MakeTodayKeyLocal() แล้วเก็บใน TodayKey
-		GD.Print($"🗓️ TodayKey set to {TodayKey}");// พิมพ์ข้อความบอกใน Output
+		GD.Print($"*TodayKey set to {TodayKey}");// พิมพ์ข้อความบอกใน Output
 	}
 
 	// ฟังก์ชันตั้งค่าผู้เล่นปัจจุบัน + อัปเดตวันที่
@@ -51,7 +47,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 	{
 		CurrentUser = user;// เก็บข้อมูลผู้เล่นปัจจุบัน
 		StampTodayKey();   // อัปเดตวันที่วันนี้
-		GD.Print($"🔑 Login as {CurrentUser?.PlayerName ?? "(null)"} ; TodayKey={TodayKey}"); // แสดงชื่อผู้เล่นและวันที่ใน Output
+		GD.Print($"*Login as {CurrentUser?.PlayerName ?? "(null)"} ; TodayKey={TodayKey}"); // แสดงชื่อผู้เล่นและวันที่ใน Output
 	}
 
 	// ฟังก์ชัน Godot เรียกอัตโนมัติเมื่อ Node พร้อมใช้งาน (เช่น ตอนเปิดซีน)
@@ -61,10 +57,10 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 		TodayKey = MakeTodayKeyLocal(); // ตั้งวันที่ปัจจุบันให้ TodayKey
 
 		// แสดงข้อความว่าพร้อมแล้ว และแปลง path user:// เป็น path จริงของระบบ
-		GD.Print("🟢 PlayerLogin ready at " + ProjectSettings.GlobalizePath(SavePathUser));
+		GD.Print("*PlayerLogin ready at " + ProjectSettings.GlobalizePath(SavePathUser));
 
 		// แสดงค่า TodayKey ที่ตั้งไว้ตอนเริ่มต้น
-		GD.Print($"🗓️ Initial TodayKey = {TodayKey}");
+		GD.Print($"*Initial TodayKey = {TodayKey}");
 
 		// ตรวจว่ามีไฟล์ players.json ใน user:// แล้วยัง
 		if (!Godot.FileAccess.FileExists(SavePathUser))
@@ -74,13 +70,13 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 			{
 				using var src = Godot.FileAccess.Open(DefaultPath, Godot.FileAccess.ModeFlags.Read); // เปิดไฟล์ต้นฉบับแบบอ่าน
 				using var dst = Godot.FileAccess.Open(SavePathUser, Godot.FileAccess.ModeFlags.Write); // เปิดไฟล์ปลายทางแบบเขียน
-				dst.StoreString(src.GetAsText());             // อ่านเนื้อหาจากต้นฉบับแล้วเขียนลงปลายทาง
-				GD.Print($"📦 Copied default players.json to {SavePathUser}"); // แจ้งว่าก๊อปไฟล์เสร็จ
+				dst.StoreString(src.GetAsText());  // อ่านเนื้อหาจากต้นฉบับแล้วเขียนลงปลายทาง
+				GD.Print($"*Copied default players.json to {SavePathUser}"); // แจ้งว่าก๊อปไฟล์เสร็จ
 			}
 			else
 			{
 				// ถ้าไม่มีไฟล์ต้นแบบเลย → แจ้ง error
-				GD.PushError("❌ Default player file not found at " + DefaultPath);
+				GD.PushError(" Default player file not found at " + DefaultPath);
 			}
 		}
 	}
@@ -96,16 +92,16 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 			if (System.IO.File.Exists(userPath)) // ถ้ามีไฟล์ใน user:// จริง
 			{
 				System.IO.File.Copy(userPath, resPath, true); // คัดลอกไฟล์ไปยัง res:// ทับของเดิม (true = overwrite)
-				GD.Print("🔁 Mirrored user://players.json → res://players.json"); // แจ้งว่าคัดลอกสำเร็จ
+				GD.Print("*Mirrored user://players.json → res://players.json"); // แจ้งว่าคัดลอกสำเร็จ
 			}
 			else
 			{
-				GD.PushWarning("⚠️ No user file found to mirror!"); // ถ้าไม่มีไฟล์ user://  เตือน
+				GD.PushWarning(" No user file found to mirror!"); // ถ้าไม่มีไฟล์ user://  เตือน
 			}
 		}
 		catch (Exception ex)
 		{
-			GD.PushWarning($"⚠️ Mirror failed: {ex.Message}");// ถ้ามีข้อผิดพลาด แสดงข้อความเตือน
+			GD.PushWarning($" Mirror failed: {ex.Message}");// ถ้ามีข้อผิดพลาด แสดงข้อความเตือน
 		}
 	}
 
@@ -115,7 +111,8 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 	{
 		try
 		{
-			string pathUser = ProjectSettings.GlobalizePath(SavePathUser); // แปลง path user:// เป็น path จริงในเครื่อง
+			// แปลง path user:// เป็น path จริงในเครื่อง
+			string pathUser = ProjectSettings.GlobalizePath(SavePathUser); 
 
 			if (!File.Exists(pathUser))   // ถ้าไม่มีไฟล์ user://players.json
 				return new List<SaveData>(); // คืนลิสต์ว่างทันที
@@ -180,7 +177,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 		}
 		catch (Exception ex)
 		{
-			GD.PushError("❌ Failed to parse JSON: " + ex.Message);  // ถ้ามี error ในการอ่าน JSON
+			GD.PushError(" Failed to parse JSON: " + ex.Message);  // ถ้ามี error ในการอ่าน JSON
 			return new List<SaveData>();   // คืนลิสต์ว่าง
 		}
 	}
@@ -194,7 +191,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 
 		if (players.ContainsKey(name))  // ถ้ามีชื่อผู้เล่นนี้อยู่แล้ว
 		{
-			GD.Print("🚫 Duplicate name: " + name);  // แจ้งชื่อซ้ำ
+			GD.Print(" Duplicate name: " + name);  // แจ้งชื่อซ้ำ
 			return false;  // สมัครไม่สำเร็จ
 		}
 
@@ -210,7 +207,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 
 		LeaderboardStore.SaveDoc(doc);   // บันทึกเอกสารกลับไป user://players.json
 		MirrorToRes();   // mirror ไป res:// เพื่อดีบัก
-		GD.Print("✅ Saved new user (new schema only): " + name);   // แจ้งว่าบันทึกผู้ใช้ใหม่สำเร็จ
+		GD.Print(" Saved new user (new schema only): " + name);   // แจ้งว่าบันทึกผู้ใช้ใหม่สำเร็จ
 
 		try
 		{
@@ -218,11 +215,11 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 			string json = JsonSerializer.Serialize(plain, new JsonSerializerOptions { WriteIndented = true }); // แปลงเป็น JSON พร้อมจัดบรรทัดสวย
 			string realPath = ProjectSettings.GlobalizePath(DefaultPath);  // แปลง path res:// เป็น path จริง
 			System.IO.File.WriteAllText(realPath, json);  // เขียนไฟล์ players.json ลง res://
-			GD.Print($"✅ Saved players.json to RES (real path): {realPath}"); // แจ้งว่าเขียนสำเร็จ
+			GD.Print($" Saved players.json to RES (real path): {realPath}"); // แจ้งว่าเขียนสำเร็จ
 		}
 		catch (Exception ex)
 		{
-			GD.PushWarning($"⚠️ Could not write back to res:// → {ex.Message}"); // ถ้าเขียนไม่ได้ → เตือน
+			GD.PushWarning($" Could not write back to res:// → {ex.Message}"); // ถ้าเขียนไม่ได้ → เตือน
 		}
 
 		SetCurrentUserAndStampToday(new SaveData {   // ตั้งค่าผู้ใช้ปัจจุบันในหน่วยความจำ
@@ -255,7 +252,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 				{ "levels",        new GDict() }, // object ว่างเก็บข้อมูล level
 				{ "current_level", 1 }  // เริ่มต้นที่ level 1
 			};
-			GD.Print($"[LoginExisting] 🆕 Created new player record for {name}"); // แสดงว่าเพิ่งสร้าง record ใหม่
+			GD.Print($"[LoginExisting] * Created new player record for {name}"); // แสดงว่าเพิ่งสร้าง record ใหม่
 		}
 
 		var p = (GDict)players[name];  // ดึงข้อมูลผู้เล่นออกมาเก็บในตัวแปร p
@@ -274,10 +271,12 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 			int current = p.ContainsKey("current_level") // ถ้ามี key current_level
 				? (int)(long)p["current_level"]    // ดึงค่าปัจจุบันจาก dict
 				: 1;  // ถ้าไม่มีให้ค่าเริ่มต้น = 1
-
-			GD.Print($"[LoginExisting] 🔍 Loaded from file → current_level={current}, maxLvFound={maxLv}"); // แสดงผลดีบัก
-
-			if ((int)(long)p["current_level"] > maxLv)  // ถ้า current_level มากกว่า level สูงสุด
+				
+			 // แสดงผลดีบัก
+			GD.Print($"[LoginExisting] * Loaded from file → current_level={current}, maxLvFound={maxLv}");
+			
+			// ถ้า current_level มากกว่า level สูงสุด
+			if ((int)(long)p["current_level"] > maxLv)  
 			{
 				p["current_level"] = maxLv;  // ลดค่าให้เท่ากับ maxLv
 				GD.Print($"[LoginExisting] 🔧 Fixed current_level (was higher than levels) → now {maxLv}");
@@ -286,11 +285,11 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 			if (maxLv > current)  // ถ้า level ที่เล่นถึงจริงมากกว่าค่าที่เก็บไว้
 			{
 				p["current_level"] = maxLv; // อัปเดต current_level = maxLv
-				GD.Print($"[LoginExisting] 🟢 Auto-recovered current_level set to {maxLv}"); // แจ้งว่ากู้คืนค่า
+				GD.Print($"[LoginExisting] * Auto-recovered current_level set to {maxLv}"); // แจ้งว่ากู้คืนค่า
 			}
 			else
 			{
-				GD.Print($"[LoginExisting] ℹ️ Keep current_level = {current}"); // ถ้าไม่ต้องแก้ → แจ้งว่าคงค่าเดิม
+				GD.Print($"[LoginExisting] * Keep current_level = {current}"); // ถ้าไม่ต้องแก้ → แจ้งว่าคงค่าเดิม
 			}
 
 			GameProgress.CurrentLevelIndex = (int)(long)p["current_level"]; // sync ค่ากับระบบความคืบหน้าในเกม
@@ -298,7 +297,7 @@ public partial class PlayerLogin : Node   // สร้างคลาส PlayerL
 		else
 		{
 			GameProgress.CurrentLevelIndex = 1;// ถ้าไม่มีข้อมูล levels → เริ่มที่ level 1
-			GD.Print($"[LoginExisting] ℹ️ No levels found → set current_level = 1"); // แสดงข้อความแจ้ง
+			GD.Print($"[LoginExisting] * No levels found → set current_level = 1"); // แสดงข้อความแจ้ง
 		}
 
 		LeaderboardStore.SaveDoc(doc); // เซฟเอกสารกลับลงไฟล์ user://players.json

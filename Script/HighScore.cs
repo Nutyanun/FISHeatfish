@@ -26,10 +26,12 @@ public partial class HighScore : Node2D
 		_scroll  = GetNodeOrNull<ScrollContainer>(ScrollPath);// หา ScrollContainer จาก path ที่กำหนด (อาจเป็น null ได้)
 		_vbox    = GetNodeOrNull<VBoxContainer>(VBoxPath);  // หา VBoxContainer จาก path (อาจเป็น null ได้)
 		_backBtn = GetNodeOrNull<TextureButton>(BackButtonPath); // หา TextureButton จาก path (อาจเป็น null ได้)
-
-		if (_scroll == null || _vbox == null)  // ถ้าโหนดหลัก ๆ ไม่พบ
+		
+		 // ถ้าโหนดหลัก ๆ ไม่พบ
+		if (_scroll == null || _vbox == null) 
 		{
-			GD.PushError("[HighScore] Please assign ScrollPath & VBoxPath in Inspector."); // แจ้ง error ใน Output
+			// แจ้ง error ใน Output
+			GD.PushError("[HighScore] Please assign ScrollPath & VBoxPath in Inspector."); 
 			return;   // ยุติการทำงานต่อ เพื่อไม่ให้ NullReference ในภายหลัง
 		}
 
@@ -43,25 +45,27 @@ public partial class HighScore : Node2D
 		_vbox.Alignment = BoxContainer.AlignmentMode.Begin;  // จัดลูกของ VBox ให้ชิดบน
 		_vbox.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;  // ให้ VBox ยืดเต็มแนวนอน
 		_vbox.AddThemeConstantOverride("separation", 2);  // กำหนดช่องว่างระหว่างลูกของ VBox = 2px
-
-		if (_backBtn != null) _backBtn.Pressed += OnBackPressed;   // ถ้ามีปุ่มย้อนกลับ: ผูกอีเวนต์กดปุ่มให้เรียก OnBackPressed
-
-		Populate();  // สร้าง/เติมรายการสกอร์ลงใน VBox
+		
+		// ถ้ามีปุ่มย้อนกลับ: ผูกอีเวนต์กดปุ่มให้เรียก OnBackPressed
+		if (_backBtn != null) _backBtn.Pressed += OnBackPressed; 
+		// สร้าง/เติมรายการสกอร์ลงใน VBox
+		Populate();  
 	}
 	
 	// เมธอดสร้าง UI ของรายการ High Score ทั้งหมด
 	private void Populate()                                                  
 	{
-		foreach (Node c in _vbox.GetChildren()) c.QueueFree(); // ล้างลูกเดิมใน VBox (กันซ้ำ)
-
-		var doc = LeaderboardStore.LoadDoc(); // โหลดเอกสาร/ข้อมูลลีดเดอร์บอร์ดจากที่เก็บ (เช่นไฟล์)
+		// ล้างลูกเดิมใน VBox (กันซ้ำ)
+		foreach (Node c in _vbox.GetChildren()) c.QueueFree(); 
+		// โหลดเอกสาร/ข้อมูลลีดเดอร์บอร์ดจากที่เก็บ (เช่นไฟล์)
+		var doc = LeaderboardStore.LoadDoc(); 
 		if (!doc.ContainsKey("leaderboards"))  // ถ้าไม่มีคีย์ "leaderboards" แปลว่ายังไม่เคยมีข้อมูล
 		{
-			_vbox.AddChild(MakeLabel("ยังไม่มีข้อมูลอันดับ"));  // ใส่ข้อความแจ้งผู้ใช้
+			_vbox.AddChild(MakeLabel("ยังไม่มีข้อมูลอันดับ"));  
 			return;  
 		}
-
-		var lbs = (GDict)doc["leaderboards"];  // อ้างอิงอ็อบเจ็กต์ลีดเดอร์บอร์ด เป็น Dictionary
+		// อ้างอิงอ็อบเจ็กต์ลีดเดอร์บอร์ด เป็น Dictionary
+		var lbs = (GDict)doc["leaderboards"];  
 		
 		//สร้างตัวแปร currentUser ขึ้นมา ถ้า PlayerLogin.Instance และ CurrentUser มีอยู่ → เอา PlayerName
 		//ถ้าไม่มี (null) → ให้เป็นสตริงว่าง "" แทน
@@ -71,8 +75,9 @@ public partial class HighScore : Node2D
 		var dateKeys = new List<string>();  // เตรียมลิสต์เก็บคีย์วันที่ (string)
 		foreach (var k in lbs.Keys) dateKeys.Add(k.AsString()); // ดึงทุกคีย์มาเป็น string แล้วใส่ลิสต์
 		dateKeys.Sort((a, b) => string.Compare(b, a, StringComparison.Ordinal)); // เรียงจากใหม่ไปเก่า (b,a)
-
-		foreach (var dateKey in dateKeys)  // วนตามวัน (ใหม่ ไป เก่า)
+		
+		// วนตามวัน (ใหม่ ไป เก่า)
+		foreach (var dateKey in dateKeys) 
 		{
 			var dateNode = (GDict)lbs[dateKey]; // ดึง node ของวันนั้น (เก็บกลุ่มตามเลเวล)
 			_vbox.AddChild(MakeHeader($"{LeaderboardStore.FormatThaiDateForHeader(dateKey)} ")); // เพิ่มหัวข้อวัน (จัดรูปแบบไทย)
@@ -97,7 +102,8 @@ public partial class HighScore : Node2D
 					int score    = row.ContainsKey("score") ? (int)(long)row["score"] : 0;  // คะแนน (แปลงจาก long → int)
 
 					// แถวหลัก
-					var rowBox = new HBoxContainer { CustomMinimumSize = new Vector2(0, RowH) }; // สร้างกล่องแนวนอน เป็นแถวหนึ่ง
+					// สร้างกล่องแนวนอน เป็นแถวหนึ่ง
+					var rowBox = new HBoxContainer { CustomMinimumSize = new Vector2(0, RowH) };
 					rowBox.AddThemeConstantOverride("separation", 4);  // ระยะห่างระหว่างคอลัมน์ในแถว
 					
 					var nameCell  = MakeCell($"{rank}. {name}", expand: false, alignRight: false); // cell แสดง "ลำดับ. ชื่อ" เช่น "1. Nach" (ชิดซ้าย)
@@ -135,8 +141,9 @@ public partial class HighScore : Node2D
 
 					rowBox.AddChild(rightGroup);  // ใส่กลุ่มขวาลงในแถว
 					rowBox.AddChild(new Control { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill }); // ตัวดันให้เนื้อหาซ้ายติดกัน
-
-					_vbox.AddChild(rowBox);  // เพิ่มกล่องแถว (rowBox) ของผู้เล่นลงใน VBox รวมทั้งหมด เพื่อให้แสดงเรียงในแนวตั้ง
+					
+					// เพิ่มกล่องแถว (rowBox) ของผู้เล่นลงใน VBox รวมทั้งหมด เพื่อให้แสดงเรียงในแนวตั้ง
+					_vbox.AddChild(rowBox);  
 					rank++;  // เพิ่มค่าลำดับ (rank) ขึ้น 1 สำหรับผู้เล่นถัดไปในตาราง
 				}
 
@@ -144,21 +151,23 @@ public partial class HighScore : Node2D
 				bool notLastGroup = (i < levelKeys.Count - 1); // เช็คว่าเลเวลนี้ยังไม่ใช่อันสุดท้ายไหม
 					if (notLastGroup)
 					{
-						_vbox.AddChild(MakeDashedSeparator(height: 2, alpha: 0.22f, dash: 10f, gap: 6f)); // เพิ่มเส้นประคั่นกลุ่ม
+						// เพิ่มเส้นประคั่นกลุ่ม
+						_vbox.AddChild(MakeDashedSeparator(height: 2, alpha: 0.22f, dash: 10f, gap: 6f)); 
 						_vbox.AddChild(MakeSpacer(6));  // เพิ่มช่องว่างเล็กน้อยหลังเส้นประ
 					}
 					else
 					{
-						_vbox.AddChild(MakeSpacer(6));  // ถ้าเป็นกลุ่มสุดท้ายของวัน ก็ใส่ช่องว่างเฉย ๆ
+						 // ถ้าเป็นกลุ่มสุดท้ายของวัน ก็ใส่ช่องว่างเฉย ๆ
+						_vbox.AddChild(MakeSpacer(6));  
 					}
 			}
 				// เส้นทึบปิดท้ายแต่ละวัน
 			_vbox.AddChild(MakeDivider());  
 		}
 	}
-
 	// UI helpers
-	private Control MakeHeader(string text)    // สร้าง Label หัวข้อวัน (ขนาดใหญ่ สีเหลือง)
+	// สร้าง Label หัวข้อวัน (ขนาดใหญ่ สีเหลือง)
+	private Control MakeHeader(string text)   
 	{
 		var lbl = new Label { Text = text };  // สร้าง Label พร้อมข้อความ
 		lbl.AddThemeFontSizeOverride("font_size", 24);   // ขนาดฟอนต์ 24
@@ -166,23 +175,23 @@ public partial class HighScore : Node2D
 		lbl.AddThemeConstantOverride("margin_left", 6);  // ขยับเข้าไปทางขวานิดหน่อย
 		return lbl;  // ส่งกลับ Label
 	}
-
-	private Control MakeDivider()  // สร้างเส้นทึบคั่น “วัน”
+	// สร้างเส้นทึบคั่น “วัน”
+	private Control MakeDivider()  
 	{
 		var c = new ColorRect { Color = new Color(1, 1, 1, 0.1f) };  // สร้างสี่เหลี่ยมสีขาวโปร่ง (10%)
 		c.CustomMinimumSize = new Vector2(0, 2);   // ความสูง 2px
 		c.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill; // ยืดเต็มแนวนอน
 		return c;   // ส่งกลับคอนโทรล
 	}
-
-	private Control MakeSpacer(int h)  // สร้างช่องว่างแนวตั้งสูง h พิกเซล
+	// สร้างช่องว่างแนวตั้งสูง h พิกเซล
+	private Control MakeSpacer(int h)  
 	{
 		var c = new Control();   // คอนโทรลเปล่า
 		c.CustomMinimumSize = new Vector2(0, h); // ตั้งความสูงขั้นต่ำ
 		return c;    // ส่งกลับ
 	}
-
-	private Control MakeLabel(string text)   // สร้าง Label ข้อความทั่วไป (เช่น “ยังไม่มีข้อมูลอันดับ”)
+	// สร้าง Label ข้อความทั่วไป (เช่น “ยังไม่มีข้อมูลอันดับ”)
+	private Control MakeLabel(string text)  
 	{
 		var lbl = new Label { Text = text };   // สร้าง Label
 		lbl.AddThemeFontSizeOverride("font_size", 22);  // ฟอนต์ 22
@@ -205,7 +214,7 @@ public partial class HighScore : Node2D
 		return lbl;                                                                              
 	}
    
-	 // สร้างเซลล์ Label ความกว้างขั้นต่ำคงที่
+	// สร้างเซลล์ Label ความกว้างขั้นต่ำคงที่
 	private Control MakeFixedCell(string text, int minW, bool alignRight)                        
 	{
 		var lbl = new Label { Text = text, ClipText = true };  // Label พร้อม ClipText
@@ -218,10 +227,11 @@ public partial class HighScore : Node2D
 		return lbl;  
 		}                                                                   
 
-	 // ฟังก์ชันสร้างตัวคั่นแบบเส้นประ
+	// ฟังก์ชันสร้างตัวคั่นแบบเส้นประ
 	private Control MakeDashedSeparator(int height = 2, float alpha = 0.22f, float dash = 10f, float gap = 6f)
 	{
-		return new DashedSeparator  // สร้างอินสแตนซ์ของคอมโพเนนต์เส้นประ 
+		// สร้างอินสแตนซ์ของคอมโพเนนต์เส้นประ 
+		return new DashedSeparator  
 		{
 			Thickness = height,// ตั้งความหนาเส้น
 			Dash = dash, // ความยาวช่วงเส้น
@@ -231,9 +241,10 @@ public partial class HighScore : Node2D
 			SizeFlagsHorizontal = Control.SizeFlags.ExpandFill // ยืดเต็มแนวนอน
 		};
 	}
-
-	private void OnBackPressed()   // เมธอดเรียกเมื่อกดปุ่มย้อนกลับ
+	 // เมธอดเรียกเมื่อกดปุ่มย้อนกลับ
+	private void OnBackPressed()  
 	{
-		GetTree().ChangeSceneToFile("res://SceneStartandHigh/StartGame.tscn");  // สลับซีนไปหน้า StartGame
+		// สลับซีนไปหน้า StartGame
+		GetTree().ChangeSceneToFile("res://SceneStartandHigh/StartGame.tscn");  
 	}
 }

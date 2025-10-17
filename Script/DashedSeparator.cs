@@ -1,5 +1,5 @@
 using Godot;   
-using System;   // ใช้ namespace มาตรฐานของ .NET ที่มี MathF และอื่น ๆ
+using System;   
 
 // สร้างคลาสชื่อ DashedSeparator ซึ่งสืบทอดจาก Control
 // ใช้สำหรับวาดเส้นประแนวนอน (เหมือนตัวแบ่งส่วนใน UI)
@@ -9,9 +9,9 @@ public partial class DashedSeparator : Control
 	[Export] public float Thickness { get; set; } = 2f; // ความหนาของเส้น
 	[Export] public float Dash { get; set; } = 10f;  // ความยาวของเส้นแต่ละช่วง
 	[Export] public float Gap { get; set; } = 6f;  // ระยะช่องว่างระหว่างเส้น
-	[Export] public Color LineColor { get; set; } = new Color(1, 1, 1, 0.22f); // สีของเส้น (ขาวโปร่ง 22%)
+	[Export] public Color LineColor { get; set; } = new Color(1, 1, 1, 0.22f); // สีของเส้น สีขาว 0.22f = 20%
 
-	// เมธอดนี้จะถูกเรียกเมื่อ Node พร้อมใช้งาน (ตอนเริ่มต้น)
+	// เมธอดนี้จะถูกเรียกเมื่อ Node พร้อมใช้งาน 
 	public override void _Ready()
 	{
 		MouseFilter = MouseFilterEnum.Ignore; 
