@@ -3,21 +3,23 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://ds8gd55pxgq5j"
-path="res://.godot/imported/Purple.png-3a7b25f24d87102e4fb6dfe8db5ba4b4.ctex"
+path="res://.godot/imported/Purple.png-1548f54dfcedee7e624bb4b71eafa345.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://SpearFishing Assets Pack/Sprites/Fish2 - 32x16/Purple.png"
-dest_files=["res://.godot/imported/Purple.png-3a7b25f24d87102e4fb6dfe8db5ba4b4.ctex"]
+source_file="res://Fish2 - 32x16/Purple.png"
+dest_files=["res://.godot/imported/Purple.png-1548f54dfcedee7e624bb4b71eafa345.ctex"]
 
 [params]
 
 compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
@@ -25,6 +27,10 @@ mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false
